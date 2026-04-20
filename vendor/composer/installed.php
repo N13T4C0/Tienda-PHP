@@ -3,7 +3,7 @@
         'name' => 'rruiz/tiendaphp',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'b31d8d8cb6c31bc09e637dda5a56050ee5a68b96',
+        'reference' => 'd05559db2fcee6ef98bd6879d0b0a0e645434823',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -85,7 +85,7 @@
         'rruiz/tiendaphp' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'b31d8d8cb6c31bc09e637dda5a56050ee5a68b96',
+            'reference' => 'd05559db2fcee6ef98bd6879d0b0a0e645434823',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
