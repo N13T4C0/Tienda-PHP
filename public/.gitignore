@@ -1,0 +1,14 @@
+# Dependencias de Composer
+/vendor/
+
+# Variables de entorno
+.env
+
+# Archivos subidos por usuarios
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+*.log
