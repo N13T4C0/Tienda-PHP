@@ -1,6 +1,9 @@
-<IfModule mod_rewrite.c >
+# Activar mod_rewrite
+<IfModule mod_rewrite.c>
     RewriteEngine On
+    
+    # Redirigir todo a index.php excepto archivos/carpetas existentes
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ index.php [QSA,L]
+    RewriteRule ^(.*)$ index.php [L,QSA]
 </IfModule>
