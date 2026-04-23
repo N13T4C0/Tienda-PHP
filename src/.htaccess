@@ -1,1 +1,2 @@
-Require all denied
+# Denegar acceso directo a archivos PHP del src
+Deny from all
