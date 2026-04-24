@@ -3,7 +3,7 @@
 <div class="container">
     <h1>Registro de Usuario</h1>
     
-    <form action="/registro" method="POST">
+    <form action="<?= $base_url ?>/registro" method="POST">
         <div class="form-group">
             <label for="nombre">Nombre:</label>
             <input type="text" id="nombre" name="nombre" 
@@ -28,9 +28,8 @@
         </div>
 
         <button type="submit">Registrarse</button>
+        <a href="<?= $base_url ?>/login" class="btn">Ya tengo cuenta</a>
     </form>
-
-    <p>¿Ya tienes cuenta? <a href="/login">Inicia sesión aquí</a></p>
 </div>
 
 <?php 

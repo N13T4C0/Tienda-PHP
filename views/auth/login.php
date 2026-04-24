@@ -3,10 +3,10 @@
 <div class="container">
     <h1>Iniciar Sesión</h1>
     
-    <form action="/login" method="POST">
+    <form action="<?= $base_url ?>/login" method="POST">
         <div class="form-group">
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
+            <input type="email" id="email" name="email" required autofocus>
         </div>
 
         <div class="form-group">
@@ -15,9 +15,8 @@
         </div>
 
         <button type="submit">Iniciar Sesión</button>
+        <a href="<?= $base_url ?>/registro" class="btn">Crear cuenta</a>
     </form>
-
-    <p>¿No tienes cuenta? <a href="/registro">Regístrate aquí</a></p>
 </div>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

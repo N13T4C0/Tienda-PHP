@@ -2,7 +2,7 @@
 namespace App\Controllers;
 
 use App\Request\RegistroRequest;
-use App\Services\UsuariosService;
+use App\Services\UsuarioService;
 
 class AuthController{
     private $service;
@@ -12,6 +12,7 @@ class AuthController{
     }
 
     public function registro(){
+        $base_url = dirname($_SERVER['SCRIPT_NAME']);
         require_once __DIR__ . '/../../views/auth/registro.php';
     }
 
@@ -37,6 +38,7 @@ class AuthController{
     }
 
     public function login() {
+        $base_url = dirname($_SERVER['SCRIPT_NAME']);
         require_once __DIR__ . '/../../views/auth/login.php';
     }
 
