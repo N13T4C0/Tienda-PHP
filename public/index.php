@@ -22,7 +22,7 @@ $router->add('GET', '/login', 'App\Controllers\AuthController', 'login');
 $router->add('POST', '/login', 'App\Controllers\AuthController', 'autenticar');
 $router->add('GET', '/logout', 'App\Controllers\AuthController', 'logout');
 // ====== RUTAS ADMIN ======
-// Categorías
+// Cat  
 $router->add('GET', '/admin/categorias', 'App\Controllers\CategoriaController', 'index');
 $router->add('GET', '/admin/categorias/crear', 'App\Controllers\CategoriaController', 'crear');
 $router->add('POST', '/admin/categorias/guardar', 'App\Controllers\CategoriaController', 'guardar');
