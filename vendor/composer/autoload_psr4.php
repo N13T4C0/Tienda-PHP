@@ -23,4 +23,5 @@ return array(
     'Dompdf\\' => array($vendorDir . '/dompdf/dompdf/src'),
     'Doctrine\\Common\\Lexer\\' => array($vendorDir . '/doctrine/lexer/src'),
     'App\\' => array($baseDir . '/src'),
+    'Config\\' => array($baseDir . '/src/Config'),
 );
