@@ -5,17 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tienda Online</title>
     <?php
-    // Obtener la URL base correctamente (quitando /public del path)
+    // Obtener la URL base completa con protocolo y host
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'];
+
+    // Obtener el path del script
     $scriptName = $_SERVER['SCRIPT_NAME'];
     $scriptDir = dirname($scriptName);
+    
+    // Si estamos en public/, quitar ese segmento para obtener la base del proyecto
     if (basename($scriptDir) === 'public') {
-        $base_url = dirname($scriptDir);
+        $basePath = dirname($scriptDir);
     } else {
-        $base_url = $scriptDir;
+        $basePath = $scriptDir;
     }
-    if ($base_url === '/' || $base_url === '\\') {
-        $base_url = '';
+    
+    // Normalizar basePath
+    if ($basePath === '/' || $basePath === '\\') {
+        $basePath = '';
     }
+    
+    // Construir URL base completa
+    $base_url = $protocol . '://' . $host . $basePath;
     ?>
     <link rel="stylesheet" href="<?= $base_url ?>/css/estilos.css">
 </head>

@@ -9,19 +9,28 @@ class CarritoController {
 
     public function __construct() {
         $this->service = new CarritoService();
-        // Obtener la URL base correctamente (quitando /public del path)
+        // Calcular la URL base completa con protocolo y host
+        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'];
+        
+        // Obtener el path del script
         $scriptName = $_SERVER['SCRIPT_NAME'];
         $scriptDir = dirname($scriptName);
-        // Si estamos en public/, quitar ese segmento
+        
+        // Si estamos en public/, quitar ese segmento para obtener la base del proyecto
         if (basename($scriptDir) === 'public') {
-            $this->base_url = dirname($scriptDir);
+            $basePath = dirname($scriptDir);
         } else {
-            $this->base_url = $scriptDir;
+            $basePath = $scriptDir;
         }
-        // Normalizar: si es \ o /, dejar vacío
-        if ($this->base_url === '/' || $this->base_url === '\\') {
-            $this->base_url = '';
+        
+        // Normalizar basePath
+        if ($basePath === '/' || $basePath === '\\') {
+            $basePath = '';
         }
+        
+        // Construir URL base completa
+        $this->base_url = $protocol . '://' . $host . $basePath;
     }
 
     public function index() {

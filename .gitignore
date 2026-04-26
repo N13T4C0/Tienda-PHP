@@ -1,19 +1,26 @@
-```php
+```
 # Compiled and build artifacts
-*.phpc
-*.class
+*.pyc
+__pycache__/
 *.o
 *.obj
+*.class
+*.exe
+*.dll
+*.so
+*.a
 *.out
 
 # Dependencies
 vendor/
-composer.lock
+node_modules/
+*.lock
 
 # Logs and temp files
 *.log
 *.tmp
 *.swp
+*.swo
 
 # Environment
 .env
@@ -26,26 +33,17 @@ composer.lock
 *.swp
 *.swo
 
-# OS generated files
+# System
 .DS_Store
 Thumbs.db
 
-# Cache directories
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Coverage reports
+# Coverage
 coverage/
 htmlcov/
 .coverage
 
-# Distribution / packaging
+# Build directories
 dist/
 build/
-*.egg-info/
-
-# Testing
-.phpunit.result.cache
+target/
 ```
