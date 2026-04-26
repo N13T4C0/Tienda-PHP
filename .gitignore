@@ -1,4 +1,6 @@
 ```
+# Dependencies
+vendor/
 # Logs and temp files
 *.log
 *.tmp
@@ -7,12 +9,20 @@
 # Environment
 .env
 .env.local
+.env.*
+
+# Logs and temp files
+*.log
+*.tmp
 *.env.*
 
 # Editors
 .vscode/
 .idea/
 
+# OS generated files
+.DS_Store
+Thumbs.db
 # Dependencies
 node_modules/
 .venv/
