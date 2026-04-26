@@ -3,7 +3,17 @@ namespace App\Middleware;
 
 class AdminMiddleware {
     public static function verificar() {
-        $base_url = dirname($_SERVER['SCRIPT_NAME']);
+        // Calcular URL base correcta (quitando /public del path)
+        $scriptName = $_SERVER['SCRIPT_NAME'];
+        $scriptDir = dirname($scriptName);
+        if (basename($scriptDir) === 'public') {
+            $base_url = dirname($scriptDir);
+        } else {
+            $base_url = $scriptDir;
+        }
+        if ($base_url === '/' || $base_url === '\\') {
+            $base_url = '';
+        }
         
         if (!isset($_SESSION['identity'])) {
             $_SESSION['error'] = 'Debes iniciar sesión';

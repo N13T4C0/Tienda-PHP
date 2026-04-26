@@ -6,23 +6,35 @@ use App\Services\UsuarioService;
 
 class AuthController{
     private $service;
+    private $base_url;
 
     public function __construct(){
         $this->service = new UsuarioService();
+        // Calcular la URL base correcta (quitando /public del path)
+        $scriptName = $_SERVER['SCRIPT_NAME'];
+        $scriptDir = dirname($scriptName);
+        // Si estamos en public/, quitar ese segmento
+        if (basename($scriptDir) === 'public') {
+            $this->base_url = dirname($scriptDir);
+        } else {
+            $this->base_url = $scriptDir;
+        }
+        // Normalizar: si es \ o /, dejar vacío
+        if ($this->base_url === '/' || $this->base_url === '\\') {
+            $this->base_url = '';
+        }
     }
 
     public function registro(){
-        $base_url = dirname($_SERVER['SCRIPT_NAME']);
         require_once __DIR__ . '/../../views/auth/registro.php';
     }
 
     public function guardarRegistro(){
-        $base_url = dirname($_SERVER['SCRIPT_NAME']);
         $request = new RegistroRequest();
 
         if(!$request->validar($_POST)){
             $_SESSION['errores'] = $request->getErrores();
-            header('Location: ' . $base_url . '/registro');
+            header('Location: ' . $this->base_url . '/registro');
             exit;
         }
 
@@ -30,16 +42,15 @@ class AuthController{
         
         if (isset($resultado['error'])) {
             $_SESSION['error'] = $resultado['error'];
-            header('Location: ' . $base_url . '/registro');
+            header('Location: ' . $this->base_url . '/registro');
         } else {
             $_SESSION['success'] = 'Registro exitoso. Revisa tu email para confirmar.';
-            header('Location: ' . $base_url . '/login');
+            header('Location: ' . $this->base_url . '/login');
         }
         exit;
     }
 
     public function login() {
-        $base_url = dirname($_SERVER['SCRIPT_NAME']);
         require_once __DIR__ . '/../../views/auth/login.php';
     }
 
@@ -48,18 +59,18 @@ class AuthController{
         
         if (isset($resultado['error'])) {
             $_SESSION['error'] = $resultado['error'];
-            header('Location: ' . $base_url . '/login');
+            header('Location: ' . $this->base_url . '/login');
         } else {
             // Guardar solo el objeto usuario en la sesión, no todo el array
             $_SESSION['identity'] = $resultado['usuario'];
-            header('Location: ' . $base_url . '/');
+            header('Location: ' . $this->base_url . '/');
         }
         exit;
     }
 
     public function logout() {
         unset($_SESSION['identity']);
-        header('Location: ' . $base_url . '/');
+        header('Location: ' . $this->base_url . '/');
         exit;
     }
 }

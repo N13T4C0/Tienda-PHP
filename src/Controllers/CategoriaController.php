@@ -11,10 +11,19 @@ class CategoriaController {
 
     public function __construct() {
         $this->service = new CategoriaService();
-        // Obtener la URL base correctamente
+        // Obtener la URL base correctamente (quitando /public del path)
         $scriptName = $_SERVER['SCRIPT_NAME'];
         $scriptDir = dirname($scriptName);
-        $this->base_url = ($scriptDir === '/' || $scriptDir === '\\') ? '' : $scriptDir;
+        // Si estamos en public/, quitar ese segmento
+        if (basename($scriptDir) === 'public') {
+            $this->base_url = dirname($scriptDir);
+        } else {
+            $this->base_url = $scriptDir;
+        }
+        // Normalizar: si es \ o /, dejar vacío
+        if ($this->base_url === '/' || $this->base_url === '\\') {
+            $this->base_url = '';
+        }
     }
 
     public function index() {
