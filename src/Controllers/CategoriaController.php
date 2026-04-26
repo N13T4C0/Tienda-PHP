@@ -7,9 +7,14 @@ use App\Middleware\AdminMiddleware;
 
 class CategoriaController {
     private $service;
+    private $base_url;
 
     public function __construct() {
         $this->service = new CategoriaService();
+        // Obtener la URL base correctamente
+        $scriptName = $_SERVER['SCRIPT_NAME'];
+        $scriptDir = dirname($scriptName);
+        $this->base_url = ($scriptDir === '/' || $scriptDir === '\\') ? '' : $scriptDir;
     }
 
     public function index() {
@@ -27,7 +32,7 @@ class CategoriaController {
 
     public function guardar() {
         AdminMiddleware::verificar();
-        $base_url = dirname($_SERVER['SCRIPT_NAME']);
+        $base_url = $this->base_url;
         
         $request = new CategoriaRequest();
         
@@ -57,7 +62,7 @@ class CategoriaController {
         $categoria = $this->service->buscarPorId($id);
         
         if (!$categoria) {
-            $base_url = dirname($_SERVER['SCRIPT_NAME']);
+            $base_url = $this->base_url;
             $_SESSION['error'] = 'Categoría no encontrada';
             header('Location: ' . $base_url . '/admin/categorias');
             exit;
@@ -68,7 +73,7 @@ class CategoriaController {
 
     public function actualizar($id) {
         AdminMiddleware::verificar();
-        $base_url = dirname($_SERVER['SCRIPT_NAME']);
+        $base_url = $this->base_url;
         
         $request = new CategoriaRequest();
         
@@ -94,7 +99,7 @@ class CategoriaController {
 
     public function eliminar($id) {
         AdminMiddleware::verificar();
-        $base_url = dirname($_SERVER['SCRIPT_NAME']);
+        $base_url = $this->base_url;
         
         $resultado = $this->service->eliminar($id);
 

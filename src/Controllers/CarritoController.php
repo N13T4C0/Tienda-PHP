@@ -5,9 +5,14 @@ use App\Services\CarritoService;
 
 class CarritoController {
     private $service;
+    private $base_url;
 
     public function __construct() {
         $this->service = new CarritoService();
+        // Obtener la URL base correctamente
+        $scriptName = $_SERVER['SCRIPT_NAME'];
+        $scriptDir = dirname($scriptName);
+        $this->base_url = ($scriptDir === '/' || $scriptDir === '\\') ? '' : $scriptDir;
     }
 
     public function index() {
@@ -19,7 +24,7 @@ class CarritoController {
     }
 
     public function agregar() {
-        $base_url = dirname($_SERVER['SCRIPT_NAME']);
+        $base_url = $this->base_url;
         if (!isset($_POST['producto_id']) || !isset($_POST['cantidad'])) {
             $_SESSION['error'] = 'Datos incompletos';
             header('Location: ' . $base_url . '/productos');
@@ -44,7 +49,7 @@ class CarritoController {
     }
 
     public function actualizar() {
-        $base_url = dirname($_SERVER['SCRIPT_NAME']);
+        $base_url = $this->base_url;
         if (!isset($_POST['producto_id']) || !isset($_POST['cantidad'])) {
             $_SESSION['error'] = 'Datos incompletos';
             header('Location: ' . $base_url . '/carrito');
@@ -67,7 +72,7 @@ class CarritoController {
     }
 
     public function eliminar() {
-        $base_url = dirname($_SERVER['SCRIPT_NAME']);
+        $base_url = $this->base_url;
         if (!isset($_POST['producto_id'])) {
             $_SESSION['error'] = 'Producto no especificado';
             header('Location: ' . $base_url . '/carrito');
@@ -83,7 +88,7 @@ class CarritoController {
     }
 
     public function vaciar() {
-        $base_url = dirname($_SERVER['SCRIPT_NAME']);
+        $base_url = $this->base_url;
         $resultado = $this->service->vaciar();
         $_SESSION['success'] = $resultado['mensaje'];
         header('Location: ' . $base_url . '/carrito');

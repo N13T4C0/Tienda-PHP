@@ -1,76 +1,30 @@
-```php
+```
 # Compiled and build artifacts
 *.pyc
 __pycache__/
-*.o
-*.obj
-*.class
-*.exe
-*.dll
-*.so
-*.a
-*.out
 
 # Dependencies
 vendor/
-node_modules/
-venv/
-.venv/
-.env
-.env.local
-.env.*
+composer.lock
 
-# Build and distribution
-dist/
-build/
-target/
-*.zip
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-
-# Logs and temporary files
+# Logs and temp files
 *.log
 *.tmp
-*.swp
-*.swo
-*.bak
-*.cache
 
-# Coverage reports
-coverage/
-htmlcov/
-.coverage
+# Environment
+.env
+.env.local
+*.env.*
 
-# IDE specific
+# Editors
 .vscode/
 .idea/
-*.swp
-*.swo
+
+# Web server
+.htaccess
+public/.htaccess
 
 # OS specific
 .DS_Store
 Thumbs.db
-
-# PHP specific
-*.php~
-*.php.bak
-*.php.swp
-
-# Session files
-sess_*
-
-# Cache directories
-.cache/
-tmp/
-temp/
-
-# Database files
-*.db
-*.sqlite
-*.sqlite3
-
-# Environment variables
-.env*
-!.env.example
 ```

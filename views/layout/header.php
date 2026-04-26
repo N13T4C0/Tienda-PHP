@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tienda Online</title>
     <?php
-    $base_url = dirname($_SERVER['SCRIPT_NAME']);
+    // Obtener la URL base correctamente
+    $scriptName = $_SERVER['SCRIPT_NAME'];
+    $scriptDir = dirname($scriptName);
+    $base_url = ($scriptDir === '/' || $scriptDir === '\\') ? '' : $scriptDir;
     ?>
     <link rel="stylesheet" href="<?= $base_url ?>/css/estilos.css">
 </head>
