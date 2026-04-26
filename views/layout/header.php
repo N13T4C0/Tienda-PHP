@@ -5,10 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tienda Online</title>
     <?php
-    // Obtener la URL base correctamente
+    // Obtener la URL base correctamente (quitando /public del path)
     $scriptName = $_SERVER['SCRIPT_NAME'];
     $scriptDir = dirname($scriptName);
-    $base_url = ($scriptDir === '/' || $scriptDir === '\\') ? '' : $scriptDir;
+    if (basename($scriptDir) === 'public') {
+        $base_url = dirname($scriptDir);
+    } else {
+        $base_url = $scriptDir;
+    }
+    if ($base_url === '/' || $base_url === '\\') {
+        $base_url = '';
+    }
     ?>
     <link rel="stylesheet" href="<?= $base_url ?>/css/estilos.css">
 </head>
