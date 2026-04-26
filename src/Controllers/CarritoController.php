@@ -19,9 +19,10 @@ class CarritoController {
     }
 
     public function agregar() {
+        $base_url = dirname($_SERVER['SCRIPT_NAME']);
         if (!isset($_POST['producto_id']) || !isset($_POST['cantidad'])) {
             $_SESSION['error'] = 'Datos incompletos';
-            header('Location: /productos');
+            header('Location: ' . $base_url . '/productos');
             exit;
         }
 
@@ -37,15 +38,16 @@ class CarritoController {
         }
 
         // Redirigir a la página anterior o al carrito
-        $referer = $_SERVER['HTTP_REFERER'] ?? '/carrito';
+        $referer = $_SERVER['HTTP_REFERER'] ?? $base_url . '/carrito';
         header('Location: ' . $referer);
         exit;
     }
 
     public function actualizar() {
+        $base_url = dirname($_SERVER['SCRIPT_NAME']);
         if (!isset($_POST['producto_id']) || !isset($_POST['cantidad'])) {
             $_SESSION['error'] = 'Datos incompletos';
-            header('Location: /carrito');
+            header('Location: ' . $base_url . '/carrito');
             exit;
         }
 
@@ -60,14 +62,15 @@ class CarritoController {
             $_SESSION['success'] = 'Carrito actualizado';
         }
 
-        header('Location: /carrito');
+        header('Location: ' . $base_url . '/carrito');
         exit;
     }
 
     public function eliminar() {
+        $base_url = dirname($_SERVER['SCRIPT_NAME']);
         if (!isset($_POST['producto_id'])) {
             $_SESSION['error'] = 'Producto no especificado';
-            header('Location: /carrito');
+            header('Location: ' . $base_url . '/carrito');
             exit;
         }
 
@@ -75,14 +78,15 @@ class CarritoController {
         $resultado = $this->service->eliminar($productoId);
 
         $_SESSION['success'] = $resultado['mensaje'];
-        header('Location: /carrito');
+        header('Location: ' . $base_url . '/carrito');
         exit;
     }
 
     public function vaciar() {
+        $base_url = dirname($_SERVER['SCRIPT_NAME']);
         $resultado = $this->service->vaciar();
         $_SESSION['success'] = $resultado['mensaje'];
-        header('Location: /carrito');
+        header('Location: ' . $base_url . '/carrito');
         exit;
     }
 }

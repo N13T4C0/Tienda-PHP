@@ -17,11 +17,12 @@ class AuthController{
     }
 
     public function guardarRegistro(){
+        $base_url = dirname($_SERVER['SCRIPT_NAME']);
         $request = new RegistroRequest();
 
         if(!$request->validar($_POST)){
             $_SESSION['errores'] = $request->getErrores();
-            header('Location: /registro');
+            header('Location: ' . $base_url . '/registro');
             exit;
         }
 
@@ -29,10 +30,10 @@ class AuthController{
         
         if (isset($resultado['error'])) {
             $_SESSION['error'] = $resultado['error'];
-            header('Location: /registro');
+            header('Location: ' . $base_url . '/registro');
         } else {
             $_SESSION['success'] = 'Registro exitoso. Revisa tu email para confirmar.';
-            header('Location: /login');
+            header('Location: ' . $base_url . '/login');
         }
         exit;
     }
@@ -43,21 +44,22 @@ class AuthController{
     }
 
     public function autenticar() {
-        $usuario = $this->service->autenticar($_POST['email'], $_POST['password']);
+        $resultado = $this->service->autenticar($_POST['email'], $_POST['password']);
         
-        if ($usuario) {
-            $_SESSION['identity'] = $usuario;
-            header('Location: /');
+        if (isset($resultado['error'])) {
+            $_SESSION['error'] = $resultado['error'];
+            header('Location: ' . $base_url . '/login');
         } else {
-            $_SESSION['error'] = 'Credenciales incorrectas';
-            header('Location: /login');
+            // Guardar solo el objeto usuario en la sesión, no todo el array
+            $_SESSION['identity'] = $resultado['usuario'];
+            header('Location: ' . $base_url . '/');
         }
         exit;
     }
 
     public function logout() {
         unset($_SESSION['identity']);
-        header('Location: /');
+        header('Location: ' . $base_url . '/');
         exit;
     }
 }
