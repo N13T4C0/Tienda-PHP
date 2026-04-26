@@ -1,5 +1,6 @@
 # Redirigir todas las peticiones a public/
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    RewriteBase /ProyectoTiendaPHP/Tienda-PHP/
     RewriteRule ^(.*)$ public/$1 [L]
 </IfModule>
