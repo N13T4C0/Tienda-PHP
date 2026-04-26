@@ -32,12 +32,20 @@
                 </a>
             </li>
                 <?php if (isset($_SESSION['identity'])): ?>
-                    <?php if ($_SESSION['identity']->rol === 'admin'): ?>
+                    <?php 
+                    // Asegurarnos de que identity es un objeto y no un array
+                    $identity = $_SESSION['identity'];
+                    if (is_array($identity)) {
+                        // Convertir array a objeto si es necesario
+                        $identity = (object)$identity;
+                    }
+                    ?>
+                    <?php if (isset($identity->rol) && $identity->rol === 'admin'): ?>
                         <li><a href="<?= $base_url ?>/admin/categorias">Admin Categorías</a></li>
                         <li><a href="<?= $base_url ?>/admin/productos">Admin Productos</a></li>
                     <?php endif; ?>
                     <li><a href="<?= $base_url ?>/pedidos/mis-pedidos">Mis Pedidos</a></li>
-                    <li>Hola, <?= htmlspecialchars($_SESSION['identity']->nombre) ?></li>
+                    <li>Hola, <?= htmlspecialchars(isset($identity->nombre) ? $identity->nombre : 'Usuario') ?></li>
                     <li><a href="<?= $base_url ?>/logout">Cerrar Sesión</a></li>
                 <?php else: ?>
                     <li><a href="<?= $base_url ?>/login">Login</a></li>
