@@ -27,13 +27,14 @@ class CategoriaController {
 
     public function guardar() {
         AdminMiddleware::verificar();
+        $base_url = dirname($_SERVER['SCRIPT_NAME']);
         
         $request = new CategoriaRequest();
         
         if (!$request->validar($_POST)) {
             $_SESSION['errores'] = $request->getErrores();
             $_SESSION['old'] = $_POST;
-            header('Location: /admin/categorias/crear');
+            header('Location: ' . $base_url . '/admin/categorias/crear');
             exit;
         }
 
@@ -42,10 +43,10 @@ class CategoriaController {
         if (isset($resultado['error'])) {
             $_SESSION['error'] = $resultado['error'];
             $_SESSION['old'] = $_POST;
-            header('Location: /admin/categorias/crear');
+            header('Location: ' . $base_url . '/admin/categorias/crear');
         } else {
             $_SESSION['success'] = 'Categoría creada correctamente';
-            header('Location: /admin/categorias');
+            header('Location: ' . $base_url . '/admin/categorias');
         }
         exit;
     }
@@ -56,8 +57,9 @@ class CategoriaController {
         $categoria = $this->service->buscarPorId($id);
         
         if (!$categoria) {
+            $base_url = dirname($_SERVER['SCRIPT_NAME']);
             $_SESSION['error'] = 'Categoría no encontrada';
-            header('Location: /admin/categorias');
+            header('Location: ' . $base_url . '/admin/categorias');
             exit;
         }
 
@@ -66,13 +68,14 @@ class CategoriaController {
 
     public function actualizar($id) {
         AdminMiddleware::verificar();
+        $base_url = dirname($_SERVER['SCRIPT_NAME']);
         
         $request = new CategoriaRequest();
         
         if (!$request->validar($_POST)) {
             $_SESSION['errores'] = $request->getErrores();
             $_SESSION['old'] = $_POST;
-            header('Location: /admin/categorias/editar/' . $id);
+            header('Location: ' . $base_url . '/admin/categorias/editar/' . $id);
             exit;
         }
 
@@ -81,16 +84,17 @@ class CategoriaController {
         if (isset($resultado['error'])) {
             $_SESSION['error'] = $resultado['error'];
             $_SESSION['old'] = $_POST;
-            header('Location: /admin/categorias/editar/' . $id);
+            header('Location: ' . $base_url . '/admin/categorias/editar/' . $id);
         } else {
             $_SESSION['success'] = 'Categoría actualizada correctamente';
-            header('Location: /admin/categorias');
+            header('Location: ' . $base_url . '/admin/categorias');
         }
         exit;
     }
 
     public function eliminar($id) {
         AdminMiddleware::verificar();
+        $base_url = dirname($_SERVER['SCRIPT_NAME']);
         
         $resultado = $this->service->eliminar($id);
 
@@ -100,7 +104,7 @@ class CategoriaController {
             $_SESSION['success'] = 'Categoría eliminada correctamente';
         }
 
-        header('Location: /admin/categorias');
+        header('Location: ' . $base_url . '/admin/categorias');
         exit;
     }
 }

@@ -36,6 +36,14 @@ $router->add('POST', '/carrito/agregar', 'App\Controllers\CarritoController', 'a
 $router->add('POST', '/carrito/actualizar', 'App\Controllers\CarritoController', 'actualizar');
 $router->add('POST', '/carrito/eliminar', 'App\Controllers\CarritoController', 'eliminar');
 $router->add('POST', '/carrito/vaciar', 'App\Controllers\CarritoController', 'vaciar');
+
+// Productos
+$router->add('GET', '/productos', 'App\Controllers\HomeController', 'productos');
+$router->add('GET', '/producto/{id}', 'App\Controllers\HomeController', 'verProducto');
+
+// Pedidos
+$router->add('GET', '/pedidos/mis-pedidos', 'App\Controllers\HomeController', 'misPedidos');
+
 //sin esto no funcionaria bien:
 $router->dispatch();
 

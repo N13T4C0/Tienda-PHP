@@ -1,81 +1,76 @@
-```
-# Dependencies
-vendor/
-# Logs and temp files
-*.log
-*.tmp
-*.swp
-
-# Environment
-.env
-.env.local
-.env.*
-
-# Logs and temp files
-*.log
-*.tmp
-*.env.*
-
-# Editors
-.vscode/
-.idea/
-
-# OS generated files
-.DS_Store
-Thumbs.db
-# Dependencies
-node_modules/
-.venv/
-venv/
-__pycache__/
-.mypy_cache/
-.pytest_cache/
-dist/
-build/
-target/
-.gradle/
-
-# Compiled files
+```php
+# Compiled and build artifacts
 *.pyc
-*.class
+__pycache__/
 *.o
+*.obj
+*.class
 *.exe
 *.dll
 *.so
 *.a
-*.obj
 *.out
 
-# System files
-.DS_Store
-Thumbs.db
+# Dependencies
+vendor/
+node_modules/
+venv/
+.venv/
+.env
+.env.local
+.env.*
 
-# Coverage
+# Build and distribution
+dist/
+build/
+target/
+*.zip
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+*.bak
+*.cache
+
+# Coverage reports
 coverage/
 htmlcov/
 .coverage
 
-# Compressed files
-*.zip
-*.gz
-*.tar
-*.tgz
-*.bz2
-*.xz
-*.7z
-*.rar
-*.zst
-*.lz4
-*.lzh
-*.cab
-*.arj
-*.rpm
-*.deb
-*.Z
-*.lz
-*.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
+# IDE specific
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# PHP specific
+*.php~
+*.php.bak
+*.php.swp
+
+# Session files
+sess_*
+
+# Cache directories
+.cache/
+tmp/
+temp/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment variables
+.env*
+!.env.example
 ```
