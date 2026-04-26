@@ -1,7 +1,7 @@
 <?php
 namespace App\Controllers;
 
-use App\Request\RegistroRequest;
+use App\Requests\RegistroRequest;
 use App\Services\UsuarioService;
 
 class AuthController{

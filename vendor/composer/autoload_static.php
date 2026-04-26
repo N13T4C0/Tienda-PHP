@@ -123,6 +123,7 @@ class ComposerStaticInit87ecfec8aad08c647be36bdfcc1d1825
         'F' =>
         array (
             'FontLib\\' => 8,
+            'Firebase\\JWT\\' => 13,
         ),
         'E' =>
         array (
@@ -133,6 +134,10 @@ class ComposerStaticInit87ecfec8aad08c647be36bdfcc1d1825
             'Dotenv\\' => 7,
             'Dompdf\\' => 7,
             'Doctrine\\Common\\Lexer\\' => 22,
+        ),
+        'C' =>
+        array (
+            'Config\\' => 7,
         ),
         'A' =>
         array (
@@ -189,6 +194,10 @@ class ComposerStaticInit87ecfec8aad08c647be36bdfcc1d1825
         array (
             0 => __DIR__ . '/..' . '/dompdf/php-font-lib/src/FontLib',
         ),
+        'Firebase\\JWT\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
+        ),
         'Egulias\\EmailValidator\\' =>
         array (
             0 => __DIR__ . '/..' . '/egulias/email-validator/src',
@@ -204,6 +213,10 @@ class ComposerStaticInit87ecfec8aad08c647be36bdfcc1d1825
         'Doctrine\\Common\\Lexer\\' =>
         array (
             0 => __DIR__ . '/..' . '/doctrine/lexer/src',
+        ),
+        'Config\\' =>
+        array (
+            0 => __DIR__ . '/../..' . '/src/Config',
         ),
         'App\\' =>
         array (
