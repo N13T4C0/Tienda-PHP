@@ -3,7 +3,7 @@
         'name' => 'rruiz/tiendaphp',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '778399d478d595827fd36d8026b9257d29afd42a',
+        'reference' => '5a4cb6d6c51811f56531135b452aecb1a2961ee6',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -55,6 +55,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'firebase/php-jwt' => array(
+            'pretty_version' => 'v7.0.5',
+            'version' => '7.0.5.0',
+            'reference' => '47ad26bab5e7c70ae8a6f08ed25ff83631121380',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../firebase/php-jwt',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'graham-campbell/result-type' => array(
             'pretty_version' => 'v1.1.4',
             'version' => '1.1.4.0',
@@ -103,7 +112,7 @@
         'rruiz/tiendaphp' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '778399d478d595827fd36d8026b9257d29afd42a',
+            'reference' => '5a4cb6d6c51811f56531135b452aecb1a2961ee6',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
