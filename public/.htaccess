@@ -2,9 +2,11 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /ProyectoTiendaPHP/Tienda-PHP/public/
-    
-    # Redirigir todo a index.php excepto archivos/carpetas existentes
+
+    # Si existe el archivo o carpeta, servirlo directamente
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ index.php [L,QSA]
+
+    # Si no, enviar todo a index.php
+    RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
 </IfModule>
