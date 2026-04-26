@@ -75,27 +75,36 @@ class Router {
      */
     public function dispatch() {
         $method = $_SERVER['REQUEST_METHOD'];
-        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         
-        // Obtener la ruta base del proyecto
-        $scriptName = $_SERVER['SCRIPT_NAME'];
-        $scriptDir = dirname($scriptName);
-        
-        // Quitar la parte del directorio del script de la URI
-        if ($scriptDir !== '/' && strpos($uri, $scriptDir) === 0) {
-            $path = substr($uri, strlen($scriptDir));
+        // Si viene el parámetro ?url= de .htaccess, usarlo directamente
+        if (isset($_GET['url'])) {
+            $path = '/' . trim($_GET['url'], '/');
+            if (empty($path) || $path === '/') {
+                $path = '/';
+            }
         } else {
-            $path = $uri;
-        }
-        
-        // Si la ruta está vacía, ponerla como "/"
-        if (empty($path)) {
-            $path = '/';
-        }
-        
-        // Asegurar que empiece con /
-        if ($path[0] !== '/') {
-            $path = '/' . $path;
+            $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+            
+            // Obtener la ruta base del proyecto
+            $scriptName = $_SERVER['SCRIPT_NAME'];
+            $scriptDir = dirname($scriptName);
+            
+            // Quitar la parte del directorio del script de la URI
+            if ($scriptDir !== '/' && strpos($uri, $scriptDir) === 0) {
+                $path = substr($uri, strlen($scriptDir));
+            } else {
+                $path = $uri;
+            }
+            
+            // Si la ruta está vacía, ponerla como "/"
+            if (empty($path)) {
+                $path = '/';
+            }
+            
+            // Asegurar que empiece con /
+            if ($path[0] !== '/') {
+                $path = '/' . $path;
+            }
         }
         
         // Buscar coincidencia en las rutas registradas

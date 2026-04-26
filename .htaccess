@@ -1,8 +1,15 @@
-# Redirigir todas las peticiones a public/
+# Redirigir todas las peticiones a public/index.php
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /ProyectoTiendaPHP/Tienda-PHP/
+    
+    # Si es un archivo o directorio real en la raíz, servirlo directamente
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+    
+    # Todo lo demás va a public/index.php manteniendo la ruta original
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ public/$1 [L,QSA]
+    RewriteRule ^(.*)$ public/index.php?url=$1 [L,QSA]
 </IfModule>
