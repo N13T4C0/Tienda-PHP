@@ -1,9 +1,6 @@
-# Proyecto Tienda PHP (2DAW)
+# Proyecto Tienda PHP 
 
-Tienda online sencilla en PHP siguiendo el patron MVC. Inspirada en
-[Tienda-PHP de pablovacasgarcia](https://github.com/pablovacasgarcia/TiendaPHP)
-pero reescrita con nombres y estructura propios para facilitar su comprension
-en 2º DAW.
+
 
 ## Caracteristicas
 
