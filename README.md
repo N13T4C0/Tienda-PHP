@@ -119,14 +119,3 @@ Por simplicidad, los emails NO se envian de verdad: el helper
 archivo `.html` en `storage/mails/`. Asi se puede ver el resultado sin
 configurar SMTP. Cambiar `MODO_SIMULACION` a `false` en
 `app/ayudantes/EnvioMail.php` para usar la funcion `mail()` real.
-
-## Notas para el alumnado de 2DAW
-
-- Si XAMPP esta en otra carpeta o usas otra ruta, ajusta la constante
-  `URL_BASE` en `public/index.php`.
-- Para anadir nuevos controladores basta con crear un archivo en
-  `app/controladores/NombreControlador.php` con clase `NombreControlador`.
-- Las vistas son simples ficheros PHP; en el controlador se hace
-  `require` de cabecera, vista y pie.
-- Para anadir imagenes reales de productos, copialas en `public/img/`
-  y pon el nombre del archivo en el panel de admin al crear/editar el producto.
