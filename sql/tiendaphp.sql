@@ -95,7 +95,7 @@ INSERT INTO categorias (nombre, descripcion) VALUES
     ('Ropa',         'Ropa y complementos'),
     ('Hogar',        'Articulos para el hogar'),
     ('Libros',       'Libros y revistas');
-
+-- cambniar precio de los productos para probar el paypal, NO PASARSE DE 500
 INSERT INTO productos (categoria_id, nombre, descripcion, precio, stock, imagen) VALUES
     (1, 'Auriculares Bluetooth', 'Auriculares inalambricos con cancelacion de ruido', 49.99, 25, 'auriculares.jpg'),
     (1, 'Smartwatch Sport',      'Reloj inteligente resistente al agua',              79.50, 15, 'smartwatch.jpg'),
