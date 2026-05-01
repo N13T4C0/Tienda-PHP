@@ -107,6 +107,8 @@ INSERT INTO productos (categoria_id, nombre, descripcion, precio, stock, imagen)
     (4, 'Aprende PHP en 30 dias','Manual practico para aprender PHP',                 22.00,  8, 'libro-php.jpg'),
     (4, 'Bases de datos MySQL',  'Guia completa de MySQL',                            18.00,  6, 'libro-mysql.jpg');
 
+ALTER TABLE usuarios ADD COLUMN google_id VARCHAR(255) DEFAULT NULL UNIQUE;
+ALTER TABLE usuarios ADD COLUMN avatar VARCHAR(255) DEFAULT NULL;
 -- IMPORTANTE: los usuarios de prueba NO se crean aqui,
 -- ya que las contrasenas deben hashearse con password_hash (bcrypt).
 -- Ejecuta UNA vez el script:
