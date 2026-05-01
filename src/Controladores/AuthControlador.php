@@ -134,4 +134,83 @@ class AuthControlador
         Sesion::mensaje('info', 'Sesion cerrada correctamente');
         Sesion::redirigir('');
     }
+
+    public function loginGoogle(): void
+{
+    $google = $this->crearClienteGoogle();
+    $state  = bin2hex(random_bytes(16));
+
+    $_SESSION['oauth_state'] = $state;
+
+    header('Location: ' . $google->getAuthUrl($state));
+    exit;
+}
+
+public function googleCallback(): void
+{
+    // 1. Parámetros presentes
+    if (!isset($_GET['code'], $_GET['state'])) {
+        Sesion::mensaje('error', 'Respuesta de Google incorrecta');
+        Sesion::redirigir('auth/login');
+    }
+
+    // 2. Verificar state (CSRF)
+    if (!hash_equals($_SESSION['oauth_state'] ?? '', $_GET['state'])) {
+        unset($_SESSION['oauth_state']);
+        Sesion::mensaje('error', 'Error de seguridad. Intentalo de nuevo');
+        Sesion::redirigir('auth/login');
+    }
+    unset($_SESSION['oauth_state']);
+
+    $google = $this->crearClienteGoogle();
+
+    // 3. Intercambiar code por token
+    $tokenData = $google->intercambiarCode($_GET['code']);
+
+    if (isset($tokenData['error']) || empty($tokenData['access_token'])) {
+        Sesion::mensaje('error', 'Google rechazó la solicitud');
+        Sesion::redirigir('auth/login');
+    }
+
+    // 4. Obtener datos del usuario
+    $info = $google->getUserInfo($tokenData['access_token']);
+
+    if (empty($info['email']) || !($info['email_verified'] ?? false)) {
+        Sesion::mensaje('error', 'No se pudo verificar tu cuenta de Google');
+        Sesion::redirigir('auth/login');
+    }
+
+    // 5. Separar nombre y apellidos
+    $partes    = explode(' ', $info['name'] ?? $info['email'], 2);
+    $nombre    = htmlspecialchars($partes[0]);
+    $apellidos = htmlspecialchars($partes[1] ?? '');
+
+    // 6. Crear o actualizar en BD
+    $modelo = new Usuario();
+    $idUser = $modelo->registrarOActualizarGoogle([
+        'google_id' => $info['sub'],   // Google usa "sub" como ID único
+        'email'     => $info['email'],
+        'nombre'    => $nombre,
+        'apellidos' => $apellidos,
+        'avatar'    => $info['picture'] ?? null,
+    ]);
+
+    $usuario = $modelo->obtenerUno($idUser);
+
+    // 7. Iniciar sesión
+    Sesion::iniciar($usuario);
+    Sesion::mensaje('ok', 'Bienvenido, ' . $usuario['nombre']);
+    Sesion::redirigir('');
+}
+
+private function crearClienteGoogle(): GoogleOAuth
+{
+    $config = require APP . '/../config/google.php';
+
+    return new GoogleOAuth(
+        $config['client_id'],
+        $config['client_secret'],
+        $config['redirect_uri']
+    );
+}
 }

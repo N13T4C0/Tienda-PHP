@@ -123,6 +123,17 @@ class Rutas
         });
 
         // -------------------------------------------------------
+//  GOOGLE AUTH
+// -------------------------------------------------------
+Enrutador::agregar('GET', '/auth/loginGoogle', function () {
+    (new AuthControlador())->loginGoogle();
+});
+
+Enrutador::agregar('GET', '/auth/googleCallback', function () {
+    (new AuthControlador())->googleCallback();
+});
+
+        // -------------------------------------------------------
         //  Despachar la peticion actual
         // -------------------------------------------------------
         Enrutador::despachar();

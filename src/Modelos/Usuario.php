@@ -84,4 +84,46 @@ class Usuario
         $stmt = $this->bd->prepare("DELETE FROM usuarios WHERE id = :id");
         return $stmt->execute([':id' => $id]);
     }
+
+public function registrarOActualizarGoogle(array $datos): int
+{
+    // 1. Usamos $this->bd que es como se llama tu conexión en esta clase
+    $sql = "SELECT id FROM usuarios WHERE google_id = :google_id OR email = :email LIMIT 1";
+    $stmt = $this->bd->prepare($sql);
+    $stmt->execute([
+        ':google_id' => $datos['google_id'],
+        ':email'     => $datos['email']
+    ]);
+    $usuario = $stmt->fetch();
+
+    if ($usuario) {
+        // 2. Actualizar si ya existe
+        $sql = "UPDATE usuarios SET 
+                nombre = :nombre, 
+                apellidos = :apellidos, 
+                avatar = :avatar 
+                WHERE id = :id";
+        $stmt = $this->bd->prepare($sql);
+        $stmt->execute([
+            ':nombre'    => $datos['nombre'],
+            ':apellidos' => $datos['apellidos'],
+            ':avatar'    => $datos['avatar'],
+            ':id'        => $usuario['id']
+        ]);
+        return (int)$usuario['id'];
+    } else {
+        // 3. Insertar nuevo si no existe
+        $sql = "INSERT INTO usuarios (google_id, email, nombre, apellidos, avatar, rol, activado) 
+                VALUES (:google_id, :email, :nombre, :apellidos, :avatar, 'cliente', 1)";
+        $stmt = $this->bd->prepare($sql);
+        $stmt->execute([
+            ':google_id' => $datos['google_id'],
+            ':email'     => $datos['email'],
+            ':nombre'    => $datos['nombre'],
+            ':apellidos' => $datos['apellidos'],
+            ':avatar'    => $datos['avatar']
+        ]);
+        return (int)$this->bd->lastInsertId();
+    }
+}
 }

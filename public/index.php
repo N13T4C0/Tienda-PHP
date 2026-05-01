@@ -22,3 +22,5 @@ require_once APP . '/init.php';
 // Cargamos el archivo de rutas y despachamos
 require_once APP . '/Rutas/Rutas.php';
 Rutas::registrar();
+
+require APP . '/Lib/GoogleOAuth.php';
