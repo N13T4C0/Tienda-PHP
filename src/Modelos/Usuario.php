@@ -77,4 +77,11 @@ class Usuario
                      FROM usuarios ORDER BY fecha_alta DESC")
             ->fetchAll();
     }
+
+    /** Elimina un usuario por su id */
+    public function eliminar(int $id): bool
+    {
+        $stmt = $this->bd->prepare("DELETE FROM usuarios WHERE id = :id");
+        return $stmt->execute([':id' => $id]);
+    }
 }

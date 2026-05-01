@@ -1,4 +1,4 @@
-<?php require APP . '/vistas/comunes/cabecera.php'; ?>
+<?php require APP . '/Vistas/comunes/cabecera.php'; ?>
 
 <div class="bloque-vacio">
     <h1>404</h1>
@@ -8,4 +8,4 @@
     </p>
 </div>
 
-<?php require APP . '/vistas/comunes/pie.php'; ?>
+<?php require APP . '/Vistas/comunes/pie.php'; ?>

@@ -21,9 +21,9 @@ class AdminControlador
         $totalCategorias = count($modeloCategoria->listar());
         $totalUsuarios   = count($modeloUsuario->listar());
 
-        require APP . '/vistas/comunes/cabecera.php';
-        require APP . '/vistas/admin/panel.php';
-        require APP . '/vistas/comunes/pie.php';
+        require APP . '/Vistas/comunes/cabecera.php';
+        require APP . '/Vistas/admin/panel.php';
+        require APP . '/Vistas/comunes/pie.php';
     }
 
     // -------------------- PRODUCTOS --------------------
@@ -33,9 +33,9 @@ class AdminControlador
         $modelo    = new Producto();
         $productos = $modelo->listarTodos();
 
-        require APP . '/vistas/comunes/cabecera.php';
-        require APP . '/vistas/admin/productos.php';
-        require APP . '/vistas/comunes/pie.php';
+        require APP . '/Vistas/comunes/cabecera.php';
+        require APP . '/Vistas/admin/productos.php';
+        require APP . '/Vistas/comunes/pie.php';
     }
 
     public function nuevoProducto(): void
@@ -44,9 +44,9 @@ class AdminControlador
         $categorias = $modeloCat->listar();
         $producto   = null; // formulario vacio
 
-        require APP . '/vistas/comunes/cabecera.php';
-        require APP . '/vistas/admin/form_producto.php';
-        require APP . '/vistas/comunes/pie.php';
+        require APP . '/Vistas/comunes/cabecera.php';
+        require APP . '/Vistas/admin/form_producto.php';
+        require APP . '/Vistas/comunes/pie.php';
     }
 
     public function editarProducto($id = null): void
@@ -62,9 +62,9 @@ class AdminControlador
         $modeloCat  = new Categoria();
         $categorias = $modeloCat->listar();
 
-        require APP . '/vistas/comunes/cabecera.php';
-        require APP . '/vistas/admin/form_producto.php';
-        require APP . '/vistas/comunes/pie.php';
+        require APP . '/Vistas/comunes/cabecera.php';
+        require APP . '/Vistas/admin/form_producto.php';
+        require APP . '/Vistas/comunes/pie.php';
     }
 
     public function guardarProducto(): void
@@ -116,9 +116,9 @@ class AdminControlador
         $modelo     = new Categoria();
         $categorias = $modelo->listar();
 
-        require APP . '/vistas/comunes/cabecera.php';
-        require APP . '/vistas/admin/categorias.php';
-        require APP . '/vistas/comunes/pie.php';
+        require APP . '/Vistas/comunes/cabecera.php';
+        require APP . '/Vistas/admin/categorias.php';
+        require APP . '/Vistas/comunes/pie.php';
     }
 
     public function guardarCategoria(): void
@@ -166,8 +166,26 @@ class AdminControlador
         $modelo   = new Usuario();
         $usuarios = $modelo->listar();
 
-        require APP . '/vistas/comunes/cabecera.php';
-        require APP . '/vistas/admin/usuarios.php';
-        require APP . '/vistas/comunes/pie.php';
+        require APP . '/Vistas/comunes/cabecera.php';
+        require APP . '/Vistas/admin/usuarios.php';
+        require APP . '/Vistas/comunes/pie.php';
+    }
+
+    public function borrarUsuario($id = null): void
+    {
+        if (!is_numeric($id)) {
+            Sesion::redirigir('admin/usuarios');
+        }
+
+        // Evitamos que el admin se borre a si mismo
+        if ((int) $id === (int) Sesion::usuario()['id']) {
+            Sesion::mensaje('error', 'No puedes eliminar tu propio usuario');
+            Sesion::redirigir('admin/usuarios');
+        }
+
+        $modelo = new Usuario();
+        $modelo->eliminar((int) $id);
+        Sesion::mensaje('ok', 'Usuario eliminado correctamente');
+        Sesion::redirigir('admin/usuarios');
     }
 }

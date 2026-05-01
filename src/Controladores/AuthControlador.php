@@ -12,9 +12,9 @@ class AuthControlador
         $datosPrevios = $_SESSION['datos_form'] ?? [];
         unset($_SESSION['datos_form']);
 
-        require APP . '/vistas/comunes/cabecera.php';
-        require APP . '/vistas/auth/registro.php';
-        require APP . '/vistas/comunes/pie.php';
+        require APP . '/Vistas/comunes/cabecera.php';
+        require APP . '/Vistas/auth/registro.php';
+        require APP . '/Vistas/comunes/pie.php';
     }
 
     /** Procesa el formulario de registro */
@@ -68,7 +68,7 @@ class AuthControlador
         EnvioMail::confirmacionRegistro($email, $nombre, $token);
 
         Sesion::mensaje('ok',
-            'Registro completado. Revisa tu email (o la carpeta /storage/mails) para activar la cuenta.');
+            'Registro completado revisa tu mail');
         Sesion::redirigir('auth/login');
     }
 
@@ -95,9 +95,9 @@ class AuthControlador
     /** Muestra el formulario de login */
     public function login(): void
     {
-        require APP . '/vistas/comunes/cabecera.php';
-        require APP . '/vistas/auth/login.php';
-        require APP . '/vistas/comunes/pie.php';
+        require APP . '/Vistas/comunes/cabecera.php';
+        require APP . '/Vistas/auth/login.php';
+        require APP . '/Vistas/comunes/pie.php';
     }
 
     /** Procesa el formulario de login */

@@ -16,8 +16,8 @@ class HomeControlador
         // Mostramos como destacados los 4 primeros
         $destacados = array_slice($productos, 0, 4);
 
-        require APP . '/vistas/comunes/cabecera.php';
-        require APP . '/vistas/home/inicio.php';
-        require APP . '/vistas/comunes/pie.php';
+        require APP . '/Vistas/comunes/cabecera.php';
+        require APP . '/Vistas/home/inicio.php';
+        require APP . '/Vistas/comunes/pie.php';
     }
 }

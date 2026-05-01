@@ -10,9 +10,9 @@ class CestaControlador
         $items = Cesta::contenido();
         $total = Cesta::importeTotal();
 
-        require APP . '/vistas/comunes/cabecera.php';
-        require APP . '/vistas/cesta/ver.php';
-        require APP . '/vistas/comunes/pie.php';
+        require APP . '/Vistas/comunes/cabecera.php';
+        require APP . '/Vistas/cesta/ver.php';
+        require APP . '/Vistas/comunes/pie.php';
     }
 
     /** Anade un producto a la cesta (POST con id y cantidad) */
@@ -68,9 +68,9 @@ class CestaControlador
         $items = Cesta::contenido();
         $total = Cesta::importeTotal();
 
-        require APP . '/vistas/comunes/cabecera.php';
-        require APP . '/vistas/cesta/finalizar.php';
-        require APP . '/vistas/comunes/pie.php';
+        require APP . '/Vistas/comunes/cabecera.php';
+        require APP . '/Vistas/cesta/finalizar.php';
+        require APP . '/Vistas/comunes/pie.php';
     }
 
     /** Confirma la compra: crea el pedido en BD */
@@ -97,15 +97,26 @@ class CestaControlador
 
         try {
             $modelo   = new Pedido();
+            $usuario  = Sesion::usuario();
             $idPedido = $modelo->crearPedidoCompleto(
-                (int) Sesion::usuario()['id'],
+                (int) $usuario['id'],
                 $datosEnvio,
                 $items,
                 $total
             );
             Cesta::vaciar();
 
-            Sesion::mensaje('ok', 'Pedido #' . $idPedido . ' creado correctamente');
+            // Enviamos email de confirmacion al cliente
+            EnvioMail::confirmacionPedido(
+                $usuario['email'],
+                $usuario['nombre'],
+                $idPedido,
+                $items,
+                $total,
+                $datosEnvio
+            );
+
+            Sesion::mensaje('ok', 'Pedido #' . $idPedido . ' creado. Te hemos enviado un email de confirmacion.');
             Sesion::redirigir('');
         } catch (Throwable $e) {
             Sesion::mensaje('error', 'No se pudo procesar el pedido: ' . $e->getMessage());

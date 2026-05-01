@@ -9,7 +9,7 @@
  * Despues conviene RENOMBRARLO o BORRARLO para no dejarlo accesible.
  */
 
-require_once __DIR__ . '/../app/config/conexion.php';
+require_once __DIR__ . '/../config/Conexion.php';
 
 $bd = Conexion::abrir();
 

@@ -19,9 +19,9 @@ class ProductoControlador
             $productos = $modeloProducto->listar();
         }
 
-        require APP . '/vistas/comunes/cabecera.php';
-        require APP . '/vistas/productos/catalogo.php';
-        require APP . '/vistas/comunes/pie.php';
+        require APP . '/Vistas/comunes/cabecera.php';
+        require APP . '/Vistas/productos/catalogo.php';
+        require APP . '/Vistas/comunes/pie.php';
     }
 
     /** Detalle de un producto */
@@ -38,9 +38,9 @@ class ProductoControlador
             Sesion::redirigir('producto');
         }
 
-        require APP . '/vistas/comunes/cabecera.php';
-        require APP . '/vistas/productos/detalle.php';
-        require APP . '/vistas/comunes/pie.php';
+        require APP . '/Vistas/comunes/cabecera.php';
+        require APP . '/Vistas/productos/detalle.php';
+        require APP . '/Vistas/comunes/pie.php';
     }
 
     /** Buscador (recibe ?q=texto via GET) */
@@ -58,8 +58,8 @@ class ProductoControlador
             $productos = $modelo->buscar($texto);
         }
 
-        require APP . '/vistas/comunes/cabecera.php';
-        require APP . '/vistas/productos/buscar.php';
-        require APP . '/vistas/comunes/pie.php';
+        require APP . '/Vistas/comunes/cabecera.php';
+        require APP . '/Vistas/productos/buscar.php';
+        require APP . '/Vistas/comunes/pie.php';
     }
 }
