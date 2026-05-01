@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Helper estatico para gestionar la sesion del usuario logeado
  * y los mensajes flash (alertas que solo se muestran una vez).
@@ -11,7 +12,7 @@ class Sesion
         $_SESSION['usuario'] = [
             'id'       => $usuario['id'],
             'nombre'   => $usuario['nombre'],
-            'apellidos'=> $usuario['apellidos'] ?? '',
+            'apellidos' => $usuario['apellidos'] ?? '',
             'email'    => $usuario['email'],
             'rol'      => $usuario['rol'],
         ];
@@ -21,6 +22,7 @@ class Sesion
     public static function cerrar(): void
     {
         unset($_SESSION['usuario']);
+        unset($_SESSION['cesta_invitado']);
     }
 
     /** ¿Hay alguien logeado? */

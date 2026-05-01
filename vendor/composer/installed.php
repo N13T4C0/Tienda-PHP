@@ -3,7 +3,7 @@
         'name' => 'alumno/tiendaphp',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '252efe7434feceded6d472c8d1550bf2b5ae5830',
+        'reference' => 'cf7507bb2db5b87d019d7ea59fc7c26a2f350699',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'alumno/tiendaphp' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '252efe7434feceded6d472c8d1550bf2b5ae5830',
+            'reference' => 'cf7507bb2db5b87d019d7ea59fc7c26a2f350699',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
