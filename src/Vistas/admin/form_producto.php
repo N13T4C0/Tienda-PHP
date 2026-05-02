@@ -1,3 +1,11 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="<?= URL_BASE ?>/css/estilo.css">
+</head>
+
 <div class="formulario ancho">
     <h1><?= $producto ? 'Editar producto' : 'Nuevo producto' ?></h1>
 
@@ -30,7 +38,7 @@
             <textarea name="descripcion" id="descripcion"><?= htmlspecialchars($producto['descripcion'] ?? '') ?></textarea>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div class="campo campo--doble">
             <div class="campo">
                 <label for="precio">Precio (&euro;) *</label>
                 <input type="number" step="0.01" min="0" name="precio" id="precio" required

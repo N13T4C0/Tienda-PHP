@@ -1,6 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="<?= URL_BASE ?>/css/estilo.css">
+</head>
+
 <h1>Gestion de categorias</h1>
 
-<div class="layout-tienda" style="grid-template-columns:1fr 320px;">
+<div class="layout-tienda layout-tienda--checkout">
 
     <div>
         <table class="tabla">
@@ -21,7 +29,7 @@
                         <td><?= $c['id'] ?></td>
                         <td><?= htmlspecialchars($c['nombre']) ?></td>
                         <td><?= htmlspecialchars($c['descripcion']) ?></td>
-                        <td class="txt-centro acciones" style="justify-content:center;">
+                        <td class="txt-centro acciones acciones--centro">
                             <a class="boton boton-pequeno boton-borrar"
                                href="<?= URL_BASE ?>/admin/borrarCategoria/<?= $c['id'] ?>"
                                onclick="return confirm('¿Borrar esta categoria?')">Borrar</a>
@@ -30,10 +38,10 @@
                 <?php endforeach; ?>
             </tbody>
         </table>
-        <p style="margin-top:1rem;"><a href="<?= URL_BASE ?>/admin">&larr; Volver al panel</a></p>
+        <p class="volver"><a href="<?= URL_BASE ?>/admin">&larr; Volver al panel</a></p>
     </div>
 
-    <aside class="formulario" style="margin:0;max-width:none;">
+    <aside class="formulario formulario--checkout">
         <h2>Nueva categoria</h2>
         <form method="POST" action="<?= URL_BASE ?>/admin/guardarCategoria">
             <div class="campo">
@@ -44,7 +52,7 @@
                 <label for="descripcion">Descripcion</label>
                 <textarea name="descripcion" id="descripcion"></textarea>
             </div>
-            <button class="boton" type="submit" style="width:100%;">Crear</button>
+            <button class="boton boton--full" type="submit">Crear</button>
         </form>
     </aside>
 

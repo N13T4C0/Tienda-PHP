@@ -18,12 +18,6 @@ $_usuario       = Sesion::usuario();
     <div class="cabecera-contenido">
         <a class="logo" href="<?= URL_BASE ?>/">Tienda<span>PHP</span></a>
 
-        <form action="<?= URL_BASE ?>/producto/buscar" method="GET" style="flex:1;max-width:300px;">
-            <input type="text" name="q" placeholder="Buscar productos..."
-                   value="<?= htmlspecialchars($_GET['q'] ?? '') ?>"
-                   style="width:100%;padding:.5rem;border-radius:6px;border:0;">
-        </form>
-
         <ul class="menu">
             <li><a href="<?= URL_BASE ?>/">Inicio</a></li>
             <li><a href="<?= URL_BASE ?>/producto">Catalogo</a></li>

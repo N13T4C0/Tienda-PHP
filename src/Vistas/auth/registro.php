@@ -1,5 +1,5 @@
 <div class="formulario ancho">
-    <h1 style="text-align:center;margin-bottom:1.5rem;">Crear una cuenta</h1>
+    <h1 class="formulario__titulo">Crear una cuenta</h1>
 
     <form method="POST" action="<?= URL_BASE ?>/auth/procesarRegistro">
 
@@ -31,10 +31,10 @@
             <input type="password" name="clave2" id="clave2" required minlength="6">
         </div>
 
-        <button type="submit" class="boton" style="width:100%;">Registrarme</button>
+        <button type="submit" class="boton boton--full">Registrarme</button>
     </form>
 
-    <p style="margin-top:1rem;text-align:center;">
+    <p class="formulario__pie">
         ¿Ya tienes cuenta? <a href="<?= URL_BASE ?>/auth/login">Inicia sesion</a>
     </p>
 </div>

@@ -1,3 +1,11 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="<?= URL_BASE ?>/css/estilo.css">
+</head>
+
 <h1>Gestion de usuarios</h1>
 
 <table class="tabla">
@@ -36,4 +44,4 @@
     </tbody>
 </table>
 
-<p style="margin-top:1rem;"><a href="<?= URL_BASE ?>/admin">&larr; Volver al panel</a></p>
+<p class="volver"><a href="<?= URL_BASE ?>/admin">&larr; Volver al panel</a></p>

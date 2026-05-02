@@ -1,3 +1,12 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="<?= URL_BASE ?>/css/estilo.css">
+</head>
+
+
 <h1>Catalogo</h1>
 
 <div class="layout-tienda">
@@ -34,7 +43,7 @@
                         </a>
                         <div class="cuerpo">
                             <span class="etiqueta-categoria"><?= htmlspecialchars($p['categoria_nombre']) ?></span>
-                            <h3 style="margin-top:.5rem;">
+                            <h3 class="tarjeta-producto__nombre">
                                 <a href="<?= URL_BASE ?>/producto/detalle/<?= $p['id'] ?>">
                                     <?= htmlspecialchars($p['nombre']) ?>
                                 </a>
@@ -51,7 +60,7 @@
                                         + Cesta
                                     </button>
                                 <?php else: ?>
-                                    <span style="color:var(--color-error);">Sin stock</span>
+                                    <span class="sin-stock">Sin stock</span>
                                 <?php endif; ?>
                             </div>
                         </div>

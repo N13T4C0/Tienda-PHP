@@ -1,8 +1,8 @@
 <h1>Finalizar compra</h1>
 
-<div class="layout-tienda" style="grid-template-columns: 1fr 320px;">
+<div class="layout-tienda layout-tienda--checkout">
 
-    <div class="formulario ancho" style="margin:0;max-width:none;">
+    <div class="formulario formulario--checkout">
         <h2>Direccion de envio</h2>
 
         <form method="POST" action="<?= URL_BASE ?>/cesta/confirmar">
@@ -19,13 +19,13 @@
                 <input type="text" name="provincia" id="provincia">
             </div>
 
-            <button class="boton" type="submit" style="width:100%;">Confirmar pedido</button>
+            <button class="boton boton--full" type="submit">Confirmar pedido</button>
         </form>
     </div>
 
-    <aside class="resumen-cesta" style="margin:0;">
+    <aside class="resumen-cesta resumen-cesta--checkout">
         <h3>Resumen</h3>
-        <table style="width:100%;margin-top:.5rem;">
+        <table class="resumen-cesta__tabla">
             <?php foreach ($items as $item): ?>
                 <tr>
                     <td><?= htmlspecialchars($item['producto']['nombre']) ?>

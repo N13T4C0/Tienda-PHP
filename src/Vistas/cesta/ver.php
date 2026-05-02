@@ -3,7 +3,7 @@
 <?php if (empty($items)): ?>
     <div class="bloque-vacio">
         <p>Tu cesta esta vacia.</p>
-        <p style="margin-top:1rem;">
+        <p class="bloque-vacio__accion">
             <a class="boton" href="<?= URL_BASE ?>/producto">Ver catalogo</a>
         </p>
     </div>
@@ -24,14 +24,14 @@
                 <tr>
                     <td>
                         <strong><?= htmlspecialchars($item['producto']['nombre']) ?></strong><br>
-                        <small style="color:#777;">
+                        <small class="tabla__categoria">
                             <?= htmlspecialchars($item['producto']['categoria_nombre']) ?>
                         </small>
                     </td>
                     <td class="txt-centro"><?= number_format($item['producto']['precio'], 2) ?> &euro;</td>
                     <td class="txt-centro">
                         <form method="POST" action="<?= URL_BASE ?>/cesta/actualizar"
-                              style="display:flex;gap:.25rem;justify-content:center;">
+                              class="form-cantidad">
                             <input type="hidden" name="id_producto" value="<?= $item['producto']['id'] ?>">
                             <input type="number" name="cantidad" value="<?= $item['cantidad'] ?>"
                                    min="1" max="<?= $item['producto']['stock'] ?>"

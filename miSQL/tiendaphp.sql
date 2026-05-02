@@ -97,15 +97,15 @@ INSERT INTO categorias (nombre, descripcion) VALUES
     ('Libros',       'Libros y revistas');
 -- cambniar precio de los productos para probar el paypal, NO PASARSE DE 500
 INSERT INTO productos (categoria_id, nombre, descripcion, precio, stock, imagen) VALUES
-    (1, 'Auriculares Bluetooth', 'Auriculares inalambricos con cancelacion de ruido', 49.99, 25, 'auriculares.jpg'),
-    (1, 'Smartwatch Sport',      'Reloj inteligente resistente al agua',              79.50, 15, 'smartwatch.jpg'),
-    (1, 'Teclado mecanico',      'Teclado mecanico retroiluminado RGB',               89.00, 10, 'teclado.jpg'),
-    (2, 'Camiseta basica',       'Camiseta 100% algodon, varios colores',              9.99, 50, 'camiseta.jpg'),
-    (2, 'Sudadera con capucha',  'Sudadera comoda y abrigada',                        24.95, 30, 'sudadera.jpg'),
-    (3, 'Lampara de mesa LED',   'Lampara con luz regulable',                         19.90, 20, 'lampara.jpg'),
-    (3, 'Juego de sabanas',      'Sabanas de microfibra cama 90',                     29.50, 12, 'sabanas.jpg'),
-    (4, 'Aprende PHP en 30 dias','Manual practico para aprender PHP',                 22.00,  8, 'libro-php.jpg'),
-    (4, 'Bases de datos MySQL',  'Guia completa de MySQL',                            18.00,  6, 'libro-mysql.jpg');
+    (1, 'Auriculares Bluetooth', 'Auriculares inalambricos con cancelacion de ruido', 1, 25, 'auriculares.jpg'),
+    (1, 'Smartwatch Sport',      'Reloj inteligente resistente al agua',              1, 15, 'smartwatch.jpg'),
+    (1, 'Teclado mecanico',      'Teclado mecanico retroiluminado RGB',               1, 10, 'teclado.jpg'),
+    (2, 'Camiseta basica',       'Camiseta 100% algodon, varios colores',              1, 50, 'camiseta.jpg'),
+    (2, 'Sudadera con capucha',  'Sudadera comoda y abrigada',                        1, 30, 'sudadera.jpg'),
+    (3, 'Lampara de mesa LED',   'Lampara con luz regulable',                         1, 20, 'lampara.jpg'),
+    (3, 'Juego de sabanas',      'Sabanas de microfibra cama 90',                     1, 12, 'sabanas.jpg'),
+    (4, 'Aprende PHP en 30 dias','Manual practico para aprender PHP',                 1,  8, 'libro-php.jpg'),
+    (4, 'Bases de datos MySQL',  'Guia completa de MySQL',                            1,  6, 'libro-mysql.jpg');
 
 ALTER TABLE usuarios ADD COLUMN google_id VARCHAR(255) DEFAULT NULL UNIQUE;
 ALTER TABLE usuarios ADD COLUMN avatar VARCHAR(255) DEFAULT NULL;
