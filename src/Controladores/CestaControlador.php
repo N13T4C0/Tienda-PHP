@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Controlador de la cesta de la compra.
  */
@@ -18,10 +19,24 @@ class CestaControlador
     /** Anade un producto a la cesta (POST con id y cantidad) */
     public function anadir(): void
     {
-        $id        = (int) ($_POST['id_producto'] ?? 0);
-        $cantidad  = max(1, (int) ($_POST['cantidad'] ?? 1));
+        $id       = (int) ($_POST['id_producto'] ?? 0);
+        $cantidad = max(1, (int) ($_POST['cantidad'] ?? 1));
 
         $resultado = Cesta::meterProducto($id, $cantidad);
+
+        $esAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+
+        if ($esAjax) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'ok'            => $resultado['ok'],
+                'mensaje'       => $resultado['mensaje'],
+                'totalUnidades' => Cesta::totalUnidades(),
+            ]);
+            exit;
+        }
+
         Sesion::mensaje($resultado['ok'] ? 'ok' : 'error', $resultado['mensaje']);
         Sesion::redirigir('cesta');
     }
@@ -106,7 +121,6 @@ class CestaControlador
             );
             Cesta::vaciar();
 
-            // Enviamos email de confirmacion al cliente
             EnvioMail::confirmacionPedido(
                 $usuario['email'],
                 $usuario['nombre'],

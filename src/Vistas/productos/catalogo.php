@@ -7,12 +7,12 @@
         <ul>
             <li>
                 <a class="<?= $categoriaActiva === null ? 'activo' : '' ?>"
-                   href="<?= URL_BASE ?>/producto">Todas</a>
+                    href="<?= URL_BASE ?>/producto">Todas</a>
             </li>
             <?php foreach ($categorias as $cat): ?>
                 <li>
                     <a class="<?= $categoriaActiva === (int) $cat['id'] ? 'activo' : '' ?>"
-                       href="<?= URL_BASE ?>/producto/index/<?= $cat['id'] ?>">
+                        href="<?= URL_BASE ?>/producto/index/<?= $cat['id'] ?>">
                         <?= htmlspecialchars($cat['nombre']) ?>
                     </a>
                 </li>
@@ -29,8 +29,8 @@
                     <article class="tarjeta-producto">
                         <a href="<?= URL_BASE ?>/producto/detalle/<?= $p['id'] ?>">
                             <img src="<?= URL_BASE ?>/img/<?= htmlspecialchars($p['imagen']) ?>"
-                                 alt="<?= htmlspecialchars($p['nombre']) ?>"
-                                 onerror="this.src='<?= URL_BASE ?>/img/sin-imagen.svg'">
+                                alt="<?= htmlspecialchars($p['nombre']) ?>"
+                                onerror="this.src='<?= URL_BASE ?>/img/sin-imagen.svg'">
                         </a>
                         <div class="cuerpo">
                             <span class="etiqueta-categoria"><?= htmlspecialchars($p['categoria_nombre']) ?></span>
@@ -45,11 +45,11 @@
                                     Ver detalle
                                 </a>
                                 <?php if ((int) $p['stock'] > 0): ?>
-                                    <form method="POST" action="<?= URL_BASE ?>/cesta/anadir" style="display:inline;">
-                                        <input type="hidden" name="id_producto" value="<?= $p['id'] ?>">
-                                        <input type="hidden" name="cantidad"    value="1">
-                                        <button class="boton boton-pequeno boton-secundario" type="submit">+ Cesta</button>
-                                    </form>
+                                    <button
+                                        class="boton boton-pequeno boton-secundario btn-anadir-cesta"
+                                        data-id="<?= $p['id'] ?>">
+                                        + Cesta
+                                    </button>
                                 <?php else: ?>
                                     <span style="color:var(--color-error);">Sin stock</span>
                                 <?php endif; ?>
@@ -62,3 +62,47 @@
     </section>
 
 </div>
+
+<script>
+    document.querySelectorAll('.btn-anadir-cesta').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var id = this.dataset.id;
+            var boton = this;
+
+            var datos = new FormData();
+            datos.append('id_producto', id);
+            datos.append('cantidad', 1);
+
+            fetch('<?= URL_BASE ?>/cesta/anadir', {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: datos
+                })
+                .then(function(res) {
+                    return res.json();
+                })
+                .then(function(data) {
+                    if (data.ok) {
+                        boton.textContent = '✓ Añadido';
+                        boton.disabled = true;
+                        setTimeout(function() {
+                            boton.textContent = '+ Cesta';
+                            boton.disabled = false;
+                        }, 1500);
+
+                        var contador = document.querySelector('.contador-cesta');
+                        if (contador) {
+                            contador.textContent = data.totalUnidades;
+                        }
+                    } else {
+                        alert(data.mensaje);
+                    }
+                })
+                .catch(function() {
+                    alert('Error al añadir el producto');
+                });
+        });
+    });
+</script>

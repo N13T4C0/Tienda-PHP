@@ -7,11 +7,19 @@
  */
 class Cesta
 {
+    /** Devuelve la clave de sesion correcta segun si hay usuario logueado o no */
+    private static function clave(): string
+    {
+        $usuario = Sesion::usuario();
+        return $usuario ? 'cesta_u' . $usuario['id'] : 'cesta_invitado';
+    }
+
     /** Inicializa la cesta si no existia */
     public static function preparar(): void
     {
-        if (!isset($_SESSION['cesta'])) {
-            $_SESSION['cesta'] = [];
+        $clave = self::clave();
+        if (!isset($_SESSION[$clave])) {
+            $_SESSION[$clave] = [];
         }
     }
 
@@ -19,20 +27,22 @@ class Cesta
     public static function meterProducto(int $idProducto, int $unidades = 1): array
     {
         self::preparar();
+        $clave    = self::clave();
         $modelo   = new Producto();
         $producto = $modelo->obtenerUno($idProducto);
+
         if (!$producto) {
             return ['ok' => false, 'mensaje' => 'Producto no encontrado'];
         }
 
-        $yaTenia = $_SESSION['cesta'][$idProducto] ?? 0;
+        $yaTenia = $_SESSION[$clave][$idProducto] ?? 0;
         $total   = $yaTenia + $unidades;
 
         if ($total > (int) $producto['stock']) {
             return ['ok' => false, 'mensaje' => 'No hay stock suficiente (quedan ' . $producto['stock'] . ')'];
         }
 
-        $_SESSION['cesta'][$idProducto] = $total;
+        $_SESSION[$clave][$idProducto] = $total;
         return ['ok' => true, 'mensaje' => 'Producto anadido a la cesta'];
     }
 
@@ -40,12 +50,15 @@ class Cesta
     public static function cambiarUnidades(int $idProducto, int $unidades): array
     {
         self::preparar();
+        $clave = self::clave();
+
         if ($unidades <= 0) {
             return self::quitarProducto($idProducto);
         }
 
         $modelo   = new Producto();
         $producto = $modelo->obtenerUno($idProducto);
+
         if (!$producto) {
             return ['ok' => false, 'mensaje' => 'Producto no encontrado'];
         }
@@ -53,7 +66,7 @@ class Cesta
             return ['ok' => false, 'mensaje' => 'Stock insuficiente'];
         }
 
-        $_SESSION['cesta'][$idProducto] = $unidades;
+        $_SESSION[$clave][$idProducto] = $unidades;
         return ['ok' => true, 'mensaje' => 'Cesta actualizada'];
     }
 
@@ -61,23 +74,24 @@ class Cesta
     public static function quitarProducto(int $idProducto): array
     {
         self::preparar();
-        unset($_SESSION['cesta'][$idProducto]);
+        unset($_SESSION[self::clave()][$idProducto]);
         return ['ok' => true, 'mensaje' => 'Producto eliminado de la cesta'];
     }
 
     /** Vacia la cesta */
     public static function vaciar(): void
     {
-        $_SESSION['cesta'] = [];
+        $_SESSION[self::clave()] = [];
     }
 
     /** Devuelve el contenido de la cesta con datos completos del producto */
     public static function contenido(): array
     {
         self::preparar();
-        $items   = [];
-        $modelo  = new Producto();
-        foreach ($_SESSION['cesta'] as $idProducto => $unidades) {
+        $items  = [];
+        $modelo = new Producto();
+
+        foreach ($_SESSION[self::clave()] as $idProducto => $unidades) {
             $producto = $modelo->obtenerUno((int) $idProducto);
             if ($producto) {
                 $items[] = [
@@ -94,7 +108,7 @@ class Cesta
     public static function totalUnidades(): int
     {
         self::preparar();
-        return array_sum($_SESSION['cesta']);
+        return array_sum($_SESSION[self::clave()]);
     }
 
     /** Importe total de la cesta */
@@ -103,7 +117,8 @@ class Cesta
         self::preparar();
         $total  = 0.0;
         $modelo = new Producto();
-        foreach ($_SESSION['cesta'] as $idProducto => $unidades) {
+
+        foreach ($_SESSION[self::clave()] as $idProducto => $unidades) {
             $producto = $modelo->obtenerUno((int) $idProducto);
             if ($producto) {
                 $total += (float) $producto['precio'] * (int) $unidades;
@@ -115,6 +130,34 @@ class Cesta
     /** ¿Esta vacia? */
     public static function vacia(): bool
     {
-        return empty($_SESSION['cesta']);
+        self::preparar();
+        return empty($_SESSION[self::clave()]);
+    }
+
+    /**
+     * Al hacer login: migra la cesta de invitado a la del usuario.
+     * Llamar justo despues de Sesion::iniciar()
+     */
+    public static function migrarAlLogin(int $idUsuario): void
+    {
+        $claveInvitado = 'cesta_invitado';
+        $claveUsuario  = 'cesta_u' . $idUsuario;
+
+        if (empty($_SESSION[$claveInvitado])) {
+            return; // No habia cesta de invitado, nada que migrar
+        }
+
+        if (!isset($_SESSION[$claveUsuario])) {
+            $_SESSION[$claveUsuario] = [];
+        }
+
+        // Fusiona: suma las unidades si el producto ya estaba en la cesta del usuario
+        foreach ($_SESSION[$claveInvitado] as $idProducto => $unidades) {
+            $yaHabia = $_SESSION[$claveUsuario][$idProducto] ?? 0;
+            $_SESSION[$claveUsuario][$idProducto] = $yaHabia + $unidades;
+        }
+
+        // Borra la cesta de invitado
+        unset($_SESSION[$claveInvitado]);
     }
 }
