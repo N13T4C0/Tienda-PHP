@@ -27,17 +27,16 @@
 
             <div class="rejilla-productos">
                 <?php foreach ($productos as $p): ?>
-                    <article class="tarjeta-producto">
+                    <article class="tarjeta-producto" id="producto-<?= $p['id'] ?>">
                         <a href="<?= URL_BASE ?>/producto/detalle/<?= $p['id'] ?>">
                             <?php
-                            // Si la imagen es de uploads la buscamos alli, si no en /img
                             $rutaImg = file_exists(PUBLICO . '/uploads/imagenes/' . $p['imagen'])
                                 ? URL_BASE . '/uploads/imagenes/' . htmlspecialchars($p['imagen'])
                                 : URL_BASE . '/img/' . htmlspecialchars($p['imagen']);
                             ?>
                             <img src="<?= $rutaImg ?>"
-                                 alt="<?= htmlspecialchars($p['nombre']) ?>"
-                                 onerror="this.src='<?= URL_BASE ?>/img/sin-imagen.svg'">
+                                alt="<?= htmlspecialchars($p['nombre']) ?>"
+                                onerror="this.src='<?= URL_BASE ?>/img/sin-imagen.svg'">
                         </a>
                         <div class="cuerpo">
                             <span class="etiqueta-categoria"><?= htmlspecialchars($p['categoria_nombre']) ?></span>
@@ -52,13 +51,10 @@
                                     Ver detalle
                                 </a>
                                 <?php if ((int) $p['stock'] > 0): ?>
-                                    <form action="<?= URL_BASE ?>/cesta/anadir" method="POST">
-                                        <input type="hidden" name="id_producto" value="<?= $p['id'] ?>">
-                                        <input type="hidden" name="cantidad" value="1">
-                                        <button type="submit" class="boton boton-pequeno boton-secundario">
-                                            + Cesta
-                                        </button>
-                                    </form>
+                                    <button class="boton boton-pequeno boton-secundario btn-anadir-cesta"
+                                        data-id="<?= $p['id'] ?>">
+                                        + Cesta
+                                    </button>
                                 <?php else: ?>
                                     <span class="sin-stock">Sin stock</span>
                                 <?php endif; ?>
@@ -70,13 +66,12 @@
 
             <?php if ($paginador->totalPaginas() > 1): ?>
                 <?php
-                // Construimos la base de la URL para no perder el filtro de categoria
                 $urlBase = URL_BASE . ($categoriaActiva ? '/producto/index/' . $categoriaActiva : '/producto');
                 ?>
                 <nav class="paginacion">
                     <?php if ($paginador->hayAnterior()): ?>
                         <a class="boton boton-pequeno boton-secundario"
-                           href="<?= $urlBase ?>?pagina=<?= $paginador->paginaActual() - 1 ?>">
+                            href="<?= $urlBase ?>?pagina=<?= $paginador->paginaActual() - 1 ?>">
                             &laquo; Anterior
                         </a>
                     <?php endif; ?>
@@ -88,7 +83,7 @@
 
                     <?php if ($paginador->haySiguiente()): ?>
                         <a class="boton boton-pequeno boton-secundario"
-                           href="<?= $urlBase ?>?pagina=<?= $paginador->paginaActual() + 1 ?>">
+                            href="<?= $urlBase ?>?pagina=<?= $paginador->paginaActual() + 1 ?>">
                             Siguiente &raquo;
                         </a>
                     <?php endif; ?>
@@ -99,3 +94,41 @@
     </section>
 
 </div>
+
+<script>
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-anadir-cesta');
+        if (!btn) return;
+
+        btn.disabled = true;
+        btn.textContent = '...';
+
+        fetch('<?= URL_BASE ?>/cesta/anadir', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: 'id_producto=' + btn.dataset.id + '&cantidad=1'
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.ok) {
+                    document.querySelector('.contador-cesta').textContent = data.total;
+                    btn.textContent = '✓';
+                    setTimeout(() => {
+                        btn.textContent = '+ Cesta';
+                        btn.disabled = false;
+                    }, 1500);
+                } else {
+                    btn.textContent = '+ Cesta';
+                    btn.disabled = false;
+                    alert(data.mensaje);
+                }
+            })
+            .catch(() => {
+                btn.textContent = '+ Cesta';
+                btn.disabled = false;
+            });
+    });
+</script>

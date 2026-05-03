@@ -1,3 +1,5 @@
+<?php require APP . '/Vistas/comunes/cabecera.php'; ?>
+
 <div class="pago-resultado pago-resultado--info">
     <div class="pago-icono pago-icono--info">✕</div>
     <h2>Pago cancelado</h2>
