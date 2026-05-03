@@ -91,50 +91,41 @@ class CestaControlador
     /** Confirma la compra: crea el pedido en BD */
     public function confirmar(): void
     {
-        Sesion::exigirLogin();
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || Cesta::vacia()) {
-            Sesion::redirigir('cesta');
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . URL_BASE . '/cesta');
+            exit;
         }
 
-        $datosEnvio = [
+        $cesta = Cesta::contenido();
+        if (empty($cesta)) {
+            header('Location: ' . URL_BASE . '/cesta');
+            exit;
+        }
+
+        // Guardamos dirección en sesión para usarla tras el pago
+        $_SESSION['pago_envio'] = [
             'direccion' => trim($_POST['direccion'] ?? ''),
             'localidad' => trim($_POST['localidad'] ?? ''),
             'provincia' => trim($_POST['provincia'] ?? ''),
         ];
 
-        if ($datosEnvio['direccion'] === '' || $datosEnvio['localidad'] === '') {
-            Sesion::mensaje('error', 'Debes indicar la direccion completa');
-            Sesion::redirigir('cesta/finalizar');
+        $total = array_reduce($cesta, fn($c, $i) => $c + $i['subtotal'], 0);
+
+        // Creamos la orden en PayPal y redirigimos
+        $paypal = new Paypal();
+        $orden  = $paypal->crearOrden($total);
+
+        $_SESSION['paypal_order_id'] = $orden['id'];
+
+        foreach ($orden['links'] as $link) {
+            if ($link['rel'] === 'approve') {
+                header('Location: ' . $link['href']);
+                exit;
+            }
         }
 
-        $items = Cesta::contenido();
-        $total = Cesta::importeTotal();
-
-        try {
-            $modelo   = new Pedido();
-            $usuario  = Sesion::usuario();
-            $idPedido = $modelo->crearPedidoCompleto(
-                (int) $usuario['id'],
-                $datosEnvio,
-                $items,
-                $total
-            );
-            Cesta::vaciar();
-
-            EnvioMail::confirmacionPedido(
-                $usuario['email'],
-                $usuario['nombre'],
-                $idPedido,
-                $items,
-                $total,
-                $datosEnvio
-            );
-
-            Sesion::mensaje('ok', 'Pedido #' . $idPedido . ' creado. Te hemos enviado un email de confirmacion.');
-            Sesion::redirigir('');
-        } catch (Throwable $e) {
-            Sesion::mensaje('error', 'No se pudo procesar el pedido: ' . $e->getMessage());
-            Sesion::redirigir('cesta/finalizar');
-        }
+        // Si algo falla con PayPal
+        header('Location: ' . URL_BASE . '/pago/error');
+        exit;
     }
 }
