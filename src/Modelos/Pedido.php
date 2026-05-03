@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Modelo Pedido. Inserta cabeceras de pedido y sus lineas asociadas
  * usando una transaccion para garantizar consistencia.
@@ -47,7 +48,7 @@ class Pedido
                  VALUES (:pe, :pr, :np, :pu, :un, :st)"
             );
             $stmtStock = $this->bd->prepare(
-                "UPDATE productos SET stock = stock - :u WHERE id = :id AND stock >= :u"
+                "UPDATE productos SET stock = stock - :u WHERE id = :id AND stock >= :u2"
             );
 
             foreach ($cesta as $item) {
@@ -66,6 +67,7 @@ class Pedido
 
                 $stmtStock->execute([
                     ':u'  => $unidades,
+                    ':u2' => $unidades,
                     ':id' => $producto['id'],
                 ]);
             }

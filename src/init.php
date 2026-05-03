@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Inicializacion de la aplicacion (bootstrap).
  *
@@ -32,6 +33,7 @@ spl_autoload_register(function (string $clase) {
         APP . '/Controladores/' . $clase . '.php',
         APP . '/Lib/'           . $clase . '.php',
         APP . '/Rutas/'         . $clase . '.php',
+        APP . '/Utils/'         . $clase . '.php',
     ];
     foreach ($rutasPosibles as $ruta) {
         if (is_file($ruta)) {

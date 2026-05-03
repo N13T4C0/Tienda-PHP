@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Definicion centralizada de rutas de la aplicacion.
  *
@@ -80,6 +81,22 @@ class Rutas
         });
 
         // -------------------------------------------------------
+        //  PAGO (PayPal)
+        // -------------------------------------------------------
+        Enrutador::agregar('GET', '/pago/exito', function () {
+            (new PagoControlador())->exito();
+        });
+        Enrutador::agregar('GET', '/pago/cancelado', function () {
+            (new PagoControlador())->cancelado();
+        });
+        Enrutador::agregar('GET', '/pago/gracias', function () {
+            (new PagoControlador())->gracias();
+        });
+        Enrutador::agregar('GET', '/pago/error', function () {
+            (new PagoControlador())->error();
+        });
+
+        // -------------------------------------------------------
         //  PANEL DE ADMINISTRACION
         // -------------------------------------------------------
         Enrutador::agregar('GET', '/admin', function () {
@@ -123,15 +140,15 @@ class Rutas
         });
 
         // -------------------------------------------------------
-//  GOOGLE AUTH
-// -------------------------------------------------------
-Enrutador::agregar('GET', '/auth/loginGoogle', function () {
-    (new AuthControlador())->loginGoogle();
-});
+        //  GOOGLE AUTH
+        // -------------------------------------------------------
+        Enrutador::agregar('GET', '/auth/loginGoogle', function () {
+            (new AuthControlador())->loginGoogle();
+        });
 
-Enrutador::agregar('GET', '/auth/googleCallback', function () {
-    (new AuthControlador())->googleCallback();
-});
+        Enrutador::agregar('GET', '/auth/googleCallback', function () {
+            (new AuthControlador())->googleCallback();
+        });
 
         // -------------------------------------------------------
         //  Despachar la peticion actual

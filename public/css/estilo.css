@@ -471,6 +471,7 @@ footer.pie a {
     box-shadow: var(--sombra);
     color: #777;
 }
+
 .formulario__titulo {
     text-align: center;
     margin-bottom: 1.5rem;
@@ -518,7 +519,8 @@ footer.pie a {
     margin-top: 1rem;
     text-align: center;
 }
-.boton--full{
+
+.boton--full {
     width: 100%;
 }
 
@@ -587,10 +589,71 @@ footer.pie a {
     padding: 2rem;
 }
 
-.tarjeta-producto__nombre {
-    margin-top: .5rem;
-}
-
 .sin-stock {
     color: var(--color-error);
+}
+
+/* ---------- VISTAS DE PAGO ---------- */
+
+/* Icono grande centrado (✓ o ✕) */
+.pago-icono {
+    font-size: 4rem;
+    line-height: 1;
+    margin-bottom: 1rem;
+}
+
+.pago-icono--ok {
+    color: var(--color-ok);
+}
+
+.pago-icono--error {
+    color: var(--color-error);
+}
+
+.pago-icono--info {
+    color: #2980b9;
+}
+
+/* Bloque principal de resultado */
+.pago-resultado {
+    background: #fff;
+    max-width: 480px;
+    margin: 3rem auto;
+    padding: 3rem 2rem;
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+    text-align: center;
+}
+
+.pago-resultado h2 {
+    font-size: 1.6rem;
+    margin-bottom: .5rem;
+}
+
+.pago-resultado p {
+    color: #666;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+}
+
+/* Separador fino entre mensaje y botones */
+.pago-resultado__acciones {
+    display: flex;
+    gap: .75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+}
+
+/* Línea decorativa de color en la parte superior de la tarjeta */
+.pago-resultado--ok {
+    border-top: 4px solid var(--color-ok);
+}
+
+.pago-resultado--error {
+    border-top: 4px solid var(--color-error);
+}
+
+.pago-resultado--info {
+    border-top: 4px solid #2980b9;
 }
