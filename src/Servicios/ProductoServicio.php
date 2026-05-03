@@ -3,12 +3,7 @@ namespace Servicios;
 
 use Repositorios\ProductoRepositorio;
 
-/**
- * ProductoServicio
- *
- * Logica de negocio relacionada con productos:
- * filtrado del catalogo, gestion desde el panel admin.
- */
+
 class ProductoServicio
 {
     private ProductoRepositorio $repositorio;

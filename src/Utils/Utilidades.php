@@ -1,12 +1,7 @@
 <?php
 namespace Utils;
 
-/**
- * Mini lector de archivos .env (formato CLAVE=valor).
- *
- * Carga las variables del .env en $_ENV y getenv()
- * sin depender de ninguna libreria externa.
- */
+
 class Utilidades
 {
     /** Carga el archivo .env indicado. Devuelve true si lo encontro. */
@@ -23,7 +18,6 @@ class Utilidades
                 continue;
             }
             [$clave, $valor] = array_map('trim', explode('=', $linea, 2));
-            // Quitamos comillas alrededor del valor si las hubiera
             $valor = trim($valor, "\"'");
             $_ENV[$clave] = $valor;
             putenv($clave . '=' . $valor);

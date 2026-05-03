@@ -5,15 +5,6 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use Utils\Utilidades;
 
-/**
- * Helper estatico para enviar emails usando PHPMailer + SMTP.
- *
- * Las credenciales se leen del archivo .env (nunca hardcodeadas):
- *   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM, SMTP_FROM_NAME
- *
- * En desarrollo: usa Mailtrap (sandbox.smtp.mailtrap.io, puerto 2525).
- * En produccion: sustituye las credenciales por las de Gmail u otro proveedor.
- */
 class EnvioMail
 {
     /**
@@ -47,13 +38,6 @@ class EnvioMail
     /**
      * Email de confirmacion de pedido.
      * Se llama tras crear el pedido en la base de datos.
-     *
-     * @param string $email    Correo del cliente
-     * @param string $nombre   Nombre del cliente
-     * @param int    $idPedido ID del pedido recien creado
-     * @param array  $items    Lineas del carrito: [['producto'=>[...], 'cantidad'=>N], ...]
-     * @param float  $total    Importe total
-     * @param array  $envio    ['direccion', 'localidad', 'provincia']
      */
     public static function confirmacionPedido(
         string $email,
@@ -133,7 +117,7 @@ class EnvioMail
      */
     private static function enviar(string $para, string $asunto, string $cuerpoHtml): bool
     {
-        $mail = new PHPMailer(true); // true = activa excepciones
+        $mail = new PHPMailer(true);
 
         try {
             // --- Servidor SMTP ---

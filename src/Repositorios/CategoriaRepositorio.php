@@ -3,12 +3,7 @@ namespace Repositorios;
 
 use Config\Conexion;
 
-/**
- * CategoriaRepositorio
- *
- * Responsabilidad UNICA: ejecutar las consultas SQL
- * relacionadas con la tabla `categorias`.
- */
+
 class CategoriaRepositorio
 {
     private $bd;

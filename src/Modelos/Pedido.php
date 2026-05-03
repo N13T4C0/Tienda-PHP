@@ -3,10 +3,7 @@ namespace Modelos;
 
 use Config\Conexion;
 
-/**
- * Modelo Pedido. Inserta cabeceras de pedido y sus lineas asociadas
- * usando una transaccion para garantizar consistencia.
- */
+
 class Pedido
 {
     private $bd;
@@ -18,12 +15,6 @@ class Pedido
 
     /**
      * Inserta un pedido completo (cabecera + lineas) en una transaccion.
-     *
-     * @param int   $idUsuario
-     * @param array $datosEnvio  ['direccion','localidad','provincia']
-     * @param array $cesta       array de items con producto y cantidad
-     * @param float $total
-     * @return int  Id del pedido creado
      */
     public function crearPedidoCompleto(int $idUsuario, array $datosEnvio, array $cesta, float $total): int
     {

@@ -3,13 +3,7 @@ namespace Repositorios;
 
 use Config\Conexion;
 
-/**
- * UsuarioRepositorio
- *
- * Responsabilidad UNICA: ejecutar las consultas SQL
- * relacionadas con la tabla `usuarios`.
- * No tiene logica de negocio (eso es tarea del Servicio).
- */
+
 class UsuarioRepositorio
 {
     private $bd;

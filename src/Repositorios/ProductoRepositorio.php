@@ -3,12 +3,7 @@ namespace Repositorios;
 
 use Config\Conexion;
 
-/**
- * ProductoRepositorio
- *
- * Responsabilidad UNICA: ejecutar las consultas SQL
- * relacionadas con la tabla `productos`.
- */
+
 class ProductoRepositorio
 {
     private $bd;

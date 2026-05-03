@@ -1,11 +1,9 @@
 <div class="formulario ancho">
     <h1><?= $producto ? 'Editar producto' : 'Nuevo producto' ?></h1>
 
-    <!-- enctype="multipart/form-data" es obligatorio para subir archivos -->
     <form method="POST" action="<?= URL_BASE ?>/admin/guardarProducto" enctype="multipart/form-data">
         <?php if ($producto): ?>
             <input type="hidden" name="id" value="<?= $producto['id'] ?>">
-            <!-- Guardamos la imagen actual por si el usuario no sube una nueva -->
             <input type="hidden" name="imagen_actual" value="<?= htmlspecialchars($producto['imagen'] ?? 'sin-imagen.svg') ?>">
         <?php endif; ?>
 

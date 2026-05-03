@@ -11,10 +11,9 @@ use PDOException;
 
 class Conexion
 {
-    /** @var PDO|null */
     private static $pdo = null;
 
-    /** Datos de conexion (XAMPP por defecto) */
+    /** Datos de conexion */
     private const HOST    = 'localhost';
     private const BD      = 'tiendaphp';
     private const USUARIO = 'root';

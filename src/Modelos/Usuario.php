@@ -3,9 +3,7 @@ namespace Modelos;
 
 use Config\Conexion;
 
-/**
- * Modelo Usuario. Maneja el registro, login y confirmacion de usuarios.
- */
+
 class Usuario
 {
     private $bd;
@@ -91,7 +89,7 @@ class Usuario
 
 public function registrarOActualizarGoogle(array $datos): int
 {
-    // 1. Usamos $this->bd que es como se llama tu conexión en esta clase
+    // 1. Usamos $this->bd que es como se llama la conexión en esta clase
     $sql = "SELECT id FROM usuarios WHERE google_id = :google_id OR email = :email LIMIT 1";
     $stmt = $this->bd->prepare($sql);
     $stmt->execute([

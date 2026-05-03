@@ -1,15 +1,9 @@
--- =====================================================
---  Base de datos: tiendaphp
---  Proyecto MVC sencillo de tienda online (2º DAW)
--- =====================================================
 
 DROP DATABASE IF EXISTS tiendaphp;
 CREATE DATABASE tiendaphp CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE tiendaphp;
 
--- -----------------------------------------------------
--- Tabla: categorias
--- -----------------------------------------------------
+
 CREATE TABLE categorias (
     id          INT AUTO_INCREMENT PRIMARY KEY,
     nombre      VARCHAR(100) NOT NULL UNIQUE,
@@ -17,9 +11,7 @@ CREATE TABLE categorias (
     fecha_alta  DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
--- -----------------------------------------------------
--- Tabla: productos
--- -----------------------------------------------------
+
 CREATE TABLE productos (
     id            INT AUTO_INCREMENT PRIMARY KEY,
     categoria_id  INT NOT NULL,
@@ -35,9 +27,7 @@ CREATE TABLE productos (
         ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
--- -----------------------------------------------------
--- Tabla: usuarios
--- -----------------------------------------------------
+
 CREATE TABLE usuarios (
     id           INT AUTO_INCREMENT PRIMARY KEY,
     nombre       VARCHAR(80) NOT NULL,
@@ -50,9 +40,7 @@ CREATE TABLE usuarios (
     fecha_alta   DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
--- -----------------------------------------------------
--- Tabla: pedidos
--- -----------------------------------------------------
+
 CREATE TABLE pedidos (
     id            INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id    INT NOT NULL,
@@ -67,9 +55,7 @@ CREATE TABLE pedidos (
         ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
--- -----------------------------------------------------
--- Tabla: lineas_pedido
--- -----------------------------------------------------
+
 CREATE TABLE lineas_pedido (
     id              INT AUTO_INCREMENT PRIMARY KEY,
     pedido_id       INT NOT NULL,
@@ -86,16 +72,14 @@ CREATE TABLE lineas_pedido (
         ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
--- =====================================================
---  Datos de prueba
--- =====================================================
+
 
 INSERT INTO categorias (nombre, descripcion) VALUES
     ('Electronica',  'Dispositivos electronicos y gadgets'),
     ('Ropa',         'Ropa y complementos'),
     ('Hogar',        'Articulos para el hogar'),
     ('Libros',       'Libros y revistas');
--- cambniar precio de los productos para probar el paypal, NO PASARSE DE 500
+
 INSERT INTO productos (categoria_id, nombre, descripcion, precio, stock, imagen) VALUES
     (1, 'Auriculares Bluetooth', 'Auriculares inalambricos con cancelacion de ruido', 1, 25, 'auriculares.jpg'),
     (1, 'Smartwatch Sport',      'Reloj inteligente resistente al agua',              1, 15, 'smartwatch.jpg'),
@@ -109,10 +93,3 @@ INSERT INTO productos (categoria_id, nombre, descripcion, precio, stock, imagen)
 
 ALTER TABLE usuarios ADD COLUMN google_id VARCHAR(255) DEFAULT NULL UNIQUE;
 ALTER TABLE usuarios ADD COLUMN avatar VARCHAR(255) DEFAULT NULL;
--- IMPORTANTE: los usuarios de prueba NO se crean aqui,
--- ya que las contrasenas deben hashearse con password_hash (bcrypt).
--- Ejecuta UNA vez el script:
---    http://localhost/ProyectoTiendaPHP/public/instalar.php
--- Crea automaticamente:
---    admin@tiendaphp.com   / clave: admin123    (rol admin)
---    cliente@tiendaphp.com / clave: cliente123  (rol cliente)

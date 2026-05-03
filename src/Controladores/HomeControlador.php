@@ -4,9 +4,6 @@ namespace Controladores;
 use Servicios\ProductoServicio;
 use Servicios\CategoriaServicio;
 
-/**
- * Controlador de la pagina principal.
- */
 class HomeControlador
 {
     /** Pagina inicial: muestra los productos destacados */

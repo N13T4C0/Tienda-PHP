@@ -33,7 +33,6 @@ class AdminControlador
         require APP . '/Vistas/comunes/pie.php';
     }
 
-    // -------------------- PRODUCTOS --------------------
 
     // Lista todos los productos
     public function productos(): void
@@ -144,7 +143,6 @@ class AdminControlador
         Sesion::redirigir('admin/productos');
     }
 
-    // -------------------- CATEGORIAS --------------------
 
     // Lista todas las categorias
     public function categorias(): void
@@ -209,7 +207,6 @@ class AdminControlador
         Sesion::redirigir('admin/categorias');
     }
 
-    // -------------------- USUARIOS --------------------
 
     // Lista todos los usuarios
     public function usuarios(): void
@@ -235,7 +232,6 @@ class AdminControlador
         Sesion::redirigir('admin/usuarios');
     }
 
-    // -------------------- HELPER PRIVADO --------------------
 
     /**
      * Sube la imagen al servidor y devuelve el nombre del archivo guardado.

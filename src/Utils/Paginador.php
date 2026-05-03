@@ -1,16 +1,7 @@
 <?php
 namespace Utils;
 
-/**
- * Paginador generico.
- *
- * Uso:
- *   $paginador = new Paginador($arrayTotal, $porPagina, $paginaActual);
- *   $items     = $paginador->elementosPagina(); // los items de esta pagina
- *
- * En la vista usamos $paginador->totalPaginas(), $paginador->paginaActual(), etc.
- * para renderizar los botones de navegacion.
- */
+
 class Paginador
 {
     private array $todos;

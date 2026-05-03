@@ -6,9 +6,6 @@ use Servicios\ProductoServicio;
 use Servicios\CategoriaServicio;
 use Utils\Paginador;
 
-/**
- * Controlador de productos (catalogo publico, detalle y buscador).
- */
 class ProductoControlador
 {
     /**
@@ -60,7 +57,6 @@ class ProductoControlador
         require APP . '/Vistas/comunes/pie.php';
     }
 
-    /** Buscador (recibe ?q=texto via GET) */
     public function buscar(): void
     {
         $texto = trim($_GET['q'] ?? '');

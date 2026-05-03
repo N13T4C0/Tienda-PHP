@@ -1,28 +1,14 @@
 <?php
 namespace Lib;
 
-/**
- * Enrutador - Gestiona el registro y despacho de rutas HTTP.
- *
- * Uso basico:
- *   Enrutador::agregar('GET', '/ruta/', function() { ... });
- *   Enrutador::despachar();
- *
- * Soporta rutas con parametro dinamico al final:
- *   Enrutador::agregar('GET', '/producto/detalle/:id', function($id) { ... });
- */
+
 class Enrutador
 {
-    /** @var array<string, array<string, callable>> */
     private static array $rutas = [];
 
-    /**
-     * Registra una ruta.
-     *
-     * @param string   $metodo     Metodo HTTP: 'GET' o 'POST'
-     * @param string   $accion     Patron de ruta, ej: '/auth/login/' o '/producto/detalle/:id'
-     * @param callable $controlador Funcion anonima que ejecuta la accion
-     */
+   
+      //Registra una ruta.
+    
     public static function agregar(string $metodo, string $accion, callable $controlador): void
     {
         $accion = trim($accion, '/');
@@ -39,8 +25,8 @@ class Enrutador
 
         // Limpiamos la URI: quitamos query string y la base del proyecto
         $uri = $_SERVER['REQUEST_URI'];
-        $uri = strtok($uri, '?');                                              // sin query string
-        $uri = preg_replace('#^' . preg_quote(URL_BASE, '#') . '#', '', $uri); // sin prefijo base
+        $uri = strtok($uri, '?');                                              
+        $uri = preg_replace('#^' . preg_quote(URL_BASE, '#') . '#', '', $uri);
         $uri = trim($uri, '/');
 
         // 1. Intentamos coincidencia exacta

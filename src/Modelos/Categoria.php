@@ -3,9 +3,7 @@ namespace Modelos;
 
 use Config\Conexion;
 
-/**
- * Modelo Categoria. Operaciones CRUD sobre la tabla `categorias`.
- */
+
 class Categoria
 {
     private $bd;

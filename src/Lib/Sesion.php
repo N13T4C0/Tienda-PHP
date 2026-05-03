@@ -1,10 +1,7 @@
 <?php
 namespace Lib;
 
-/**
- * Helper estatico para gestionar la sesion del usuario logeado
- * y los mensajes flash (alertas que solo se muestran una vez).
- */
+
 class Sesion
 {
     /** Guarda al usuario en sesion tras un login correcto */

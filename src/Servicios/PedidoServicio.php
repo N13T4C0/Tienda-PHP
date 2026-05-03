@@ -4,12 +4,7 @@ namespace Servicios;
 use Repositorios\PedidoRepositorio;
 use Repositorios\ProductoRepositorio;
 
-/**
- * PedidoServicio
- *
- * Logica de negocio para crear pedidos:
- * gestiona la transaccion, inserta cabecera, lineas y descuenta stock.
- */
+
 class PedidoServicio
 {
     private PedidoRepositorio   $repoPedido;
@@ -24,12 +19,6 @@ class PedidoServicio
     /**
      * Crea un pedido completo dentro de una transaccion:
      * inserta cabecera, las lineas y descuenta el stock de cada producto.
-     *
-     * @param int   $idUsuario
-     * @param array $datosEnvio  ['direccion', 'localidad', 'provincia']
-     * @param array $cesta       items con 'producto' y 'cantidad'
-     * @param float $total
-     * @return int  Id del pedido creado
      */
     public function crearPedido(int $idUsuario, array $datosEnvio, array $cesta, float $total): int
     {

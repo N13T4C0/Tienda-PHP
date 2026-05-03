@@ -1,12 +1,6 @@
 <?php
 /**
- * Script de instalacion (uso unico).
- *
- * - Crea (si no existen) los usuarios de prueba con clave hasheada con bcrypt.
- * - Hay que ejecutarlo UNA sola vez tras importar el SQL.
- *   URL: http://localhost/ProyectonetStore/public/instalar.php
- *
- * Despues conviene RENOMBRARLO o BORRARLO para no dejarlo accesible.
+ * Instalación de usuarios de prueba
  */
 
 require_once __DIR__ . '/../config/Conexion.php';
@@ -14,46 +8,34 @@ require_once __DIR__ . '/../config/Conexion.php';
 $bd = Conexion::abrir();
 
 $usuarios = [
-    [
-        'nombre'    => 'Admin',
-        'apellidos' => 'Tienda',
-        'email'     => 'admin@netstore.com',
-        'clave'     => 'admin123',
-        'rol'       => 'admin',
-    ],
-    [
-        'nombre'    => 'Cliente',
-        'apellidos' => 'Demo',
-        'email'     => 'cliente@netstore.com',
-        'clave'     => 'cliente123',
-        'rol'       => 'cliente',
-    ],
+    ['nombre' => 'Admin',   'apellidos' => 'Tienda', 'email' => 'admin@netstore.com',   'clave' => 'admin123',   'rol' => 'admin'],
+    ['nombre' => 'Cliente', 'apellidos' => 'Demo',   'email' => 'cliente@netstore.com', 'clave' => 'cliente123', 'rol' => 'cliente'],
 ];
 
-echo "<h1>Instalacion de netStore</h1>";
+echo "<h1>Instalación de netStore</h1>";
 echo "<pre style='background:#eee;padding:1rem;'>";
 
 foreach ($usuarios as $u) {
     $stmt = $bd->prepare("SELECT id FROM usuarios WHERE email = :email");
     $stmt->execute([':email' => $u['email']]);
+
     if ($stmt->fetch()) {
-        echo "[SKIP] {$u['email']} ya existia\n";
+        echo "[SKIP] {$u['email']} ya existía\n";
         continue;
     }
 
-    $hash = password_hash($u['clave'], PASSWORD_BCRYPT);
-    $ins = $bd->prepare(
+    $bd->prepare(
         "INSERT INTO usuarios (nombre, apellidos, email, clave, rol, activado)
          VALUES (:n, :a, :e, :c, :r, 1)"
-    );
-    $ins->execute([
+    )->execute([
         ':n' => $u['nombre'],
         ':a' => $u['apellidos'],
         ':e' => $u['email'],
-        ':c' => $hash,
+        ':c' => password_hash($u['clave'], PASSWORD_BCRYPT),
         ':r' => $u['rol'],
     ]);
-    echo "[OK]   Creado {$u['email']} (clave: {$u['clave']}, rol: {$u['rol']})\n";
+
+    echo "[OK] Creado {$u['email']} (clave: {$u['clave']}, rol: {$u['rol']})\n";
 }
 
 echo "</pre>";

@@ -3,13 +3,7 @@ namespace Servicios;
 
 use Repositorios\UsuarioRepositorio;
 
-/**
- * UsuarioServicio
- *
- * Contiene la logica de negocio relacionada con los usuarios:
- * registro, login, activacion de cuenta y autenticacion con Google.
- * Usa UsuarioRepositorio para acceder a la base de datos.
- */
+
 class UsuarioServicio
 {
     private UsuarioRepositorio $repositorio;

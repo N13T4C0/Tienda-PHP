@@ -3,13 +3,9 @@ namespace Modelos;
 
 use Config\Conexion;
 
-/**
- * Modelo Producto.
- * Encapsula todas las consultas relacionadas con la tabla `productos`.
- */
+
 class Producto
 {
-    /** @var PDO */
     private $bd;
 
     public function __construct()
@@ -17,7 +13,7 @@ class Producto
         $this->bd = Conexion::abrir();
     }
 
-    /** Devuelve todos los productos visibles (catalogo publico) */
+    /** Devuelve todos los productos visibles  */
     public function listar(): array
     {
         $sql = "SELECT p.*, c.nombre AS categoria_nombre
@@ -28,7 +24,7 @@ class Producto
         return $this->bd->query($sql)->fetchAll();
     }
 
-    /** Devuelve TODOS los productos (incluye no visibles, para el admin) */
+    /** Devuelve TODOS los productos  */
     public function listarTodos(): array
     {
         $sql = "SELECT p.*, c.nombre AS categoria_nombre

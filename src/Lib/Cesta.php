@@ -4,12 +4,6 @@ namespace Lib;
 use Lib\Sesion;
 use Repositorios\ProductoRepositorio;
 
-/**
- * Helper para gestionar el carrito de la compra (lo guardamos en sesion).
- *
- * Estructura en sesion:
- *   $_SESSION['cesta_invitado'] o $_SESSION['cesta_uXX'] = [ id_producto => unidades, ... ]
- */
 class Cesta
 {
     /** Devuelve la clave de sesion correcta segun si hay usuario logueado o no */
@@ -31,7 +25,6 @@ class Cesta
     /**
      * Anade unidades de un producto a la cesta.
      * Valida stock real contra la base de datos.
-     * Devuelve [ok => bool, mensaje => string]
      */
     public static function meterProducto(int $idProducto, int $unidades = 1): array
     {

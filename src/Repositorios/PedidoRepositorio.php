@@ -3,13 +3,7 @@ namespace Repositorios;
 
 use Config\Conexion;
 
-/**
- * PedidoRepositorio
- *
- * Responsabilidad UNICA: ejecutar las consultas SQL
- * relacionadas con las tablas `pedidos` y `lineas_pedido`.
- * La transaccion se gestiona desde PedidoServicio.
- */
+
 class PedidoRepositorio
 {
     private $bd;
@@ -19,7 +13,7 @@ class PedidoRepositorio
         $this->bd = Conexion::abrir();
     }
 
-    /** Devuelve la conexion PDO (necesaria para gestionar transacciones desde el servicio) */
+    /** Devuelve la conexion PDO  */
     public function conexion(): \PDO
     {
         return $this->bd;

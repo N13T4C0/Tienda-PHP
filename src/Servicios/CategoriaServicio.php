@@ -3,11 +3,7 @@ namespace Servicios;
 
 use Repositorios\CategoriaRepositorio;
 
-/**
- * CategoriaServicio
- *
- * Logica de negocio relacionada con categorias.
- */
+
 class CategoriaServicio
 {
     private CategoriaRepositorio $repositorio;
@@ -49,11 +45,7 @@ class CategoriaServicio
         return $this->repositorio->actualizar($id, $datos);
     }
 
-    /**
-     * Elimina una categoria. Lanza una excepcion si tiene productos asociados.
-     *
-     * @throws \RuntimeException
-     */
+   
     public function eliminar(int $id): bool
     {
         if ($this->repositorio->tieneProductos($id)) {

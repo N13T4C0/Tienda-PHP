@@ -9,26 +9,17 @@ use Controladores\CestaControlador;
 use Controladores\PagoControlador;
 use Controladores\AdminControlador;
 
-/**
- * Definicion centralizada de rutas de la aplicacion.
- *
- * Se basa en la clase Enrutador (src/Lib/Enrutador.php).
- * Formato: Enrutador::agregar('METODO', '/ruta/', funcion_controlador);
- */
+
 class Rutas
 {
     public static function registrar(): void
     {
-        // -------------------------------------------------------
-        //  INICIO
-        // -------------------------------------------------------
+      
         Enrutador::agregar('GET', '/', function () {
             (new HomeControlador())->index();
         });
 
-        // -------------------------------------------------------
-        //  AUTENTICACION
-        // -------------------------------------------------------
+       
         Enrutador::agregar('GET', '/auth/registro', function () {
             (new AuthControlador())->registro();
         });
@@ -48,9 +39,6 @@ class Rutas
             (new AuthControlador())->logout();
         });
 
-        // -------------------------------------------------------
-        //  PRODUCTOS (catalogo publico)
-        // -------------------------------------------------------
         Enrutador::agregar('GET', '/producto', function () {
             (new ProductoControlador())->index();
         });
@@ -64,9 +52,6 @@ class Rutas
             (new ProductoControlador())->buscar();
         });
 
-        // -------------------------------------------------------
-        //  CESTA DE LA COMPRA
-        // -------------------------------------------------------
         Enrutador::agregar('GET', '/cesta', function () {
             (new CestaControlador())->index();
         });
@@ -89,9 +74,6 @@ class Rutas
             (new CestaControlador())->confirmar();
         });
 
-        // -------------------------------------------------------
-        //  PAGO (PayPal)
-        // -------------------------------------------------------
         Enrutador::agregar('GET', '/pago/exito', function () {
             (new PagoControlador())->exito();
         });
@@ -105,14 +87,11 @@ class Rutas
             (new PagoControlador())->error();
         });
 
-        // -------------------------------------------------------
-        //  PANEL DE ADMINISTRACION
-        // -------------------------------------------------------
         Enrutador::agregar('GET', '/admin', function () {
             (new AdminControlador())->index();
         });
 
-        // -- Productos (admin) --
+
         Enrutador::agregar('GET', '/admin/productos', function () {
             (new AdminControlador())->productos();
         });
@@ -129,7 +108,7 @@ class Rutas
             (new AdminControlador())->borrarProducto($id);
         });
 
-        // -- Categorias (admin) --
+        
         Enrutador::agregar('GET', '/admin/categorias', function () {
             (new AdminControlador())->categorias();
         });
@@ -140,7 +119,7 @@ class Rutas
             (new AdminControlador())->borrarCategoria($id);
         });
 
-        // -- Usuarios (admin) --
+        
         Enrutador::agregar('GET', '/admin/usuarios', function () {
             (new AdminControlador())->usuarios();
         });
@@ -148,9 +127,7 @@ class Rutas
             (new AdminControlador())->borrarUsuario($id);
         });
 
-        // -------------------------------------------------------
-        //  GOOGLE AUTH
-        // -------------------------------------------------------
+
         Enrutador::agregar('GET', '/auth/loginGoogle', function () {
             (new AuthControlador())->loginGoogle();
         });
@@ -159,9 +136,7 @@ class Rutas
             (new AuthControlador())->googleCallback();
         });
 
-        // -------------------------------------------------------
-        //  Despachar la peticion actual
-        // -------------------------------------------------------
+        
         Enrutador::despachar();
     }
 }

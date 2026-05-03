@@ -1,10 +1,7 @@
 <?php
 namespace Lib;
 
-/**
- * Cliente OAuth 2.0 para Google sin dependencias externas.
- * Usa curl nativo de PHP.
- */
+
 class GoogleOAuth
 {
     private const AUTH_URL  = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -35,7 +32,6 @@ class GoogleOAuth
 
     /**
      * Intercambia el code por un access_token
-     * @return array<string,mixed>
      */
     public function intercambiarCode(string $code): array
     {
@@ -50,14 +46,12 @@ class GoogleOAuth
 
     /**
      * Obtiene los datos del usuario con el access_token
-     * @return array<string,mixed>
      */
     public function getUserInfo(string $accessToken): array
     {
         return $this->get(self::USER_URL, $accessToken);
     }
 
-    /** @return array<string,mixed> */
     private function post(string $url, array $data): array
     {
         $ch = curl_init($url);
@@ -74,7 +68,6 @@ class GoogleOAuth
         return json_decode($response, true) ?? [];
     }
 
-    /** @return array<string,mixed> */
     private function get(string $url, string $token): array
     {
         $ch = curl_init($url);
