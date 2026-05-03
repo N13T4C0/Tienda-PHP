@@ -1,15 +1,16 @@
 <?php
-namespace Modelos;
+namespace Repositorios;
 
 use Config\Conexion;
 
 /**
- * Modelo Producto.
- * Encapsula todas las consultas relacionadas con la tabla `productos`.
+ * ProductoRepositorio
+ *
+ * Responsabilidad UNICA: ejecutar las consultas SQL
+ * relacionadas con la tabla `productos`.
  */
-class Producto
+class ProductoRepositorio
 {
-    /** @var PDO */
     private $bd;
 
     public function __construct()
@@ -18,7 +19,7 @@ class Producto
     }
 
     /** Devuelve todos los productos visibles (catalogo publico) */
-    public function listar(): array
+    public function obtenerVisibles(): array
     {
         $sql = "SELECT p.*, c.nombre AS categoria_nombre
                 FROM productos p
@@ -28,8 +29,8 @@ class Producto
         return $this->bd->query($sql)->fetchAll();
     }
 
-    /** Devuelve TODOS los productos (incluye no visibles, para el admin) */
-    public function listarTodos(): array
+    /** Devuelve TODOS los productos incluidos los no visibles (panel admin) */
+    public function obtenerTodos(): array
     {
         $sql = "SELECT p.*, c.nombre AS categoria_nombre
                 FROM productos p
@@ -39,7 +40,7 @@ class Producto
     }
 
     /** Devuelve productos de una categoria concreta */
-    public function listarPorCategoria(int $idCategoria): array
+    public function obtenerPorCategoria(int $idCategoria): array
     {
         $sql = "SELECT p.*, c.nombre AS categoria_nombre
                 FROM productos p
@@ -51,8 +52,8 @@ class Producto
         return $stmt->fetchAll();
     }
 
-    /** Busca productos por palabra clave */
-    public function buscar(string $texto): array
+    /** Busca productos por texto en nombre o descripcion */
+    public function buscarPorTexto(string $texto): array
     {
         $sql = "SELECT p.*, c.nombre AS categoria_nombre
                 FROM productos p
@@ -78,8 +79,8 @@ class Producto
         return $fila ?: null;
     }
 
-    /** Inserta un producto y devuelve el id generado */
-    public function guardar(array $datos): int
+    /** Inserta un producto nuevo y devuelve el id generado */
+    public function insertar(array $datos): int
     {
         $sql = "INSERT INTO productos
                   (categoria_id, nombre, descripcion, precio, stock, imagen, visible)
@@ -98,8 +99,8 @@ class Producto
         return (int) $this->bd->lastInsertId();
     }
 
-    /** Modifica un producto existente */
-    public function modificar(int $id, array $datos): bool
+    /** Actualiza un producto existente */
+    public function actualizar(int $id, array $datos): bool
     {
         $sql = "UPDATE productos SET
                     categoria_id = :cat,
@@ -123,19 +124,19 @@ class Producto
         ]);
     }
 
-    /** Borra un producto */
-    public function borrar(int $id): bool
+    /** Elimina un producto por su id */
+    public function eliminar(int $id): bool
     {
         $stmt = $this->bd->prepare("DELETE FROM productos WHERE id = :id");
         return $stmt->execute([':id' => $id]);
     }
 
     /** Resta unidades del stock al confirmar un pedido */
-    public function descontarStock(int $id, int $unidades): bool
+    public function restarStock(int $id, int $unidades): bool
     {
         $stmt = $this->bd->prepare(
-            "UPDATE productos SET stock = stock - :u WHERE id = :id AND stock >= :u"
+            "UPDATE productos SET stock = stock - :u WHERE id = :id AND stock >= :u2"
         );
-        return $stmt->execute([':u' => $unidades, ':id' => $id]);
+        return $stmt->execute([':u' => $unidades, ':u2' => $unidades, ':id' => $id]);
     }
 }

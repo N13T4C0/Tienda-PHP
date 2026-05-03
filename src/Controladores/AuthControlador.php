@@ -1,13 +1,17 @@
 <?php
+namespace Controladores;
 
-/**
- * Controlador de autenticacion: registro, login, logout y confirmacion email.
- */
+use Lib\Sesion;
+use Lib\Cesta;
+use Lib\EnvioMail;
+use Lib\GoogleOAuth;
+use Servicios\UsuarioServicio;
+use Requests\RegistroRequest;
+use Requests\LoginRequest;
+
 class AuthControlador
 {
-    // -------------------- REGISTRO --------------------
-
-    /** Muestra el formulario de registro */
+    // Muestra el formulario de registro
     public function registro(): void
     {
         $datosPrevios = $_SESSION['datos_form'] ?? [];
@@ -18,7 +22,7 @@ class AuthControlador
         require APP . '/Vistas/comunes/pie.php';
     }
 
-    /** Procesa el formulario de registro */
+    // Procesa el formulario de registro
     public function procesarRegistro(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -31,16 +35,19 @@ class AuthControlador
         $clave     = $_POST['clave']          ?? '';
         $clave2    = $_POST['clave2']         ?? '';
 
+        // Guardamos los datos para repintar el formulario si hay errores
         $_SESSION['datos_form'] = compact('nombre', 'apellidos', 'email');
 
-        $errores = [];
-        if ($nombre === '')                                  $errores[] = 'El nombre es obligatorio';
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL))      $errores[] = 'El email no tiene un formato valido';
-        if (strlen($clave) < 6)                              $errores[] = 'La clave debe tener al menos 6 caracteres';
-        if ($clave !== $clave2)                              $errores[] = 'Las claves no coinciden';
+        $errores = RegistroRequest::validar([
+            'nombre' => $nombre,
+            'email'  => $email,
+            'clave'  => $clave,
+            'clave2' => $clave2,
+        ]);
 
-        $modelo = new Usuario();
-        if (!$errores && $modelo->buscarPorEmail($email)) {
+        $servicio = new UsuarioServicio();
+
+        if (!$errores && $servicio->emailExiste($email)) {
             $errores[] = 'Ya existe una cuenta con ese email';
         }
 
@@ -49,46 +56,43 @@ class AuthControlador
             Sesion::redirigir('auth/registro');
         }
 
-        $token = bin2hex(random_bytes(16));
-
-        $idNuevo = $modelo->registrar([
-            'nombre'      => htmlspecialchars($nombre),
-            'apellidos'   => htmlspecialchars($apellidos),
-            'email'       => $email,
-            'clave'       => password_hash($clave, PASSWORD_BCRYPT),
-            'rol'         => 'cliente',
-            'activado'    => 0,
-            'token_email' => $token,
+        // El servicio hashea la clave, genera el token y hace el INSERT
+        $token = $servicio->registrar([
+            'nombre'    => $nombre,
+            'apellidos' => $apellidos,
+            'email'     => $email,
+            'clave'     => $clave,
         ]);
 
         unset($_SESSION['datos_form']);
+
         EnvioMail::confirmacionRegistro($email, $nombre, $token);
 
-        Sesion::mensaje('ok', 'Registro completado revisa tu mail');
+        Sesion::mensaje('ok', 'Registro completado, revisa tu email');
         Sesion::redirigir('auth/login');
     }
 
-    /** Confirma el email a traves del token */
+    // Activa la cuenta del usuario mediante el enlace del email
     public function confirmar($token = null): void
     {
         if (!$token) {
             Sesion::mensaje('error', 'Token no valido');
             Sesion::redirigir('auth/login');
         }
-        $modelo  = new Usuario();
-        $usuario = $modelo->buscarPorToken($token);
+
+        $servicio = new UsuarioServicio();
+        $usuario  = $servicio->activarCuenta($token);
+
         if (!$usuario) {
             Sesion::mensaje('error', 'El enlace no es valido o ya se uso');
             Sesion::redirigir('auth/login');
         }
-        $modelo->activarCuenta((int) $usuario['id']);
+
         Sesion::mensaje('ok', 'Cuenta activada. Ya puedes iniciar sesion.');
         Sesion::redirigir('auth/login');
     }
 
-    // -------------------- LOGIN --------------------
-
-    /** Muestra el formulario de login */
+    // Muestra el formulario de login
     public function login(): void
     {
         require APP . '/Vistas/comunes/cabecera.php';
@@ -96,7 +100,7 @@ class AuthControlador
         require APP . '/Vistas/comunes/pie.php';
     }
 
-    /** Procesa el formulario de login */
+    // Procesa el formulario de login
     public function procesarLogin(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -106,13 +110,20 @@ class AuthControlador
         $email = trim($_POST['email'] ?? '');
         $clave = $_POST['clave']      ?? '';
 
-        $modelo  = new Usuario();
-        $usuario = $modelo->buscarPorEmail($email);
+        $errores = LoginRequest::validar(['email' => $email, 'clave' => $clave]);
+        if ($errores) {
+            Sesion::mensaje('error', implode('<br>', $errores));
+            Sesion::redirigir('auth/login');
+        }
 
-        if (!$usuario || !password_verify($clave, $usuario['clave'])) {
+        $servicio = new UsuarioServicio();
+        $usuario  = $servicio->verificarCredenciales($email, $clave);
+
+        if (!$usuario) {
             Sesion::mensaje('error', 'Credenciales incorrectas');
             Sesion::redirigir('auth/login');
         }
+
         if (!$usuario['activado']) {
             Sesion::mensaje('error', 'Tu cuenta aun no esta activada');
             Sesion::redirigir('auth/login');
@@ -124,7 +135,7 @@ class AuthControlador
         Sesion::redirigir('');
     }
 
-    /** Cierra sesion */
+    // Cierra la sesion del usuario
     public function logout(): void
     {
         Sesion::cerrar();
@@ -132,8 +143,7 @@ class AuthControlador
         Sesion::redirigir('');
     }
 
-    // -------------------- GOOGLE --------------------
-
+    // Redirige al usuario a la pantalla de login de Google
     public function loginGoogle(): void
     {
         $google = $this->crearClienteGoogle();
@@ -145,6 +155,7 @@ class AuthControlador
         exit;
     }
 
+    // Google redirige aqui despues de que el usuario acepte los permisos
     public function googleCallback(): void
     {
         if (!isset($_GET['code'], $_GET['state'])) {
@@ -159,12 +170,11 @@ class AuthControlador
         }
         unset($_SESSION['oauth_state']);
 
-        $google = $this->crearClienteGoogle();
-
+        $google    = $this->crearClienteGoogle();
         $tokenData = $google->intercambiarCode($_GET['code']);
 
         if (isset($tokenData['error']) || empty($tokenData['access_token'])) {
-            Sesion::mensaje('error', 'Google rechazó la solicitud');
+            Sesion::mensaje('error', 'Google rechazo la solicitud');
             Sesion::redirigir('auth/login');
         }
 
@@ -175,20 +185,9 @@ class AuthControlador
             Sesion::redirigir('auth/login');
         }
 
-        $partes    = explode(' ', $info['name'] ?? $info['email'], 2);
-        $nombre    = htmlspecialchars($partes[0]);
-        $apellidos = htmlspecialchars($partes[1] ?? '');
-
-        $modelo = new Usuario();
-        $idUser = $modelo->registrarOActualizarGoogle([
-            'google_id' => $info['sub'],
-            'email'     => $info['email'],
-            'nombre'    => $nombre,
-            'apellidos' => $apellidos,
-            'avatar'    => $info['picture'] ?? null,
-        ]);
-
-        $usuario = $modelo->obtenerUno($idUser);
+        // El servicio maneja la logica de crear o actualizar el usuario de Google
+        $servicio = new UsuarioServicio();
+        $usuario  = $servicio->procesarLoginGoogle($info);
 
         Sesion::iniciar($usuario);
         Cesta::migrarAlLogin((int) $usuario['id']);
@@ -196,6 +195,7 @@ class AuthControlador
         Sesion::redirigir('');
     }
 
+    // Crea el cliente de Google con las credenciales del archivo de configuracion
     private function crearClienteGoogle(): GoogleOAuth
     {
         $config = require APP . '/../config/google.php';

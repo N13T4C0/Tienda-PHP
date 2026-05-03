@@ -10,7 +10,12 @@
         <?php foreach ($productos as $p): ?>
             <article class="tarjeta-producto">
                 <a href="<?= URL_BASE ?>/producto/detalle/<?= $p['id'] ?>">
-                    <img src="<?= URL_BASE ?>/img/<?= htmlspecialchars($p['imagen']) ?>"
+                    <?php
+                    $rutaImg = file_exists(PUBLICO . '/uploads/imagenes/' . $p['imagen'])
+                        ? URL_BASE . '/uploads/imagenes/' . htmlspecialchars($p['imagen'])
+                        : URL_BASE . '/img/' . htmlspecialchars($p['imagen']);
+                    ?>
+                    <img src="<?= $rutaImg ?>"
                          alt="<?= htmlspecialchars($p['nombre']) ?>"
                          onerror="this.src='<?= URL_BASE ?>/img/sin-imagen.svg'">
                 </a>

@@ -42,8 +42,7 @@
                     <td class="txt-derecha"><?= number_format($item['subtotal'], 2) ?> &euro;</td>
                     <td class="txt-centro">
                         <a href="<?= URL_BASE ?>/cesta/quitar/<?= $item['producto']['id'] ?>"
-                           class="boton boton-pequeno boton-borrar"
-                           onclick="return confirm('Quitar de la cesta?')">Quitar</a>
+                           class="boton boton-pequeno boton-borrar">Quitar</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -53,8 +52,7 @@
     <div class="resumen-cesta">
         <div class="acciones">
             <a class="boton boton-secundario" href="<?= URL_BASE ?>/producto">Seguir comprando</a>
-            <a class="boton boton-borrar" href="<?= URL_BASE ?>/cesta/vaciar"
-               onclick="return confirm('¿Vaciar toda la cesta?')">Vaciar cesta</a>
+            <a class="boton boton-borrar" href="<?= URL_BASE ?>/cesta/vaciar">Vaciar cesta</a>
         </div>
         <p class="total">Total: <?= number_format($total, 2) ?> &euro;</p>
         <p class="txt-derecha">

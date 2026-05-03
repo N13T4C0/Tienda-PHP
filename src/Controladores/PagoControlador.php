@@ -1,17 +1,21 @@
 <?php
+namespace Controladores;
+
+use Lib\Sesion;
+use Lib\Cesta;
+use Servicios\PedidoServicio;
+use Utils\Paypal;
+
 class PagoControlador
 {
-    /**
-     * PayPal redirige aqui tras aprobar el pago.
-     * Captura la orden y crea el pedido en BD.
-     */
+    // PayPal redirige aqui cuando el usuario aprueba el pago
+    // Capturamos el pago y si todo va bien creamos el pedido en la base de datos
     public function exito(): void
     {
         $orderId = $_GET['token'] ?? null;
 
         if (!$orderId || $orderId !== ($_SESSION['paypal_order_id'] ?? '')) {
-            header('Location: ' . URL_BASE . '/cesta');
-            exit;
+            Sesion::redirigir('cesta');
         }
 
         $paypal    = new Paypal();
@@ -23,29 +27,32 @@ class PagoControlador
             $cesta      = Cesta::contenido();
             $total      = Cesta::importeTotal();
 
-            $modeloPedido = new Pedido();
-            $modeloPedido->crearPedidoCompleto($idUsuario, $datosEnvio, $cesta, $total);
+            // El servicio gestiona la transaccion: cabecera + lineas + descuento de stock
+            $servicio = new PedidoServicio();
+            $servicio->crearPedido($idUsuario, $datosEnvio, $cesta, $total);
 
             Cesta::vaciar();
             unset($_SESSION['paypal_order_id'], $_SESSION['pago_envio']);
 
-            header('Location: ' . URL_BASE . '/pago/gracias');
+            Sesion::redirigir('pago/gracias');
         } else {
-            header('Location: ' . URL_BASE . '/pago/error');
+            Sesion::redirigir('pago/error');
         }
-        exit;
     }
 
+    // El usuario cancelo el pago en PayPal
     public function cancelado(): void
     {
         require APP . '/Vistas/pago/cancelado.php';
     }
 
+    // El pago se completo correctamente
     public function gracias(): void
     {
         require APP . '/Vistas/pago/gracias.php';
     }
 
+    // Algo fue mal con el pago
     public function error(): void
     {
         require APP . '/Vistas/pago/error.php';

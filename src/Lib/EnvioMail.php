@@ -1,7 +1,9 @@
 <?php
+namespace Lib;
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+use Utils\Utilidades;
 
 /**
  * Helper estatico para enviar emails usando PHPMailer + SMTP.
@@ -21,13 +23,13 @@ class EnvioMail
     public static function confirmacionRegistro(string $email, string $nombre, string $token): bool
     {
         $enlace = 'http://localhost' . URL_BASE . '/auth/confirmar/' . $token;
-        $asunto = 'Confirma tu registro en Tienda PHP';
+        $asunto = 'Confirma tu registro en netStore';
 
         $cuerpo = "
         <div style='font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:24px;
                     border:1px solid #e0e0e0;border-radius:8px;'>
             <h2 style='color:#1e3a5f;'>Hola, {$nombre}!</h2>
-            <p>Gracias por registrarte en <strong>Tienda PHP</strong>.</p>
+            <p>Gracias por registrarte en <strong>netStore</strong>.</p>
             <p>Para activar tu cuenta haz clic en el boton:</p>
             <p style='text-align:center;margin:32px 0;'>
                 <a href='{$enlace}'
@@ -61,7 +63,7 @@ class EnvioMail
         float  $total,
         array  $envio
     ): bool {
-        $asunto = "Confirmacion de tu pedido #{$idPedido} - Tienda PHP";
+        $asunto = "Confirmacion de tu pedido #{$idPedido} - netStore";
         $fecha  = date('d/m/Y H:i');
 
         // Construimos la tabla de productos del pedido
@@ -118,7 +120,7 @@ class EnvioMail
             <p><strong>Direccion de envio:</strong> {$direccion}</p>
 
             <p style='color:#888;font-size:13px;margin-top:24px;'>
-                Gracias por comprar en <strong>Tienda PHP</strong>.
+                Gracias por comprar en <strong>netStore</strong>.
             </p>
         </div>";
 
@@ -145,8 +147,8 @@ class EnvioMail
 
             // --- Remitente y destinatario ---
             $mail->setFrom(
-                Utilidades::obtener('SMTP_FROM',      'no-responder@tiendaphp.local'),
-                Utilidades::obtener('SMTP_FROM_NAME', 'Tienda PHP')
+                Utilidades::obtener('SMTP_FROM',      'no-responder@netstore.local'),
+                Utilidades::obtener('SMTP_FROM_NAME', 'netStore')
             );
             $mail->addAddress($para);
 

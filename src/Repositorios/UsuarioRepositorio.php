@@ -1,12 +1,16 @@
 <?php
-namespace Modelos;
+namespace Repositorios;
 
 use Config\Conexion;
 
 /**
- * Modelo Usuario. Maneja el registro, login y confirmacion de usuarios.
+ * UsuarioRepositorio
+ *
+ * Responsabilidad UNICA: ejecutar las consultas SQL
+ * relacionadas con la tabla `usuarios`.
+ * No tiene logica de negocio (eso es tarea del Servicio).
  */
-class Usuario
+class UsuarioRepositorio
 {
     private $bd;
 
@@ -15,8 +19,8 @@ class Usuario
         $this->bd = Conexion::abrir();
     }
 
-    /** Crea un usuario nuevo */
-    public function registrar(array $datos): int
+    /** Inserta un usuario nuevo y devuelve su id */
+    public function insertar(array $datos): int
     {
         $sql = "INSERT INTO usuarios
                     (nombre, apellidos, email, clave, rol, activado, token_email)
@@ -36,7 +40,7 @@ class Usuario
     }
 
     /** Busca un usuario por su email */
-    public function buscarPorEmail(string $email): ?array
+    public function encontrarPorEmail(string $email): ?array
     {
         $stmt = $this->bd->prepare("SELECT * FROM usuarios WHERE email = :email");
         $stmt->execute([':email' => $email]);
@@ -45,7 +49,7 @@ class Usuario
     }
 
     /** Busca un usuario por su id */
-    public function obtenerUno(int $id): ?array
+    public function encontrarPorId(int $id): ?array
     {
         $stmt = $this->bd->prepare("SELECT * FROM usuarios WHERE id = :id");
         $stmt->execute([':id' => $id]);
@@ -54,7 +58,7 @@ class Usuario
     }
 
     /** Busca un usuario por su token de activacion de email */
-    public function buscarPorToken(string $token): ?array
+    public function encontrarPorToken(string $token): ?array
     {
         $stmt = $this->bd->prepare(
             "SELECT * FROM usuarios WHERE token_email = :tok AND activado = 0"
@@ -64,8 +68,8 @@ class Usuario
         return $fila ?: null;
     }
 
-    /** Activa la cuenta del usuario (tras hacer click en el email) */
-    public function activarCuenta(int $id): bool
+    /** Activa la cuenta del usuario */
+    public function activar(int $id): bool
     {
         $stmt = $this->bd->prepare(
             "UPDATE usuarios SET activado = 1, token_email = NULL WHERE id = :id"
@@ -73,8 +77,8 @@ class Usuario
         return $stmt->execute([':id' => $id]);
     }
 
-    /** Lista todos los usuarios (para el admin) */
-    public function listar(): array
+    /** Devuelve todos los usuarios (para el panel admin) */
+    public function obtenerTodos(): array
     {
         return $this->bd
             ->query("SELECT id, nombre, apellidos, email, rol, activado, fecha_alta
@@ -89,45 +93,46 @@ class Usuario
         return $stmt->execute([':id' => $id]);
     }
 
-public function registrarOActualizarGoogle(array $datos): int
-{
-    // 1. Usamos $this->bd que es como se llama tu conexión en esta clase
-    $sql = "SELECT id FROM usuarios WHERE google_id = :google_id OR email = :email LIMIT 1";
-    $stmt = $this->bd->prepare($sql);
-    $stmt->execute([
-        ':google_id' => $datos['google_id'],
-        ':email'     => $datos['email']
-    ]);
-    $usuario = $stmt->fetch();
+    /**
+     * Si ya existe un usuario con ese google_id o email lo actualiza;
+     * si no, lo inserta. Devuelve el id del usuario.
+     */
+    public function guardarDesdeGoogle(array $datos): int
+    {
+        $stmt = $this->bd->prepare(
+            "SELECT id FROM usuarios WHERE google_id = :gid OR email = :email LIMIT 1"
+        );
+        $stmt->execute([
+            ':gid'   => $datos['google_id'],
+            ':email' => $datos['email'],
+        ]);
+        $existente = $stmt->fetch();
 
-    if ($usuario) {
-        // 2. Actualizar si ya existe
-        $sql = "UPDATE usuarios SET 
-                nombre = :nombre, 
-                apellidos = :apellidos, 
-                avatar = :avatar 
-                WHERE id = :id";
-        $stmt = $this->bd->prepare($sql);
+        if ($existente) {
+            $stmt = $this->bd->prepare(
+                "UPDATE usuarios SET nombre = :nom, apellidos = :ape, avatar = :av
+                 WHERE id = :id"
+            );
+            $stmt->execute([
+                ':nom' => $datos['nombre'],
+                ':ape' => $datos['apellidos'],
+                ':av'  => $datos['avatar'],
+                ':id'  => $existente['id'],
+            ]);
+            return (int) $existente['id'];
+        }
+
+        $stmt = $this->bd->prepare(
+            "INSERT INTO usuarios (google_id, email, nombre, apellidos, avatar, rol, activado)
+             VALUES (:gid, :email, :nom, :ape, :av, 'cliente', 1)"
+        );
         $stmt->execute([
-            ':nombre'    => $datos['nombre'],
-            ':apellidos' => $datos['apellidos'],
-            ':avatar'    => $datos['avatar'],
-            ':id'        => $usuario['id']
+            ':gid'   => $datos['google_id'],
+            ':email' => $datos['email'],
+            ':nom'   => $datos['nombre'],
+            ':ape'   => $datos['apellidos'],
+            ':av'    => $datos['avatar'],
         ]);
-        return (int)$usuario['id'];
-    } else {
-        // 3. Insertar nuevo si no existe
-        $sql = "INSERT INTO usuarios (google_id, email, nombre, apellidos, avatar, rol, activado) 
-                VALUES (:google_id, :email, :nombre, :apellidos, :avatar, 'cliente', 1)";
-        $stmt = $this->bd->prepare($sql);
-        $stmt->execute([
-            ':google_id' => $datos['google_id'],
-            ':email'     => $datos['email'],
-            ':nombre'    => $datos['nombre'],
-            ':apellidos' => $datos['apellidos'],
-            ':avatar'    => $datos['avatar']
-        ]);
-        return (int)$this->bd->lastInsertId();
+        return (int) $this->bd->lastInsertId();
     }
-}
 }

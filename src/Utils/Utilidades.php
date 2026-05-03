@@ -1,4 +1,6 @@
 <?php
+namespace Utils;
+
 /**
  * Mini lector de archivos .env (formato CLAVE=valor).
  *

@@ -1,4 +1,9 @@
 <?php
+namespace Config;
+
+use PDO;
+use PDOException;
+
 /**
  * Conexion PDO unica a la base de datos.
  * Patron: clase con metodo estatico que devuelve el PDO.

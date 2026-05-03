@@ -4,7 +4,7 @@
  *
  * - Crea (si no existen) los usuarios de prueba con clave hasheada con bcrypt.
  * - Hay que ejecutarlo UNA sola vez tras importar el SQL.
- *   URL: http://localhost/ProyectoTiendaPHP/public/instalar.php
+ *   URL: http://localhost/ProyectonetStore/public/instalar.php
  *
  * Despues conviene RENOMBRARLO o BORRARLO para no dejarlo accesible.
  */
@@ -17,20 +17,20 @@ $usuarios = [
     [
         'nombre'    => 'Admin',
         'apellidos' => 'Tienda',
-        'email'     => 'admin@tiendaphp.com',
+        'email'     => 'admin@netstore.com',
         'clave'     => 'admin123',
         'rol'       => 'admin',
     ],
     [
         'nombre'    => 'Cliente',
         'apellidos' => 'Demo',
-        'email'     => 'cliente@tiendaphp.com',
+        'email'     => 'cliente@netstore.com',
         'clave'     => 'cliente123',
         'rol'       => 'cliente',
     ],
 ];
 
-echo "<h1>Instalacion de TiendaPHP</h1>";
+echo "<h1>Instalacion de netStore</h1>";
 echo "<pre style='background:#eee;padding:1rem;'>";
 
 foreach ($usuarios as $u) {

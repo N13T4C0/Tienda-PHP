@@ -1,4 +1,13 @@
 <?php
+namespace Rutas;
+
+use Lib\Enrutador;
+use Controladores\HomeControlador;
+use Controladores\AuthControlador;
+use Controladores\ProductoControlador;
+use Controladores\CestaControlador;
+use Controladores\PagoControlador;
+use Controladores\AdminControlador;
 
 /**
  * Definicion centralizada de rutas de la aplicacion.

@@ -1,4 +1,5 @@
 <?php
+namespace Lib;
 
 /**
  * Cliente OAuth 2.0 para Google sin dependencias externas.

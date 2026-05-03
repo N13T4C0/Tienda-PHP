@@ -1,12 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="<?= URL_BASE ?>/css/estilo.css">
-</head>
-
-
 <h1>Catalogo</h1>
 
 <div class="layout-tienda">
@@ -33,13 +24,20 @@
         <?php if (empty($productos)): ?>
             <div class="bloque-vacio">No hay productos en esta categoria.</div>
         <?php else: ?>
+
             <div class="rejilla-productos">
                 <?php foreach ($productos as $p): ?>
                     <article class="tarjeta-producto">
                         <a href="<?= URL_BASE ?>/producto/detalle/<?= $p['id'] ?>">
-                            <img src="<?= URL_BASE ?>/img/<?= htmlspecialchars($p['imagen']) ?>"
-                                alt="<?= htmlspecialchars($p['nombre']) ?>"
-                                onerror="this.src='<?= URL_BASE ?>/img/sin-imagen.svg'">
+                            <?php
+                            // Si la imagen es de uploads la buscamos alli, si no en /img
+                            $rutaImg = file_exists(PUBLICO . '/uploads/imagenes/' . $p['imagen'])
+                                ? URL_BASE . '/uploads/imagenes/' . htmlspecialchars($p['imagen'])
+                                : URL_BASE . '/img/' . htmlspecialchars($p['imagen']);
+                            ?>
+                            <img src="<?= $rutaImg ?>"
+                                 alt="<?= htmlspecialchars($p['nombre']) ?>"
+                                 onerror="this.src='<?= URL_BASE ?>/img/sin-imagen.svg'">
                         </a>
                         <div class="cuerpo">
                             <span class="etiqueta-categoria"><?= htmlspecialchars($p['categoria_nombre']) ?></span>
@@ -54,11 +52,13 @@
                                     Ver detalle
                                 </a>
                                 <?php if ((int) $p['stock'] > 0): ?>
-                                    <button
-                                        class="boton boton-pequeno boton-secundario btn-anadir-cesta"
-                                        data-id="<?= $p['id'] ?>">
-                                        + Cesta
-                                    </button>
+                                    <form action="<?= URL_BASE ?>/cesta/anadir" method="POST">
+                                        <input type="hidden" name="id_producto" value="<?= $p['id'] ?>">
+                                        <input type="hidden" name="cantidad" value="1">
+                                        <button type="submit" class="boton boton-pequeno boton-secundario">
+                                            + Cesta
+                                        </button>
+                                    </form>
                                 <?php else: ?>
                                     <span class="sin-stock">Sin stock</span>
                                 <?php endif; ?>
@@ -67,51 +67,35 @@
                     </article>
                 <?php endforeach; ?>
             </div>
+
+            <?php if ($paginador->totalPaginas() > 1): ?>
+                <?php
+                // Construimos la base de la URL para no perder el filtro de categoria
+                $urlBase = URL_BASE . ($categoriaActiva ? '/producto/index/' . $categoriaActiva : '/producto');
+                ?>
+                <nav class="paginacion">
+                    <?php if ($paginador->hayAnterior()): ?>
+                        <a class="boton boton-pequeno boton-secundario"
+                           href="<?= $urlBase ?>?pagina=<?= $paginador->paginaActual() - 1 ?>">
+                            &laquo; Anterior
+                        </a>
+                    <?php endif; ?>
+
+                    <span class="paginacion__info">
+                        Pagina <?= $paginador->paginaActual() ?> de <?= $paginador->totalPaginas() ?>
+                        (<?= $paginador->totalElementos() ?> productos)
+                    </span>
+
+                    <?php if ($paginador->haySiguiente()): ?>
+                        <a class="boton boton-pequeno boton-secundario"
+                           href="<?= $urlBase ?>?pagina=<?= $paginador->paginaActual() + 1 ?>">
+                            Siguiente &raquo;
+                        </a>
+                    <?php endif; ?>
+                </nav>
+            <?php endif; ?>
+
         <?php endif; ?>
     </section>
 
 </div>
-
-<script>
-    document.querySelectorAll('.btn-anadir-cesta').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            var id = this.dataset.id;
-            var boton = this;
-
-            var datos = new FormData();
-            datos.append('id_producto', id);
-            datos.append('cantidad', 1);
-
-            fetch('<?= URL_BASE ?>/cesta/anadir', {
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: datos
-                })
-                .then(function(res) {
-                    return res.json();
-                })
-                .then(function(data) {
-                    if (data.ok) {
-                        boton.textContent = '✓ Añadido';
-                        boton.disabled = true;
-                        setTimeout(function() {
-                            boton.textContent = '+ Cesta';
-                            boton.disabled = false;
-                        }, 1500);
-
-                        var contador = document.querySelector('.contador-cesta');
-                        if (contador) {
-                            contador.textContent = data.totalUnidades;
-                        }
-                    } else {
-                        alert(data.mensaje);
-                    }
-                })
-                .catch(function() {
-                    alert('Error al añadir el producto');
-                });
-        });
-    });
-</script>

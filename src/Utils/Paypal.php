@@ -1,4 +1,6 @@
 <?php
+namespace Utils;
+
 class Paypal
 {
     private string $clientId;

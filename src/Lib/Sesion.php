@@ -1,4 +1,5 @@
 <?php
+namespace Lib;
 
 /**
  * Helper estatico para gestionar la sesion del usuario logeado

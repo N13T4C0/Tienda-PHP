@@ -1,17 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="<?= URL_BASE ?>/css/estilo.css">
-</head>
-
 <div class="formulario ancho">
     <h1><?= $producto ? 'Editar producto' : 'Nuevo producto' ?></h1>
 
-    <form method="POST" action="<?= URL_BASE ?>/admin/guardarProducto">
+    <!-- enctype="multipart/form-data" es obligatorio para subir archivos -->
+    <form method="POST" action="<?= URL_BASE ?>/admin/guardarProducto" enctype="multipart/form-data">
         <?php if ($producto): ?>
             <input type="hidden" name="id" value="<?= $producto['id'] ?>">
+            <!-- Guardamos la imagen actual por si el usuario no sube una nueva -->
+            <input type="hidden" name="imagen_actual" value="<?= htmlspecialchars($producto['imagen'] ?? 'sin-imagen.svg') ?>">
         <?php endif; ?>
 
         <div class="campo">
@@ -53,11 +48,16 @@
         </div>
 
         <div class="campo">
-            <label for="imagen">Nombre del archivo de imagen
-                <small>(en /public/img)</small>
+            <label for="imagen">Imagen del producto
+                <small>(JPG, PNG, GIF o WEBP)</small>
             </label>
-            <input type="text" name="imagen" id="imagen"
-                   value="<?= htmlspecialchars($producto['imagen'] ?? 'sin-imagen.svg') ?>">
+
+            <?php if (!empty($producto['imagen']) && $producto['imagen'] !== 'sin-imagen.svg'): ?>
+                <p>Imagen actual: <strong><?= htmlspecialchars($producto['imagen']) ?></strong>
+                &mdash; sube un archivo nuevo solo si quieres cambiarla</p>
+            <?php endif; ?>
+
+            <input type="file" name="imagen" id="imagen" accept="image/*">
         </div>
 
         <div class="campo">

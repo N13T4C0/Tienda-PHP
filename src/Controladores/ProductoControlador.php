@@ -1,23 +1,39 @@
 <?php
+namespace Controladores;
+
+use Lib\Sesion;
+use Servicios\ProductoServicio;
+use Servicios\CategoriaServicio;
+use Utils\Paginador;
+
 /**
- * Controlador de productos (catalogo + detalle + busqueda).
+ * Controlador de productos (catalogo publico, detalle y buscador).
  */
 class ProductoControlador
 {
-    /** Lista todos los productos visibles, opcionalmente filtrados por categoria */
+    /**
+     * Catalogo con soporte de filtro por categoria, busqueda y paginacion.
+     * Recibe ?pagina=N via GET para moverse entre paginas.
+     */
     public function index($idCategoria = null): void
     {
-        $modeloProducto  = new Producto();
-        $modeloCategoria = new Categoria();
-        $categorias      = $modeloCategoria->listar();
+        $servProd = new ProductoServicio();
+        $servCat  = new CategoriaServicio();
 
+        $categorias      = $servCat->listarTodas();
         $categoriaActiva = null;
+
+        // Decidimos que productos cargar segun si hay filtro de categoria
         if ($idCategoria !== null && is_numeric($idCategoria)) {
-            $productos       = $modeloProducto->listarPorCategoria((int) $idCategoria);
+            $todos           = $servProd->obtenerCatalogo((int) $idCategoria);
             $categoriaActiva = (int) $idCategoria;
         } else {
-            $productos = $modeloProducto->listar();
+            $todos = $servProd->obtenerCatalogo();
         }
+
+        // Paginacion: 8 productos por pagina
+        $paginador = new Paginador($todos, 8, (int) ($_GET['pagina'] ?? 1));
+        $productos = $paginador->elementosPagina();
 
         require APP . '/Vistas/comunes/cabecera.php';
         require APP . '/Vistas/productos/catalogo.php';
@@ -31,8 +47,9 @@ class ProductoControlador
             Sesion::redirigir('producto');
         }
 
-        $modelo   = new Producto();
-        $producto = $modelo->obtenerUno((int) $id);
+        $servicio = new ProductoServicio();
+        $producto = $servicio->obtenerUno((int) $id);
+
         if (!$producto) {
             Sesion::mensaje('error', 'El producto no existe');
             Sesion::redirigir('producto');
@@ -48,14 +65,14 @@ class ProductoControlador
     {
         $texto = trim($_GET['q'] ?? '');
 
-        $modeloCategoria = new Categoria();
-        $categorias      = $modeloCategoria->listar();
+        $servCat         = new CategoriaServicio();
+        $categorias      = $servCat->listarTodas();
         $categoriaActiva = null;
 
         $productos = [];
         if ($texto !== '') {
-            $modelo    = new Producto();
-            $productos = $modelo->buscar($texto);
+            $servProd  = new ProductoServicio();
+            $productos = $servProd->obtenerCatalogo(null, $texto);
         }
 
         require APP . '/Vistas/comunes/cabecera.php';

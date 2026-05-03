@@ -3,7 +3,12 @@
 </div>
 
 <article class="detalle-producto">
-    <img src="<?= URL_BASE ?>/img/<?= htmlspecialchars($producto['imagen']) ?>"
+    <?php
+    $rutaImg = file_exists(PUBLICO . '/uploads/imagenes/' . $producto['imagen'])
+        ? URL_BASE . '/uploads/imagenes/' . htmlspecialchars($producto['imagen'])
+        : URL_BASE . '/img/' . htmlspecialchars($producto['imagen']);
+    ?>
+    <img src="<?= $rutaImg ?>"
          alt="<?= htmlspecialchars($producto['nombre']) ?>"
          onerror="this.src='<?= URL_BASE ?>/img/sin-imagen.svg'">
 

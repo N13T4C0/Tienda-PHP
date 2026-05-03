@@ -1,13 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <link rel="stylesheet" href="<?= URL_BASE ?>/css/estilo.css">
-</head>
+
 
 <section class="hero">
-    <h1>Bienvenido a TiendaPHP</h1>
+    <h1>Bienvenido a netStore</h1>
     <p class="hero__subtitulo">
         Tu tienda online de confianza para electronica, ropa, hogar y mas.
     </p>
@@ -31,7 +25,12 @@
     <?php endif; ?>
     <?php foreach ($destacados as $p): ?>
         <article class="tarjeta-producto">
-            <img src="<?= URL_BASE ?>/img/<?= htmlspecialchars($p['imagen']) ?>"
+            <?php
+            $rutaImg = file_exists(PUBLICO . '/uploads/imagenes/' . $p['imagen'])
+                ? URL_BASE . '/uploads/imagenes/' . htmlspecialchars($p['imagen'])
+                : URL_BASE . '/img/' . htmlspecialchars($p['imagen']);
+            ?>
+            <img src="<?= $rutaImg ?>"
                  alt="<?= htmlspecialchars($p['nombre']) ?>"
                  onerror="this.src='<?= URL_BASE ?>/img/sin-imagen.svg'">
             <div class="cuerpo">

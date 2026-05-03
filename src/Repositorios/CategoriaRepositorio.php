@@ -1,12 +1,15 @@
 <?php
-namespace Modelos;
+namespace Repositorios;
 
 use Config\Conexion;
 
 /**
- * Modelo Categoria. Operaciones CRUD sobre la tabla `categorias`.
+ * CategoriaRepositorio
+ *
+ * Responsabilidad UNICA: ejecutar las consultas SQL
+ * relacionadas con la tabla `categorias`.
  */
-class Categoria
+class CategoriaRepositorio
 {
     private $bd;
 
@@ -16,7 +19,7 @@ class Categoria
     }
 
     /** Devuelve todas las categorias ordenadas alfabeticamente */
-    public function listar(): array
+    public function obtenerTodas(): array
     {
         return $this->bd
             ->query("SELECT * FROM categorias ORDER BY nombre ASC")
@@ -32,8 +35,8 @@ class Categoria
         return $fila ?: null;
     }
 
-    /** Inserta una categoria */
-    public function guardar(array $datos): int
+    /** Inserta una categoria nueva */
+    public function insertar(array $datos): int
     {
         $stmt = $this->bd->prepare(
             "INSERT INTO categorias (nombre, descripcion) VALUES (:nom, :desc)"
@@ -45,8 +48,8 @@ class Categoria
         return (int) $this->bd->lastInsertId();
     }
 
-    /** Modifica una categoria */
-    public function modificar(int $id, array $datos): bool
+    /** Actualiza una categoria existente */
+    public function actualizar(int $id, array $datos): bool
     {
         $stmt = $this->bd->prepare(
             "UPDATE categorias SET nombre = :nom, descripcion = :desc WHERE id = :id"
@@ -58,8 +61,8 @@ class Categoria
         ]);
     }
 
-    /** Borra una categoria (solo si no tiene productos) */
-    public function borrar(int $id): bool
+    /** Elimina una categoria por su id */
+    public function eliminar(int $id): bool
     {
         $stmt = $this->bd->prepare("DELETE FROM categorias WHERE id = :id");
         return $stmt->execute([':id' => $id]);
@@ -72,6 +75,7 @@ class Categoria
             "SELECT COUNT(*) AS total FROM productos WHERE categoria_id = :id"
         );
         $stmt->execute([':id' => $id]);
-        return (int) $stmt->fetch()['total'] > 0;
+        $fila = $stmt->fetch();
+        return (int) $fila['total'] > 0;
     }
 }

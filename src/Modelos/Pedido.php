@@ -1,4 +1,7 @@
 <?php
+namespace Modelos;
+
+use Config\Conexion;
 
 /**
  * Modelo Pedido. Inserta cabeceras de pedido y sus lineas asociadas

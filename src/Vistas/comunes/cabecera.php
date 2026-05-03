@@ -1,4 +1,7 @@
 <?php
+use Lib\Cesta;
+use Lib\Sesion;
+
 // Inicializamos la cesta para que se pueda mostrar el contador en la cabecera
 Cesta::preparar();
 $_unidadesCesta = Cesta::totalUnidades();
@@ -8,7 +11,7 @@ $_usuario       = Sesion::usuario();
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Tienda PHP</title>
+    <title>netStore</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="<?= URL_BASE ?>/css/estilo.css">
 </head>
@@ -16,7 +19,7 @@ $_usuario       = Sesion::usuario();
 
 <header class="cabecera">
     <div class="cabecera-contenido">
-        <a class="logo" href="<?= URL_BASE ?>/">Tienda<span>PHP</span></a>
+        <a class="logo" href="<?= URL_BASE ?>/">net<span>Store</span></a>
 
         <ul class="menu">
             <li><a href="<?= URL_BASE ?>/">Inicio</a></li>

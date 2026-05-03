@@ -1,4 +1,9 @@
 <?php
+namespace Controladores;
+
+use Servicios\ProductoServicio;
+use Servicios\CategoriaServicio;
+
 /**
  * Controlador de la pagina principal.
  */
@@ -7,11 +12,11 @@ class HomeControlador
     /** Pagina inicial: muestra los productos destacados */
     public function index(): void
     {
-        $modeloProducto  = new Producto();
-        $modeloCategoria = new Categoria();
+        $servProd = new ProductoServicio();
+        $servCat  = new CategoriaServicio();
 
-        $productos  = $modeloProducto->listar();
-        $categorias = $modeloCategoria->listar();
+        $productos  = $servProd->obtenerCatalogo();
+        $categorias = $servCat->listarTodas();
 
         // Mostramos como destacados los 4 primeros
         $destacados = array_slice($productos, 0, 4);

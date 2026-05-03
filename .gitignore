@@ -1,0 +1,9 @@
+# Dependencias de Composer (se regeneran con "composer install")
+/vendor/
+
+# Variables de entorno y credenciales (NUNCA subir al repo)
+.env
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db

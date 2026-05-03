@@ -1,4 +1,6 @@
 <?php
+namespace Lib;
+
 /**
  * Enrutador - Gestiona el registro y despacho de rutas HTTP.
  *

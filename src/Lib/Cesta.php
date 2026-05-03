@@ -1,9 +1,14 @@
 <?php
+namespace Lib;
+
+use Lib\Sesion;
+use Repositorios\ProductoRepositorio;
+
 /**
  * Helper para gestionar el carrito de la compra (lo guardamos en sesion).
  *
  * Estructura en sesion:
- *   $_SESSION['cesta'] = [ id_producto => unidades, ... ]
+ *   $_SESSION['cesta_invitado'] o $_SESSION['cesta_uXX'] = [ id_producto => unidades, ... ]
  */
 class Cesta
 {
@@ -23,13 +28,17 @@ class Cesta
         }
     }
 
-    /** Anade unidades de un producto. Devuelve [ok=>bool, mensaje=>string] */
+    /**
+     * Anade unidades de un producto a la cesta.
+     * Valida stock real contra la base de datos.
+     * Devuelve [ok => bool, mensaje => string]
+     */
     public static function meterProducto(int $idProducto, int $unidades = 1): array
     {
         self::preparar();
         $clave    = self::clave();
-        $modelo   = new Producto();
-        $producto = $modelo->obtenerUno($idProducto);
+        $repo     = new ProductoRepositorio();
+        $producto = $repo->obtenerUno($idProducto);
 
         if (!$producto) {
             return ['ok' => false, 'mensaje' => 'Producto no encontrado'];
@@ -56,8 +65,8 @@ class Cesta
             return self::quitarProducto($idProducto);
         }
 
-        $modelo   = new Producto();
-        $producto = $modelo->obtenerUno($idProducto);
+        $repo     = new ProductoRepositorio();
+        $producto = $repo->obtenerUno($idProducto);
 
         if (!$producto) {
             return ['ok' => false, 'mensaje' => 'Producto no encontrado'];
@@ -84,15 +93,15 @@ class Cesta
         $_SESSION[self::clave()] = [];
     }
 
-    /** Devuelve el contenido de la cesta con datos completos del producto */
+    /** Devuelve el contenido de la cesta con todos los datos del producto */
     public static function contenido(): array
     {
         self::preparar();
-        $items  = [];
-        $modelo = new Producto();
+        $items = [];
+        $repo  = new ProductoRepositorio();
 
         foreach ($_SESSION[self::clave()] as $idProducto => $unidades) {
-            $producto = $modelo->obtenerUno((int) $idProducto);
+            $producto = $repo->obtenerUno((int) $idProducto);
             if ($producto) {
                 $items[] = [
                     'producto' => $producto,
@@ -115,11 +124,11 @@ class Cesta
     public static function importeTotal(): float
     {
         self::preparar();
-        $total  = 0.0;
-        $modelo = new Producto();
+        $total = 0.0;
+        $repo  = new ProductoRepositorio();
 
         foreach ($_SESSION[self::clave()] as $idProducto => $unidades) {
-            $producto = $modelo->obtenerUno((int) $idProducto);
+            $producto = $repo->obtenerUno((int) $idProducto);
             if ($producto) {
                 $total += (float) $producto['precio'] * (int) $unidades;
             }
@@ -127,7 +136,7 @@ class Cesta
         return $total;
     }
 
-    /** ¿Esta vacia? */
+    /** Comprueba si la cesta esta vacia */
     public static function vacia(): bool
     {
         self::preparar();
