@@ -36,7 +36,6 @@ autenticación con Google OAuth y panel de administración completo.
 ### 1. Copiar el proyecto
 
 Coloca la carpeta en `C:\xampp\htdocs\ProyectoTiendaPHP`
-(si estás leyendo esto ya está en su sitio).
 
 ### 2. Instalar dependencias Composer
 
