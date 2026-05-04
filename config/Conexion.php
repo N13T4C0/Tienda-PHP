@@ -26,15 +26,16 @@ class Conexion
     public static function abrir(): PDO
     {
         if (self::$pdo === null) {
-            $dsn = 'mysql:host=' . self::HOST
-                 . ';dbname='   . self::BD
-                 . ';charset='  . self::CHARSET;
+            $dsn = 
+            'mysql:host=' . self::HOST
+             . ';dbname='   . self::BD
+            . ';charset='  . self::CHARSET;
 
             // ERRMODE_EXCEPTION: los errores SQL lanzan excepciones en lugar de fallar en silencio
             // FETCH_ASSOC: los resultados vienen como array con nombres de columna ($fila['nombre'])
             // EMULATE_PREPARES false: usa prepared statements reales, SQL injection mas seguro
             $opciones = [
-                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES   => false,
             ];

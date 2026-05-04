@@ -16,6 +16,7 @@ class Categoria
     /** Devuelve todas las categorias ordenadas alfabeticamente */
     public function listar(): array
     {
+        // no usar prepare porq no tiene param de usuario
         return $this->bd
             ->query("SELECT * FROM categorias ORDER BY nombre ASC")
             ->fetchAll();

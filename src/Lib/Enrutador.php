@@ -52,17 +52,20 @@ class Enrutador
 
     private static function resolverRuta(string $metodo, string $uri): array
     {
-        // Coincidencia exacta
+        // Coincidencia exacta: "productos" → busca $rutas['GET']['productos']
         if ($fn = self::$rutas[$metodo][$uri] ?? null) {
             return [$fn, null];
         }
 
-        // Último segmento como :id  (ej: productos/5 → productos/:id)
-        if (preg_match('#^(.+)/([^/]+)$#', $uri, $m)) {
-            $fn = self::$rutas[$metodo][$m[1] . '/:id'] ?? null;
-            return [$fn, $m[2]];
-        }
+        // Parte la uri por las barras y saca el último trozo como id
+        // ej: "productos/5"  →  $partes=["productos"]  $id="5"
+        $partes = explode('/', $uri);
+        $id     = array_pop($partes);    // extrae el último segmento
+        $base   = implode('/', $partes); // vuelve a unir el resto
 
-        return [null, null];
+        // Busca la ruta con el comodín :id
+        // ej: busca $rutas['GET']['productos/:id']
+        $fn = self::$rutas[$metodo][$base . '/:id'] ?? null;
+        return [$fn, $id];
     }
 }

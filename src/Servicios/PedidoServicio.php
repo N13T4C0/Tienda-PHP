@@ -19,12 +19,15 @@ class PedidoServicio
     /**
      * Crea un pedido completo dentro de una transaccion:
      * inserta cabecera, las lineas y descuenta el stock de cada producto.
+     * beginTransaction/commit/rollBack son metodos nativos de PDO: agrupan
+     * varias queries en un bloque atomico que se confirma o deshace entero.
      */
     public function crearPedido(int $idUsuario, array $datosEnvio, array $cesta, float $total): int
     {
         $pdo = $this->repoPedido->conexion();
 
         try {
+            // par q no guarde nda en la bd hasta q pidamos confirmacion
             $pdo->beginTransaction();
 
             // 1. Insertar la cabecera del pedido

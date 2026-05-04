@@ -24,8 +24,8 @@ class PagoControlador
         if (($resultado['status'] ?? '') === 'COMPLETED') {
             $idUsuario  = $_SESSION['usuario']['id'];
             $datosEnvio = $_SESSION['pago_envio'];
-            $cesta      = Cesta::contenido();
-            $total      = Cesta::importeTotal();
+            $cesta = Cesta::contenido();
+            $total = Cesta::importeTotal();
 
             // El servicio gestiona la transaccion: cabecera + lineas + descuento de stock
             $servicio = new PedidoServicio();
