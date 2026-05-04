@@ -20,18 +20,23 @@ class UsuarioServicio
      */
     public function registrar(array $datos): string
     {
+        // Token aleatorio de 32 caracteres para el enlace de verificacion del email
         $token = bin2hex(random_bytes(16));
 
         $this->repositorio->insertar([
             'nombre'      => htmlspecialchars($datos['nombre']),
             'apellidos'   => htmlspecialchars($datos['apellidos'] ?? ''),
             'email'       => $datos['email'],
+            // Nunca se guarda la clave en texto plano, BCRYPT la encripta de forma segura
             'clave'       => password_hash($datos['clave'], PASSWORD_BCRYPT),
+            // El rol siempre es cliente, el usuario no puede elegirlo
             'rol'         => 'cliente',
+            // La cuenta empieza desactivada hasta que el usuario verifique su email
             'activado'    => 0,
             'token_email' => $token,
         ]);
 
+        // Se devuelve el token para que el controlador lo envie por email al usuario
         return $token;
     }
 

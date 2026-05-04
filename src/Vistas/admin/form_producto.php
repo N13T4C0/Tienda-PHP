@@ -1,6 +1,20 @@
+<?php
+// Formulario compartido para crear y editar productos.
+// Si $producto es null, los campos aparecen vacíos (modo crear).
+// Si $producto tiene datos, los campos se rellenan con ellos (modo editar).
+?>
 <div class="formulario ancho">
     <h1><?= $producto ? 'Editar producto' : 'Nuevo producto' ?></h1>
 
+    <?php
+    // La URL del action no es un archivo físico. Toda petición pasa por index.php,
+    // que llama al enrutador. Este busca en su tabla de rutas si hay algo registrado
+    // para POST /admin/guardarProducto (definido en Rutas.php) y ejecuta AdminControlador::guardarProducto().
+    // Es el patrón Front Controller: una sola entrada, el enrutador decide qué ejecutar.
+    //
+    // enctype="multipart/form-data" es obligatorio cuando el formulario incluye un <input type="file">:
+    // sin él, el archivo de imagen nunca llegaría al servidor y $_FILES estaría vacío.
+    ?>
     <form method="POST" action="<?= URL_BASE ?>/admin/guardarProducto" enctype="multipart/form-data">
         <?php if ($producto): ?>
             <input type="hidden" name="id" value="<?= $producto['id'] ?>">
@@ -52,6 +66,7 @@
 
             <?php if (!empty($producto['imagen']) && $producto['imagen'] !== 'sin-imagen.svg'): ?>
                 <p>Imagen actual: <strong><?= htmlspecialchars($producto['imagen']) ?></strong>
+                <!-- msadh es para el guion -->
                 &mdash; sube un archivo nuevo solo si quieres cambiarla</p>
             <?php endif; ?>
 

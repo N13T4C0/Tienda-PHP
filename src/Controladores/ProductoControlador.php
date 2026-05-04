@@ -28,7 +28,9 @@ class ProductoControlador
             $todos = $servProd->obtenerCatalogo();
         }
 
-        // Paginacion: 8 productos por pagina
+        // Paginador recibe todos los productos, cuantos mostrar por pagina (8) y la pagina actual
+        // $_GET['pagina'] viene de la URL (?pagina=2), si no existe empieza en la 1
+        // elementosPagina() devuelve solo los 8 productos que corresponden a esa pagina
         $paginador = new Paginador($todos, 8, (int) ($_GET['pagina'] ?? 1));
         $productos = $paginador->elementosPagina();
 

@@ -64,6 +64,7 @@ class AuthControlador
             'clave'     => $clave,
         ]);
 
+        // Si habia datos del formulario guardados en sesion de un intento fallido anterior, los borramos
         unset($_SESSION['datos_form']);
 
         EnvioMail::confirmacionRegistro($email, $nombre, $token);

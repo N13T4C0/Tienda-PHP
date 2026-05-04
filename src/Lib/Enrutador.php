@@ -15,36 +15,54 @@ class Enrutador
         self::$rutas[$metodo][$accion] = $controlador;
     }
 
-    /**
-     * Despacha la peticion actual a la ruta correspondiente.
-     * Muestra 404 si no encuentra coincidencia.
-     */
+    // Punto de entrada principal. Lee la peticion actual, busca la ruta
+    // que le corresponde y ejecuta su controlador. Si no la encuentra muestra el 404.
     public static function despachar(): void
     {
-        $metodo = $_SERVER['REQUEST_METHOD'];
+        $metodo = $_SERVER['REQUEST_METHOD']; // GET, POST, etc.
+        $uri    = self::limpiarUri($_SERVER['REQUEST_URI']);
 
-        // Limpiamos la URI: quitamos query string y la base del proyecto
-        $uri = $_SERVER['REQUEST_URI'];
-        $uri = strtok($uri, '?');                                              
-        $uri = preg_replace('#^' . preg_quote(URL_BASE, '#') . '#', '', $uri);
-        $uri = trim($uri, '/');
-
-        // 1. Intentamos coincidencia exacta
-        $fn    = self::$rutas[$metodo][$uri] ?? null;
-        $param = null;
-
-        // 2. Si no hay coincidencia exacta, extraemos el ultimo segmento como :id
-        if (!$fn && preg_match('#^(.+)/([^/]+)$#', $uri, $m)) {
-            $uriBase = $m[1] . '/:id';
-            $param   = $m[2];
-            $fn      = self::$rutas[$metodo][$uriBase] ?? null;
-        }
+        // Devuelve el controlador y el parametro :id si lo hay
+        [$fn, $param] = self::resolverRuta($metodo, $uri);
 
         if ($fn) {
-            call_user_func($fn, $param);
+            call_user_func($fn, $param); // ejecuta el controlador pasandole el id
         } else {
             http_response_code(404);
             require APP . '/Vistas/errores/404.php';
         }
+    }
+
+    // Deja la URI limpia para compararla con las rutas registradas.
+    private static function limpiarUri(string $uri): string
+    {
+        // strtok corta la URI por el '?' y devuelve solo la parte izquierda
+        // ej: /ProyectoTiendaPHP/productos?q=camiseta  →  /ProyectoTiendaPHP/productos
+        $uri = strtok($uri, '?');
+
+        // preg_quote escapa los caracteres especiales de URL_BASE para usarlos en una regex
+        // preg_replace elimina el prefijo del proyecto al inicio de la URI
+        // ej: /ProyectoTiendaPHP/productos  →  /productos
+        $uri = preg_replace('#^' . preg_quote(URL_BASE, '#') . '#', '', $uri);
+
+        // Elimina las barras del inicio y del final para comparar limpio
+        // ej: /productos/  →  productos
+        return trim($uri, '/');
+    }
+
+    private static function resolverRuta(string $metodo, string $uri): array
+    {
+        // Coincidencia exacta
+        if ($fn = self::$rutas[$metodo][$uri] ?? null) {
+            return [$fn, null];
+        }
+
+        // Último segmento como :id  (ej: productos/5 → productos/:id)
+        if (preg_match('#^(.+)/([^/]+)$#', $uri, $m)) {
+            $fn = self::$rutas[$metodo][$m[1] . '/:id'] ?? null;
+            return [$fn, $m[2]];
+        }
+
+        return [null, null];
     }
 }

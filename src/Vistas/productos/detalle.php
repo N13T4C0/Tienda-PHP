@@ -16,6 +16,7 @@
         <span class="etiqueta-categoria"><?= htmlspecialchars($producto['categoria_nombre']) ?></span>
         <h1 class="detalle-producto__nombre"><?= htmlspecialchars($producto['nombre']) ?></h1>
         <p class="detalle-producto__descripcion">
+            <?php // nl2br convierte los saltos de linea \n del texto en <br> para que se vean en HTML ?>
             <?= nl2br(htmlspecialchars($producto['descripcion'])) ?>
         </p>
 
@@ -33,6 +34,7 @@
 
         <?php if ((int) $producto['stock'] > 0): ?>
             <form method="POST" action="<?= URL_BASE ?>/cesta/anadir" class="form-anadir">
+                <?php // type="hidden" envia el id del producto sin mostrarlo al usuario ?>
                 <input type="hidden" name="id_producto" value="<?= $producto['id'] ?>">
                 <input type="number" name="cantidad" value="1" min="1" max="<?= $producto['stock'] ?>"
                        class="input-cantidad">

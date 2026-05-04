@@ -5,7 +5,16 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "App\\": "src/"
+            "Controladores\\": "src/Controladores/",
+            "Servicios\\":     "src/Servicios/",
+            "Repositorios\\":  "src/Repositorios/",
+            "Lib\\":           "src/Lib/",
+            "Middleware\\":    "src/Middleware/",
+            "Requests\\":      "src/Requests/",
+            "Rutas\\":         "src/Rutas/",
+            "Utils\\":         "src/Utils/",
+            "Config\\":        "config/",
+            "Modelos\\":       "src/Modelos/"
         }
     },
     "minimum-stability": "stable",

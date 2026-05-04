@@ -18,12 +18,20 @@ class ComposerStaticInitc064bb36fc9310f0db89289537876e91
         ),
         'U' =>
         array (
+            'Utils\\' => 6,
             'Unirest\\' => 8,
         ),
         'S' =>
         array (
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Component\\HttpFoundation\\' => 33,
+            'Servicios\\' => 10,
+        ),
+        'R' =>
+        array (
+            'Rutas\\' => 6,
+            'Requests\\' => 9,
+            'Repositorios\\' => 13,
         ),
         'P' =>
         array (
@@ -31,14 +39,21 @@ class ComposerStaticInitc064bb36fc9310f0db89289537876e91
             'PaypalServerSdkLib\\' => 19,
             'PHPMailer\\PHPMailer\\' => 20,
         ),
+        'M' =>
+        array (
+            'Modelos\\' => 8,
+            'Middleware\\' => 11,
+        ),
+        'L' =>
+        array (
+            'Lib\\' => 4,
+        ),
         'C' =>
         array (
             'Core\\' => 5,
             'CoreInterfaces\\' => 15,
-        ),
-        'A' =>
-        array (
-            'App\\' => 4,
+            'Controladores\\' => 14,
+            'Config\\' => 7,
         ),
     );
 
@@ -46,6 +61,10 @@ class ComposerStaticInitc064bb36fc9310f0db89289537876e91
         'apimatic\\jsonmapper\\' =>
         array (
             0 => __DIR__ . '/..' . '/apimatic/jsonmapper/src',
+        ),
+        'Utils\\' =>
+        array (
+            0 => __DIR__ . '/../..' . '/src/Utils',
         ),
         'Unirest\\' =>
         array (
@@ -59,6 +78,22 @@ class ComposerStaticInitc064bb36fc9310f0db89289537876e91
         array (
             0 => __DIR__ . '/..' . '/symfony/http-foundation',
         ),
+        'Servicios\\' =>
+        array (
+            0 => __DIR__ . '/../..' . '/src/Servicios',
+        ),
+        'Rutas\\' =>
+        array (
+            0 => __DIR__ . '/../..' . '/src/Rutas',
+        ),
+        'Requests\\' =>
+        array (
+            0 => __DIR__ . '/../..' . '/src/Requests',
+        ),
+        'Repositorios\\' =>
+        array (
+            0 => __DIR__ . '/../..' . '/src/Repositorios',
+        ),
         'Psr\\Log\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/log/src',
@@ -71,6 +106,18 @@ class ComposerStaticInitc064bb36fc9310f0db89289537876e91
         array (
             0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
         ),
+        'Modelos\\' =>
+        array (
+            0 => __DIR__ . '/../..' . '/src/Modelos',
+        ),
+        'Middleware\\' =>
+        array (
+            0 => __DIR__ . '/../..' . '/src/Middleware',
+        ),
+        'Lib\\' =>
+        array (
+            0 => __DIR__ . '/../..' . '/src/Lib',
+        ),
         'Core\\' =>
         array (
             0 => __DIR__ . '/..' . '/apimatic/core/src',
@@ -79,9 +126,13 @@ class ComposerStaticInitc064bb36fc9310f0db89289537876e91
         array (
             0 => __DIR__ . '/..' . '/apimatic/core-interfaces/src',
         ),
-        'App\\' =>
+        'Controladores\\' =>
         array (
-            0 => __DIR__ . '/../..' . '/src',
+            0 => __DIR__ . '/../..' . '/src/Controladores',
+        ),
+        'Config\\' =>
+        array (
+            0 => __DIR__ . '/../..' . '/config',
         ),
     );
 

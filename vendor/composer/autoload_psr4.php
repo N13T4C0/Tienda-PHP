@@ -7,13 +7,22 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'apimatic\\jsonmapper\\' => array($vendorDir . '/apimatic/jsonmapper/src'),
+    'Utils\\' => array($baseDir . '/src/Utils'),
     'Unirest\\' => array($vendorDir . '/apimatic/unirest-php/src'),
     'Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
     'Symfony\\Component\\HttpFoundation\\' => array($vendorDir . '/symfony/http-foundation'),
+    'Servicios\\' => array($baseDir . '/src/Servicios'),
+    'Rutas\\' => array($baseDir . '/src/Rutas'),
+    'Requests\\' => array($baseDir . '/src/Requests'),
+    'Repositorios\\' => array($baseDir . '/src/Repositorios'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/src'),
     'PaypalServerSdkLib\\' => array($vendorDir . '/paypal/paypal-server-sdk/src'),
     'PHPMailer\\PHPMailer\\' => array($vendorDir . '/phpmailer/phpmailer/src'),
+    'Modelos\\' => array($baseDir . '/src/Modelos'),
+    'Middleware\\' => array($baseDir . '/src/Middleware'),
+    'Lib\\' => array($baseDir . '/src/Lib'),
     'Core\\' => array($vendorDir . '/apimatic/core/src'),
     'CoreInterfaces\\' => array($vendorDir . '/apimatic/core-interfaces/src'),
-    'App\\' => array($baseDir . '/src'),
+    'Controladores\\' => array($baseDir . '/src/Controladores'),
+    'Config\\' => array($baseDir . '/config'),
 );

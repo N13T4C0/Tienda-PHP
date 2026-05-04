@@ -54,10 +54,10 @@ class ProductoRepositorio
                 FROM productos p
                 INNER JOIN categorias c ON c.id = p.categoria_id
                 WHERE p.visible = 1
-                  AND (p.nombre LIKE :q OR p.descripcion LIKE :q)
+                  AND (p.nombre LIKE :q1 OR p.descripcion LIKE :q2)
                 ORDER BY p.fecha_alta DESC";
         $stmt = $this->bd->prepare($sql);
-        $stmt->execute([':q' => '%' . $texto . '%']);
+        $stmt->execute([':q1' => '%' . $texto . '%', ':q2' => '%' . $texto . '%']);
         return $stmt->fetchAll();
     }
 

@@ -41,6 +41,7 @@
     </tbody>
 </table>
 
+<?php // &larr; es la en HTML para lña  flecha izquierda ← ?>
 <p class="volver">
     <a href="<?= URL_BASE ?>/admin">&larr; Volver al panel</a>
 </p>

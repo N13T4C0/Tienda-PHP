@@ -27,7 +27,7 @@
 
             <div class="rejilla-productos">
                 <?php foreach ($productos as $p): ?>
-                    <article class="tarjeta-producto" id="producto-<?= $p['id'] ?>">
+                    <article class="tarjeta-producto">
                         <a href="<?= URL_BASE ?>/producto/detalle/<?= $p['id'] ?>">
                             <?php
                             $rutaImg = file_exists(PUBLICO . '/uploads/imagenes/' . $p['imagen'])
@@ -51,10 +51,13 @@
                                     Ver detalle
                                 </a>
                                 <?php if ((int) $p['stock'] > 0): ?>
-                                    <button class="boton boton-pequeno boton-secundario btn-anadir-cesta"
-                                        data-id="<?= $p['id'] ?>">
-                                        + Cesta
-                                    </button>
+                                    <form action="<?= URL_BASE ?>/cesta/anadir" method="POST">
+                                        <input type="hidden" name="id_producto" value="<?= $p['id'] ?>">
+                                        <input type="hidden" name="cantidad" value="1">
+                                        <button type="submit" class="boton boton-pequeno boton-secundario">
+                                            + Cesta
+                                        </button>
+                                    </form>
                                 <?php else: ?>
                                     <span class="sin-stock">Sin stock</span>
                                 <?php endif; ?>
@@ -94,41 +97,3 @@
     </section>
 
 </div>
-
-<script>
-    document.addEventListener('click', function(e) {
-        const btn = e.target.closest('.btn-anadir-cesta');
-        if (!btn) return;
-
-        btn.disabled = true;
-        btn.textContent = '...';
-
-        fetch('<?= URL_BASE ?>/cesta/anadir', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: 'id_producto=' + btn.dataset.id + '&cantidad=1'
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (data.ok) {
-                    document.querySelector('.contador-cesta').textContent = data.total;
-                    btn.textContent = '✓';
-                    setTimeout(() => {
-                        btn.textContent = '+ Cesta';
-                        btn.disabled = false;
-                    }, 1500);
-                } else {
-                    btn.textContent = '+ Cesta';
-                    btn.disabled = false;
-                    alert(data.mensaje);
-                }
-            })
-            .catch(() => {
-                btn.textContent = '+ Cesta';
-                btn.disabled = false;
-            });
-    });
-</script>

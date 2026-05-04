@@ -28,25 +28,13 @@ class CestaControlador
 
         $resultado = Cesta::meterProducto($id, $cantidad);
 
-        // Si es una petición AJAX devolvemos JSON
-        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') {
-            header('Content-Type: application/json');
-            echo json_encode([
-                'ok'       => $resultado['ok'],
-                'mensaje'  => $resultado['mensaje'],
-                'total'    => Cesta::totalUnidades(),
-            ]);
-            exit;
-        }
-
-        // Si no es AJAX (por si acaso) redirige como antes
         if ($resultado['ok']) {
             Sesion::mensaje('ok', $resultado['mensaje']);
         } else {
             Sesion::mensaje('error', $resultado['mensaje']);
         }
-        header('Location: ' . ($_POST['retorno'] ?? $_SERVER['HTTP_REFERER'] ?? URL_BASE . '/cesta'));
-        exit;
+
+        Sesion::redirigir('cesta');
     }
 
     // Cambia la cantidad de un producto en la cesta

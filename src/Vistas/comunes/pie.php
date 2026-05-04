@@ -1,8 +1,8 @@
 </main>
 
 <footer class="pie">
-    <p>&copy; <?= date('Y') ?> netStore - Proyecto 2DAW</p>
-    <p class="pie__subtitulo">Desarrollado con PHP, MySQL y mucho cafe</p>
+    <p>  netStore - Proyecto 2DAW</p>
+    <p class="pie__subtitulo">Desarrollado con PHP y  sql</p>
 </footer>
 
 </body>

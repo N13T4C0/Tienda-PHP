@@ -39,5 +39,5 @@ foreach ($usuarios as $u) {
 }
 
 echo "</pre>";
-echo "<p>Listo. <strong>Borra o renombra este fichero ahora</strong> por seguridad.</p>";
+echo "<p>Listo. <strong>borrra o renombra este fichero ahora</strong> por seguridad.</p>";
 echo "<p><a href='./'>Ir a la tienda</a></p>";

@@ -4,7 +4,6 @@ namespace Lib;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use Utils\Utilidades;
-
 class EnvioMail
 {
     /**
@@ -77,7 +76,7 @@ class EnvioMail
         <div style='font-family:Arial,sans-serif;max-width:650px;margin:auto;padding:24px;
                     border:1px solid #e0e0e0;border-radius:8px;'>
             <h2 style='color:#1e3a5f;'>Gracias por tu compra, {$nombre}!</h2>
-            <p>Hemos recibido tu pedido correctamente. Aqui tienes el resumen:</p>
+            <p>Hemos recibido tu pedido correctamente Aqui tienes el resumen:</p>
 
             <table style='width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;'>
                 <thead>
@@ -117,27 +116,41 @@ class EnvioMail
      */
     private static function enviar(string $para, string $asunto, string $cuerpoHtml): bool
     {
+        // true activa las excepciones en PHPMailer, sin esto los errores fallan en silencio
         $mail = new PHPMailer(true);
 
         try {
-            // --- Servidor SMTP ---
+            // Usamos SMTP en lugar del mail() de PHP, mas fiable y configurable
             $mail->isSMTP();
-            $mail->Host       = Utilidades::obtener('SMTP_HOST', 'sandbox.smtp.mailtrap.io');
-            $mail->SMTPAuth   = true;
-            $mail->Username   = Utilidades::obtener('SMTP_USER', '');
-            $mail->Password   = Utilidades::obtener('SMTP_PASS', '');
+
+            // Host del servidor SMTP — en desarrollo apunta a Mailtrap (bandeja de pruebas)
+            // En produccion cambiar SMTP_HOST en el .env al servidor real (ej: smtp.gmail.com)
+            $mail->Host = Utilidades::obtener('SMTP_HOST', 'sandbox.smtp.mailtrap.io');
+
+            // SMTPAuth obliga a autenticarse con usuario y clave antes de enviar
+            // Si el servidor no requiere auth se puede poner false, pero la mayoria si lo requieren
+            $mail->SMTPAuth = true;
+            $mail->Username = Utilidades::obtener('SMTP_USER', '');
+            $mail->Password = Utilidades::obtener('SMTP_PASS', '');
+
+            // STARTTLS cifra la conexion  alternativa es SMTPS (puerto 465)
+            // Si hay error de SSL en local, puede deberse a certificados no validos en XAMPP
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port       = (int) Utilidades::obtener('SMTP_PORT', 2525);
 
-            // --- Remitente y destinatario ---
+            // El remitente que vera el destinatario en su bandeja de entrada
             $mail->setFrom(
                 Utilidades::obtener('SMTP_FROM',      'no-responder@netstore.local'),
                 Utilidades::obtener('SMTP_FROM_NAME', 'netStore')
             );
+
+            // Destinatario  se puede llamar varias veces para enviar a varios a la vez
             $mail->addAddress($para);
 
-            // --- Contenido ---
+            // Indicamos que el cuerpo es HTML, no texto plano
             $mail->isHTML(true);
+
+            // UTF-8 para que tildes y caracteres especiales no salgan como simbolos raros
             $mail->CharSet = 'UTF-8';
             $mail->Subject = $asunto;
             $mail->Body    = $cuerpoHtml;
@@ -146,6 +159,8 @@ class EnvioMail
             return true;
 
         } catch (Exception $e) {
+            // No lanzamos el error al usuario, solo lo registramos en el log del servidor
+            // $mail->ErrorInfo tiene mas detalle que $e->getMessage() en PHPMailer
             error_log('EnvioMail ERROR: ' . $mail->ErrorInfo);
             return false;
         }

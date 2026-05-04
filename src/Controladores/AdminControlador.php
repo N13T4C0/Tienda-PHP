@@ -24,9 +24,13 @@ class AdminControlador
         $servCat  = new CategoriaServicio();
         $servUser = new UsuarioServicio();
 
+
+
         $totalProductos  = count($servProd->listarTodos());
         $totalCategorias = count($servCat->listarTodas());
         $totalUsuarios   = count($servUser->listarTodos());
+
+
 
         require APP . '/Vistas/comunes/cabecera.php';
         require APP . '/Vistas/admin/panel.php';
@@ -39,7 +43,6 @@ class AdminControlador
     {
         $servicio  = new ProductoServicio();
         $productos = $servicio->listarTodos();
-
         require APP . '/Vistas/comunes/cabecera.php';
         require APP . '/Vistas/admin/productos.php';
         require APP . '/Vistas/comunes/pie.php';
@@ -88,18 +91,23 @@ class AdminControlador
             Sesion::redirigir('admin/productos');
         }
 
+        // Recogemos y limpiamos los campos del formulario
         $datos = [
             'categoria_id' => (int)   ($_POST['categoria_id'] ?? 0),
             'nombre'       => trim($_POST['nombre']            ?? ''),
             'descripcion'  => trim($_POST['descripcion']       ?? ''),
             'precio'       => (float) ($_POST['precio']        ?? 0),
             'stock'        => (int)   ($_POST['stock']         ?? 0),
-            'imagen'       => trim($_POST['imagen_actual']     ?? 'sin-imagen.svg'),
+            'imagen'       => trim($_POST['imagen_actual']     ?? 'sin-imagen.svg'), // imagen anterior por defecto
+            // El checkbox no llega en $_POST si está desmarcado isset() lo convierte a 1 o 0
             'visible'      => isset($_POST['visible']) ? 1 : 0,
         ];
 
-        // Procesamos la subida de imagen si el usuario selecciono un archivo
+        // Solo procesamos la imagen si el usuario slec un archivo nuevo
         if (!empty($_FILES['imagen']['name'])) {
+
+            // subirImagen() valida la extensión y mueve el archivo a uploads/imagenes/
+            // Si la extensión no está permitida devuelve null
             $nombreImagen = $this->subirImagen($_FILES['imagen']);
 
             if ($nombreImagen === null) {
@@ -107,9 +115,11 @@ class AdminControlador
                 Sesion::redirigir('admin/productos');
             }
 
+            // Sustituimos la imagen anterior por el nombre del archivo recién subido
             $datos['imagen'] = $nombreImagen;
         }
 
+        // Validamos los datos antes de tocar la BD (nombre, precio, stock, etc.)
         $errores = ProductoRequest::validar($datos);
         if ($errores) {
             Sesion::mensaje('error', implode('<br>', $errores));
@@ -117,7 +127,11 @@ class AdminControlador
         }
 
         $servicio = new ProductoServicio();
-        $id       = (int) ($_POST['id'] ?? 0);
+
+        // En edicion, form_producto.php manda <input type="hidden" name="id" value="5">
+        // En creacion ese input no existe, $_POST['id'] no llega y ?? pone 0
+        // (int) convierte el valor a numero entero por seguridad
+        $id = (int) ($_POST['id'] ?? 0);
 
         if ($id > 0) {
             $servicio->modificar($id, $datos);
@@ -127,6 +141,7 @@ class AdminControlador
             Sesion::mensaje('ok', 'Producto creado');
         }
 
+        // En ambos casos volvemos a la lista de productos
         Sesion::redirigir('admin/productos');
     }
 
@@ -158,10 +173,13 @@ class AdminControlador
     // Guarda una categoria nueva o actualiza una existente
     public function guardarCategoria(): void
     {
+        // Evita que alguien acceda a esta URL directamente desde el navegador   get
+        // Solo debe ejecutarse cuando viene un formulario enviado via post
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             Sesion::redirigir('admin/categorias');
         }
 
+        // Recogemos los campos y validamos antes de guardar
         $id    = (int) ($_POST['id'] ?? 0);
         $datos = [
             'nombre'      => trim($_POST['nombre']      ?? ''),
@@ -176,6 +194,7 @@ class AdminControlador
 
         $servicio = new CategoriaServicio();
 
+        // Si viene un id es edicion, si no es creacion
         if ($id > 0) {
             $servicio->modificar($id, $datos);
             Sesion::mensaje('ok', 'Categoria actualizada');
@@ -241,7 +260,7 @@ class AdminControlador
     private function subirImagen(array $archivo): ?string
     {
         $extensionesPermitidas = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-        $extension             = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
+        $extension = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
 
         if (!in_array($extension, $extensionesPermitidas, true)) {
             return null;
@@ -256,7 +275,7 @@ class AdminControlador
         // Renombramos con timestamp para evitar que dos imagenes con el mismo
         // nombre se sobreescriban
         $nombreFinal = time() . '_' . uniqid() . '.' . $extension;
-        $rutaFinal   = $carpetaDestino . $nombreFinal;
+        $rutaFinal = $carpetaDestino . $nombreFinal;
 
         if (!move_uploaded_file($archivo['tmp_name'], $rutaFinal)) {
             return null;
