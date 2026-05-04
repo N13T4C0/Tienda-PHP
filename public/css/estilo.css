@@ -593,27 +593,7 @@ footer.pie a {
     color: var(--color-error);
 }
 
-/* ---------- VISTAS DE PAGO ---------- */
-
-/* Estilos de pago */ 
-
-.caja-pago {
-    max-width: 500px;
-    margin: 3rem auto;
-    text-align: center;
-    padding: 2rem;
-    background: var(--color-superficie);
-    border-radius: var(--radio);
-    box-shadow: var(--sombra);
-}
-
-.caja-pago .icono {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-}
-
 /* ---------- PAGINACION ---------- */
-
 .paginacion {
     display: flex;
     align-items: center;
@@ -626,4 +606,73 @@ footer.pie a {
 .paginacion__info {
     font-size: .9rem;
     color: var(--color-texto-suave, #666);
+}
+
+/* ---------- VISTAS DE PAGO ---------- */
+.pago-resultado {
+    max-width: 520px;
+    margin: 3rem auto;
+    text-align: center;
+    padding: 2.5rem 2rem;
+    background: #fff;
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+    border-top: 5px solid;
+}
+
+.pago-resultado--ok {
+    border-color: var(--color-ok);
+}
+
+.pago-resultado--error {
+    border-color: var(--color-error);
+}
+
+.pago-resultado--info {
+    border-color: #2980b9;
+}
+
+.pago-icono {
+    font-size: 2.5rem;
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem;
+    font-weight: bold;
+}
+
+.pago-icono--ok {
+    background: #e8f8ef;
+    color: var(--color-ok);
+}
+
+.pago-icono--error {
+    background: #fdecea;
+    color: var(--color-error);
+}
+
+.pago-icono--info {
+    background: #eaf3fb;
+    color: #2980b9;
+}
+
+.pago-resultado h2 {
+    font-size: 1.6rem;
+    margin-bottom: .75rem;
+}
+
+.pago-resultado p {
+    color: #666;
+    line-height: 1.7;
+    margin-bottom: 1.75rem;
+}
+
+.pago-resultado__acciones {
+    display: flex;
+    gap: .75rem;
+    justify-content: center;
+    flex-wrap: wrap;
 }
