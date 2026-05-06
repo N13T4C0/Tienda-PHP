@@ -19,6 +19,7 @@ class Sesion
     /** Cierra la sesion */
     public static function cerrar(): void
     {
+        // unset para destruit las variables
         unset($_SESSION['usuario']);
         unset($_SESSION['cesta_invitado']);
     }

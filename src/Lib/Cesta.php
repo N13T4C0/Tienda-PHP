@@ -29,8 +29,8 @@ class Cesta
     public static function meterProducto(int $idProducto, int $unidades = 1): array
     {
         self::preparar();
-        $clave    = self::clave();
-        $repo     = new ProductoRepositorio();
+        $clave = self::clave();
+        $repo = new ProductoRepositorio();
         $producto = $repo->obtenerUno($idProducto);
 
         if (!$producto) {

@@ -15,7 +15,7 @@ if (is_file(RAIZ . '/vendor/autoload.php')) {
     require_once RAIZ . '/vendor/autoload.php';
 }
 
-
+// Inicia la sesión del usuario si no está activa
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

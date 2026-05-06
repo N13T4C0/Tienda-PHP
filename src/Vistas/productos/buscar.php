@@ -1,3 +1,4 @@
+<!-- no sirve suloko -->
 <h1>Resultados de busqueda</h1>
 <p style="margin-bottom:1.5rem;">Buscando: <strong><?= htmlspecialchars($texto) ?></strong></p>
 

@@ -29,13 +29,14 @@ class AuthControlador
             Sesion::redirigir('auth/registro');
         }
 
-        $nombre    = trim($_POST['nombre']    ?? '');
+        $nombre = trim($_POST['nombre'] ?? '');
         $apellidos = trim($_POST['apellidos'] ?? '');
-        $email     = trim($_POST['email']     ?? '');
-        $clave     = $_POST['clave']          ?? '';
-        $clave2    = $_POST['clave2']         ?? '';
+        $email = trim($_POST['email'] ?? '');
+        $clave = $_POST['clave'] ?? '';
+        $clave2 = $_POST['clave2'] ?? '';
 
         // Guardamos los datos para repintar el formulario si hay errores
+        // compact() convierte variables en array: ['nombre' => $nombre, 'apellidos' => $apellidos, ...]
         $_SESSION['datos_form'] = compact('nombre', 'apellidos', 'email');
 
         $errores = RegistroRequest::validar([

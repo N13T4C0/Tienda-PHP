@@ -35,6 +35,9 @@ class PagoControlador
             unset($_SESSION['paypal_order_id'], $_SESSION['pago_envio']);
 
             Sesion::redirigir('pago/gracias');
+        
+
+
         } else {
             Sesion::redirigir('pago/error');
         }

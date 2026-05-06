@@ -11,8 +11,8 @@ class Paginador
 
     public function __construct(array $todos, int $porPagina = 8, int $paginaActual = 1)
     {
-        $this->todos        = $todos;
-        $this->porPagina    = max(1, $porPagina);
+        $this->todos = $todos;
+        $this->porPagina = max(1, $porPagina);
         $this->totalPaginas = (int) ceil(count($todos) / $this->porPagina);
 
         // Nos aseguramos de que la pagina pedida este dentro del rango valido

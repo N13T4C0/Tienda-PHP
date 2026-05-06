@@ -94,13 +94,13 @@ class AdminControlador
         // Recogemos y limpiamos los campos del formulario
         $datos = [
             'categoria_id' => (int)   ($_POST['categoria_id'] ?? 0),
-            'nombre'       => trim($_POST['nombre']            ?? ''),
-            'descripcion'  => trim($_POST['descripcion']       ?? ''),
-            'precio'       => (float) ($_POST['precio']        ?? 0),
-            'stock'        => (int)   ($_POST['stock']         ?? 0),
-            'imagen'       => trim($_POST['imagen_actual']     ?? 'sin-imagen.svg'), // imagen anterior por defecto
+            'nombre' => trim($_POST['nombre']  ?? ''),
+            'descripcion' => trim($_POST['descripcion']  ?? ''),
+            'precio' => (float) ($_POST['precio'] ?? 0),
+            'stock'  => (int)   ($_POST['stock']   ?? 0),
+            'imagen'=> trim($_POST['imagen_actual'] ?? 'sin-imagen.svg'), // imagen anterior por defecto
             // El checkbox no llega en $_POST si está desmarcado isset() lo convierte a 1 o 0
-            'visible'      => isset($_POST['visible']) ? 1 : 0,
+            'visible' => isset($_POST['visible']) ? 1 : 0,
         ];
 
         // Solo procesamos la imagen si el usuario slec un archivo nuevo

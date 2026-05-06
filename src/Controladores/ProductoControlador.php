@@ -22,7 +22,7 @@ class ProductoControlador
 
         // Decidimos que productos cargar segun si hay filtro de categoria
         if ($idCategoria !== null && is_numeric($idCategoria)) {
-            $todos           = $servProd->obtenerCatalogo((int) $idCategoria);
+            $todos = $servProd->obtenerCatalogo((int) $idCategoria);
             $categoriaActiva = (int) $idCategoria;
         } else {
             $todos = $servProd->obtenerCatalogo();
@@ -59,11 +59,13 @@ class ProductoControlador
         require APP . '/Vistas/comunes/pie.php';
     }
 
+
+    // eto no va quiatrlo o cambiarlo para que vaya
     public function buscar(): void
     {
         $texto = trim($_GET['q'] ?? '');
 
-        $servCat         = new CategoriaServicio();
+        $servCat        = new CategoriaServicio();
         $categorias      = $servCat->listarTodas();
         $categoriaActiva = null;
 
