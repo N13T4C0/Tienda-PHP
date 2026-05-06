@@ -39,7 +39,7 @@ class PedidoServicio
                 $unidades = (int) $item['cantidad'];
 
                 $this->repoPedido->insertarLinea($idPedido, $producto, $unidades);
-                // restyar stock
+                // restar stock 
                 $this->repoProducto->restarStock((int) $producto['id'], $unidades);
                 
             }
