@@ -43,7 +43,7 @@ class PedidoRepositorio
         $stmt = $this->bd->prepare(
             "INSERT INTO lineas_pedido
                 (pedido_id, producto_id, nombre_producto, precio_unidad, unidades, subtotal)
-             VALUES (:pe, :pr, :np, :pu, :un, :st)"
+            VALUES (:pe, :pr, :np, :pu, :un, :st)"
         );
         $stmt->execute([
             ':pe' => $idPedido,
