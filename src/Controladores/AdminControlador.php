@@ -1,15 +1,18 @@
 <?php
+
 namespace Controladores;
 
+use Core\BaseControlador;
 use Lib\Sesion;
-use Servicios\ProductoServicio;
-use Servicios\CategoriaServicio;
-use Servicios\UsuarioServicio;
 use Middleware\AdminMiddleware;
-use Requests\ProductoRequest;
 use Requests\CategoriaRequest;
+use Requests\ProductoRequest;
+use Servicios\CategoriaServicio;
+use Servicios\PedidoServicio;
+use Servicios\ProductoServicio;
+use Servicios\UsuarioServicio;
 
-class AdminControlador
+class AdminControlador extends BaseControlador
 {
     // El constructor comprueba que el usuario es admin antes de cualquier accion
     public function __construct()
@@ -17,26 +20,31 @@ class AdminControlador
         AdminMiddleware::verificar();
     }
 
+    // ──────────────────────────────────────────────────────
+    //  PANEL PRINCIPAL
+    // ──────────────────────────────────────────────────────
+
     // Panel principal con el resumen de la tienda
     public function index(): void
     {
         $servProd = new ProductoServicio();
         $servCat  = new CategoriaServicio();
         $servUser = new UsuarioServicio();
-
-
+        $servPed  = new PedidoServicio();
 
         $totalProductos  = count($servProd->listarTodos());
         $totalCategorias = count($servCat->listarTodas());
         $totalUsuarios   = count($servUser->listarTodos());
-
-
+        $totalPedidos    = count($servPed->listarTodos());
 
         require APP . '/Vistas/comunes/cabecera.php';
         require APP . '/Vistas/admin/panel.php';
         require APP . '/Vistas/comunes/pie.php';
     }
 
+    // ──────────────────────────────────────────────────────
+    //  PRODUCTOS
+    // ──────────────────────────────────────────────────────
 
     // Lista todos los productos
     public function productos(): void
@@ -83,26 +91,21 @@ class AdminControlador
         require APP . '/Vistas/comunes/pie.php';
     }
 
-    // Guarda un producto nuevo o actualiza uno existente
-    // Gestiona tambien la subida del archivo de imagen
-    // Guarda un producto nuevo o actualiza uno existente
-    // Gestiona tambien la subida del archivo de imagen
+    // Guarda un producto nuevo o actualiza uno existente.
+    // Gestiona tambien la subida del archivo de imagen.
     public function guardarProducto(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             Sesion::redirigir('admin/productos');
         }
 
-        //SANEAMIENTO Y VALIDACIÓN
+        // Saneamiento y validacion centralizada en el Request
         $resultado = ProductoRequest::validar($_POST);
-        $errores = $resultado['errores'];
-        $datos = $resultado['datos']; // Estos ya vienen con trim, htmlspecialchars e (int)/(float)
+        $errores   = $resultado['errores'];
+        $datos     = $resultado['datos']; // trim + htmlspecialchars + (int)/(float)
 
-        // Solo procesamos la imagen si el usuario slec un archivo nuevo
+        // Solo procesamos la imagen si el usuario subio un archivo nuevo
         if (!empty($_FILES['imagen']['name'])) {
-
-            // subirImagen() valida la extensión y mueve el archivo a uploads/imagenes/
-            // Si la extensión no está permitida devuelve null
             $nombreImagen = $this->subirImagen($_FILES['imagen']);
 
             if ($nombreImagen === null) {
@@ -110,22 +113,16 @@ class AdminControlador
                 Sesion::redirigir('admin/productos');
             }
 
-            // Sustituimos la imagen anterior por el nombre del archivo recién subido
             $datos['imagen'] = $nombreImagen;
         }
 
-        // Si el Request detectó errores, los mostramos
         if ($errores) {
             Sesion::mensaje('error', implode('<br>', $errores));
             Sesion::redirigir('admin/productos');
         }
 
         $servicio = new ProductoServicio();
-
-        // En edicion, form_producto.php manda <input type="hidden" name="id" value="5">
-        // En creacion ese input no existe, $_POST['id'] no llega y ?? pone 0
-        // (int) convierte el valor a numero entero por seguridad
-        $id = (int) ($_POST['id'] ?? 0);
+        $id       = (int) ($_POST['id'] ?? 0);
 
         if ($id > 0) {
             $servicio->modificar($id, $datos);
@@ -135,11 +132,10 @@ class AdminControlador
             Sesion::mensaje('ok', 'Producto creado');
         }
 
-        // En ambos casos volvemos a la lista de productos
         Sesion::redirigir('admin/productos');
     }
 
-    // Elimina un producto
+    // Elimina un producto (o lo oculta si tiene pedidos asociados)
     public function borrarProducto($id = null): void
     {
         if (!is_numeric($id)) {
@@ -152,6 +148,7 @@ class AdminControlador
         Sesion::redirigir('admin/productos');
     }
 
+    // Restaura un producto ocultado (visible = 1)
     public function restaurarProducto($id = null): void
     {
         if (!is_numeric($id)) {
@@ -164,11 +161,37 @@ class AdminControlador
         Sesion::redirigir('admin/productos');
     }
 
+    // ──────────────────────────────────────────────────────
+    //  CATEGORIAS
+    // ──────────────────────────────────────────────────────
 
     // Lista todas las categorias
     public function categorias(): void
     {
         $servicio   = new CategoriaServicio();
+        $categorias = $servicio->listarTodas();
+        $catEditar  = null; // null = modo creacion
+
+        require APP . '/Vistas/comunes/cabecera.php';
+        require APP . '/Vistas/admin/categorias.php';
+        require APP . '/Vistas/comunes/pie.php';
+    }
+
+    // Carga la pagina de categorias con el formulario pre-relleno para editar
+    public function editarCategoria($id = null): void
+    {
+        if (!is_numeric($id)) {
+            Sesion::redirigir('admin/categorias');
+        }
+
+        $servicio  = new CategoriaServicio();
+        $catEditar = $servicio->obtenerUna((int) $id);
+
+        if (!$catEditar) {
+            Sesion::mensaje('error', 'Categoria no encontrada');
+            Sesion::redirigir('admin/categorias');
+        }
+
         $categorias = $servicio->listarTodas();
 
         require APP . '/Vistas/comunes/cabecera.php';
@@ -179,22 +202,18 @@ class AdminControlador
     // Guarda una categoria nueva o actualiza una existente
     public function guardarCategoria(): void
     {
-        // Evita que alguien acceda a esta URL directamente desde el navegador   get
-        // Solo debe ejecutarse cuando viene un formulario enviado via post
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             Sesion::redirigir('admin/categorias');
         }
 
-        // Recogemos los campos y validamos antes de guardar
         $id    = (int) ($_POST['id'] ?? 0);
         $datos = [
             'nombre'      => $_POST['nombre']      ?? '',
             'descripcion' => $_POST['descripcion'] ?? '',
         ];
 
-        // Aquí obtenemos tanto errores como datos sanitizados
-        $resultado = CategoriaRequest::validar($datos);
-        $errores = $resultado['errores'];
+        $resultado    = CategoriaRequest::validar($datos);
+        $errores      = $resultado['errores'];
         $datosLimpios = $resultado['datos'];
 
         if ($errores) {
@@ -204,7 +223,6 @@ class AdminControlador
 
         $servicio = new CategoriaServicio();
 
-        // Si viene un id es edicion, si no es creacion
         if ($id > 0) {
             $servicio->modificar($id, $datosLimpios);
             Sesion::mensaje('ok', 'Categoria actualizada');
@@ -216,7 +234,6 @@ class AdminControlador
         Sesion::redirigir('admin/categorias');
     }
 
-
     // Elimina una categoria si no tiene productos asociados
     public function borrarCategoria($id = null): void
     {
@@ -227,7 +244,6 @@ class AdminControlador
         $servicio = new CategoriaServicio();
 
         try {
-            // El servicio lanza una excepcion si la categoria tiene productos
             $servicio->eliminar((int) $id);
             Sesion::mensaje('ok', 'Categoria eliminada');
         } catch (\RuntimeException $e) {
@@ -237,6 +253,46 @@ class AdminControlador
         Sesion::redirigir('admin/categorias');
     }
 
+    // ──────────────────────────────────────────────────────
+    //  PEDIDOS
+    // ──────────────────────────────────────────────────────
+
+    // Lista todos los pedidos (panel admin)
+    public function pedidos(): void
+    {
+        $servicio = new PedidoServicio();
+        $pedidos  = $servicio->listarTodos();
+
+        require APP . '/Vistas/comunes/cabecera.php';
+        require APP . '/Vistas/admin/pedidos.php';
+        require APP . '/Vistas/comunes/pie.php';
+    }
+
+    // Muestra el detalle de un pedido con sus lineas
+    public function detallePedido($id = null): void
+    {
+        if (!is_numeric($id)) {
+            Sesion::redirigir('admin/pedidos');
+        }
+
+        $servicio = new PedidoServicio();
+        $pedido   = $servicio->obtenerUno((int) $id);
+
+        if (!$pedido) {
+            Sesion::mensaje('error', 'Pedido no encontrado');
+            Sesion::redirigir('admin/pedidos');
+        }
+
+        $lineas = $servicio->obtenerLineas((int) $id);
+
+        require APP . '/Vistas/comunes/cabecera.php';
+        require APP . '/Vistas/admin/detalle_pedido.php';
+        require APP . '/Vistas/comunes/pie.php';
+    }
+
+    // ──────────────────────────────────────────────────────
+    //  USUARIOS
+    // ──────────────────────────────────────────────────────
 
     // Lista todos los usuarios
     public function usuarios(): void
@@ -262,11 +318,14 @@ class AdminControlador
         Sesion::redirigir('admin/usuarios');
     }
 
+    // ──────────────────────────────────────────────────────
+    //  HELPERS PRIVADOS
+    // ──────────────────────────────────────────────────────
 
     /**
      * Sube la imagen al servidor y devuelve el nombre del archivo guardado.
-     * Si el archivo no es valido devuelve null.
-     * La imagen se renombra con time() para evitar colisiones de nombres.
+     * Si la extension no esta permitida devuelve null.
+     * La imagen se renombra con time() + uniqid() para evitar colisiones.
      */
     private function subirImagen(array $archivo): ?string
     {
@@ -277,16 +336,13 @@ class AdminControlador
             return null;
         }
 
-        // Creamos la carpeta de destino si no existe
         $carpetaDestino = PUBLICO . '/uploads/imagenes/';
         if (!is_dir($carpetaDestino)) {
             mkdir($carpetaDestino, 0755, true);
         }
 
-        // Renombramos con timestamp para evitar que dos imagenes con el mismo
-        // nombre se sobreescriban
         $nombreFinal = time() . '_' . uniqid() . '.' . $extension;
-        $rutaFinal = $carpetaDestino . $nombreFinal;
+        $rutaFinal   = $carpetaDestino . $nombreFinal;
 
         if (!move_uploaded_file($archivo['tmp_name'], $rutaFinal)) {
             return null;

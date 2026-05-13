@@ -2,17 +2,11 @@
 
 namespace Repositorios;
 
-use Config\Conexion;
+use Core\BaseRepositorio;
 use PDO;
 
-class UsuarioRepositorio
+class UsuarioRepositorio extends BaseRepositorio
 {
-    private $bd;
-
-    public function __construct()
-    {
-        $this->bd = Conexion::abrir();
-    }
 
     /** Inserta un usuario nuevo y devuelve su id */
     public function insertar(array $datos): int

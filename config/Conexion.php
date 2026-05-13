@@ -1,51 +1,58 @@
 <?php
+
 namespace Config;
 
 use PDO;
 use PDOException;
 
 /**
- * Conexion PDO unica a la base de datos.
- * Patron: clase con metodo estatico que devuelve el PDO.
+ * Conexion PDO unica a la base de datos (patron Singleton).
+ *
+ * Las credenciales ya NO estan escritas aqui directamente.
+ * Se leen desde el archivo .env cargado al inicio en init.php.
+ *
+ * Ventajas de usar .env:
+ *  - En local pones tus credenciales sin afectar al resto del equipo
+ *  - En produccion pones las credenciales reales sin tocar el codigo
+ *  - No se sube informacion sensible a Git (añade .env al .gitignore)
  */
-
 class Conexion
 {
-    private static $pdo = null;
-
-    /** Datos de conexion */
-    private const HOST    = 'localhost';
-    private const BD      = 'tiendaphp';
-    private const USUARIO = 'root';
-    private const CLAVE   = '';
-    private const CHARSET = 'utf8mb4';
+    private static ?PDO $pdo = null;
 
     /**
-     * Devuelve la instancia PDO. Si no existe, la crea.
+     * Devuelve la instancia PDO compartida.
+     * Si todavia no existe, la crea leyendo los valores del .env.
      */
     public static function abrir(): PDO
     {
         if (self::$pdo === null) {
-            $dsn = 
-            'mysql:host=' . self::HOST
-             . ';dbname='   . self::BD
-            . ';charset='  . self::CHARSET;
+            // Leemos las credenciales desde las variables de entorno
+            // cargadas en init.php con Utilidades::cargar('.env')
+            $host    = $_ENV['DB_HOST']    ?? 'localhost';
+            $bd      = $_ENV['DB_NAME']    ?? 'tiendaphp';
+            $usuario = $_ENV['DB_USER']    ?? 'root';
+            $clave   = $_ENV['DB_PASS']    ?? '';
+            $charset = $_ENV['DB_CHARSET'] ?? 'utf8mb4';
 
-            // ERRMODE_EXCEPTION: los errores SQL lanzan excepciones en lugar de fallar en silencio
-            // FETCH_ASSOC: los resultados vienen como array con nombres de columna ($fila['nombre'])
-            // EMULATE_PREPARES false: usa prepared statements reales, SQL injection mas seguro
+            $dsn = "mysql:host={$host};dbname={$bd};charset={$charset}";
+
+            // ERRMODE_EXCEPTION: los errores SQL lanzan excepciones
+            // FETCH_ASSOC:       resultados como array ['columna' => valor]
+            // EMULATE_PREPARES:  false → prepared statements reales (mas seguro)
             $opciones = [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES   => false,
             ];
 
             try {
-                self::$pdo = new PDO($dsn, self::USUARIO, self::CLAVE, $opciones);
+                self::$pdo = new PDO($dsn, $usuario, $clave, $opciones);
             } catch (PDOException $e) {
                 die('No se ha podido conectar con la base de datos: ' . $e->getMessage());
             }
         }
+
         return self::$pdo;
     }
 }

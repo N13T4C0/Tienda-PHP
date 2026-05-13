@@ -14,7 +14,8 @@
             "Rutas\\":         "src/Rutas/",
             "Utils\\":         "src/Utils/",
             "Config\\":        "config/",
-            "Modelos\\":       "src/Modelos/"
+            "Modelos\\":       "src/Modelos/",
+            "Core\\":          "src/Core/"
         }
     },
     "minimum-stability": "stable",

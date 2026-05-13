@@ -1,3 +1,9 @@
+# Bloquea el acceso directo a ficheros sensibles
+<FilesMatch "^\.env|composer\.(json|lock)|\.git">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
 # Redirigimos todo el trafico al directorio public
 RewriteEngine On
 RewriteRule ^$ public/ [L]

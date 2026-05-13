@@ -21,7 +21,7 @@ return array(
     'Modelos\\' => array($baseDir . '/src/Modelos'),
     'Middleware\\' => array($baseDir . '/src/Middleware'),
     'Lib\\' => array($baseDir . '/src/Lib'),
-    'Core\\' => array($vendorDir . '/apimatic/core/src'),
+    'Core\\' => array($baseDir . '/src/Core', $vendorDir . '/apimatic/core/src'),
     'CoreInterfaces\\' => array($vendorDir . '/apimatic/core-interfaces/src'),
     'Controladores\\' => array($baseDir . '/src/Controladores'),
     'Config\\' => array($baseDir . '/config'),

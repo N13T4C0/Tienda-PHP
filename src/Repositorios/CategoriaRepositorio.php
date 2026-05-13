@@ -2,17 +2,11 @@
 
 namespace Repositorios;
 
-use Config\Conexion;
+use Core\BaseRepositorio;
 use PDO;
 
-class CategoriaRepositorio
+class CategoriaRepositorio extends BaseRepositorio
 {
-    private $bd;
-
-    public function __construct()
-    {
-        $this->bd = Conexion::abrir();
-    }
 
     /** Devuelve todas las categorias ordenadas alfabeticamente */
     public function obtenerTodas(): array
