@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2cf809a7688c4b5c360a5e167a94a4d1",
+    "content-hash": "d10a7c5ae827b94e7fa97807b6df826a",
     "packages": [
         {
             "name": "apimatic/core",
@@ -222,6 +222,59 @@
                 "source": "https://github.com/apimatic/unirest-php/tree/4.0.7"
             },
             "time": "2025-06-17T09:09:48+00:00"
+        },
+        {
+            "name": "fpdf/fpdf",
+            "version": "1.86.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/coreydoughty/Fpdf.git",
+                "reference": "2034ab9f7b03b8294933d7fd27828d13963368e5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/coreydoughty/Fpdf/zipball/2034ab9f7b03b8294933d7fd27828d13963368e5",
+                "reference": "2034ab9f7b03b8294933d7fd27828d13963368e5",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "FPDF": "Fpdf\\Fpdf"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Fpdf\\": "src/Fpdf"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Corey Doughty",
+                    "email": "corey@doughty.ca"
+                }
+            ],
+            "description": "FPDF Composer Wrapper",
+            "homepage": "https://github.com/coreydoughty/Fpdf",
+            "keywords": [
+                "fpdf",
+                "pdf",
+                "wrapper"
+            ],
+            "support": {
+                "issues": "https://github.com/coreydoughty/Fpdf/issues",
+                "source": "https://github.com/coreydoughty/Fpdf/tree/1.86.1"
+            },
+            "time": "2025-12-08T14:03:59+00:00"
         },
         {
             "name": "paypal/paypal-server-sdk",

@@ -21,6 +21,7 @@ return array(
     'Modelos\\' => array($baseDir . '/src/Modelos'),
     'Middleware\\' => array($baseDir . '/src/Middleware'),
     'Lib\\' => array($baseDir . '/src/Lib'),
+    'Fpdf\\' => array($vendorDir . '/fpdf/fpdf/src/Fpdf'),
     'Core\\' => array($vendorDir . '/apimatic/core/src'),
     'CoreInterfaces\\' => array($vendorDir . '/apimatic/core-interfaces/src'),
     'Controladores\\' => array($baseDir . '/src/Controladores'),

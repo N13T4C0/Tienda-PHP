@@ -5,6 +5,7 @@ namespace Controladores;
 use Lib\Pagina;
 use Lib\Sesion;
 use Lib\Cesta;
+use Lib\EnvioMail;
 use Servicios\PedidoServicio;
 use Utils\Paypal;
 
@@ -38,7 +39,17 @@ class PagoControlador
 
                 if (empty($cesta)) throw new \Exception("Cesta vacía");
 
-                (new PedidoServicio())->crearPedido($usuario['id'], $datosEnvio, $cesta, $total);
+                $servicio = new PedidoServicio();
+                $idPedido = $servicio->crearPedido($usuario['id'], $datosEnvio, $cesta, $total);
+
+                EnvioMail::confirmacionPedido(
+                    $usuario['email'],
+                    $usuario['nombre'],
+                    $idPedido,
+                    $cesta,
+                    $total,
+                    $datosEnvio
+                );
 
                 Cesta::vaciar();
                 unset($_SESSION['paypal_order_id'], $_SESSION['pago_envio']);
@@ -53,11 +64,11 @@ class PagoControlador
 
     public function gracias(): void
     {
-        Pagina::renderizar('pago/gracias');
+        require APP . '/Vistas/pago/gracias.php';
     }
 
     public function error(): void
     {
-        Pagina::renderizar('pago/error');
+        require APP . '/Vistas/pago/error.php';
     }
 }

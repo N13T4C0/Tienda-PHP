@@ -16,7 +16,7 @@ class PedidoServicio
         $this->prodRepo = new ProductoRepositorio();
     }
 
-    public function crearPedido(int $idUsuario, array $datosEnvio, array $cesta, float $total): void
+    public function crearPedido(int $idUsuario, array $datosEnvio, array $cesta, float $total): int
     {
         try {
             $this->pedidoRepo->iniciarTransaccion();
@@ -29,6 +29,7 @@ class PedidoServicio
             }
 
             $this->pedidoRepo->confirmar();
+            return $idPedido;
         } catch (\Exception $e) {
             $this->pedidoRepo->cancelar();
             throw $e;
