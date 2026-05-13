@@ -86,6 +86,9 @@ class Rutas
         Enrutador::agregar('GET', '/pago/error', function () {
             (new PagoControlador())->error();
         });
+        Enrutador::agregar('GET', '/pago/factura', function () {
+            (new PagoControlador())->factura();
+        });
 
         Enrutador::agregar('GET', '/admin', function () {
             (new AdminControlador())->index();

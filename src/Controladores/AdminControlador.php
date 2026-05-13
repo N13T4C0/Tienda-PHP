@@ -14,17 +14,12 @@ use Servicios\UsuarioServicio;
 
 class AdminControlador extends BaseControlador
 {
-    // El constructor comprueba que el usuario es admin antes de cualquier accion
     public function __construct()
     {
         AdminMiddleware::verificar();
     }
 
-    // ──────────────────────────────────────────────────────
-    //  PANEL PRINCIPAL
-    // ──────────────────────────────────────────────────────
-
-    // Panel principal con el resumen de la tienda
+    // Panel principal
     public function index(): void
     {
         $servProd = new ProductoServicio();
@@ -42,10 +37,6 @@ class AdminControlador extends BaseControlador
         require APP . '/Vistas/comunes/pie.php';
     }
 
-    // ──────────────────────────────────────────────────────
-    //  PRODUCTOS
-    // ──────────────────────────────────────────────────────
-
     // Lista todos los productos
     public function productos(): void
     {
@@ -56,7 +47,7 @@ class AdminControlador extends BaseControlador
         require APP . '/Vistas/comunes/pie.php';
     }
 
-    // Muestra el formulario para crear un producto nuevo
+    // Formulario para crear producto
     public function nuevoProducto(): void
     {
         $servCat    = new CategoriaServicio();
@@ -68,7 +59,7 @@ class AdminControlador extends BaseControlador
         require APP . '/Vistas/comunes/pie.php';
     }
 
-    // Muestra el formulario para editar un producto existente
+    // Formulario para editar producto existente
     public function editarProducto($id = null): void
     {
         if (!is_numeric($id)) {
@@ -91,25 +82,22 @@ class AdminControlador extends BaseControlador
         require APP . '/Vistas/comunes/pie.php';
     }
 
-    // Guarda un producto nuevo o actualiza uno existente.
-    // Gestiona tambien la subida del archivo de imagen.
+    // Guarda un producto nuevo o actualiza uno existente
     public function guardarProducto(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             Sesion::redirigir('admin/productos');
         }
 
-        // Saneamiento y validacion centralizada en el Request
         $resultado = ProductoRequest::validar($_POST);
         $errores   = $resultado['errores'];
-        $datos     = $resultado['datos']; // trim + htmlspecialchars + (int)/(float)
+        $datos     = $resultado['datos'];
 
-        // Solo procesamos la imagen si el usuario subio un archivo nuevo
         if (!empty($_FILES['imagen']['name'])) {
             $nombreImagen = $this->subirImagen($_FILES['imagen']);
 
             if ($nombreImagen === null) {
-                Sesion::mensaje('error', 'El archivo de imagen no es valido (solo JPG, PNG, GIF, WEBP)');
+                Sesion::mensaje('error', 'Imagen no valida (solo JPG, PNG, GIF, WEBP)');
                 Sesion::redirigir('admin/productos');
             }
 
@@ -135,7 +123,7 @@ class AdminControlador extends BaseControlador
         Sesion::redirigir('admin/productos');
     }
 
-    // Elimina un producto (o lo oculta si tiene pedidos asociados)
+    // Elimina un producto (o lo oculta si tiene pedidos)
     public function borrarProducto($id = null): void
     {
         if (!is_numeric($id)) {
@@ -148,7 +136,7 @@ class AdminControlador extends BaseControlador
         Sesion::redirigir('admin/productos');
     }
 
-    // Restaura un producto ocultado (visible = 1)
+    // Restaura un producto oculto
     public function restaurarProducto($id = null): void
     {
         if (!is_numeric($id)) {
@@ -161,16 +149,12 @@ class AdminControlador extends BaseControlador
         Sesion::redirigir('admin/productos');
     }
 
-    // ──────────────────────────────────────────────────────
-    //  CATEGORIAS
-    // ──────────────────────────────────────────────────────
-
     // Lista todas las categorias
     public function categorias(): void
     {
         $servicio   = new CategoriaServicio();
         $categorias = $servicio->listarTodas();
-        $catEditar  = null; // null = modo creacion
+        $catEditar  = null;
 
         require APP . '/Vistas/comunes/cabecera.php';
         require APP . '/Vistas/admin/categorias.php';
@@ -234,7 +218,7 @@ class AdminControlador extends BaseControlador
         Sesion::redirigir('admin/categorias');
     }
 
-    // Elimina una categoria si no tiene productos asociados
+    // Elimina una categoria si no tiene productos
     public function borrarCategoria($id = null): void
     {
         if (!is_numeric($id)) {
@@ -253,11 +237,7 @@ class AdminControlador extends BaseControlador
         Sesion::redirigir('admin/categorias');
     }
 
-    // ──────────────────────────────────────────────────────
-    //  PEDIDOS
-    // ──────────────────────────────────────────────────────
-
-    // Lista todos los pedidos (panel admin)
+    // Lista todos los pedidos
     public function pedidos(): void
     {
         $servicio = new PedidoServicio();
@@ -290,10 +270,6 @@ class AdminControlador extends BaseControlador
         require APP . '/Vistas/comunes/pie.php';
     }
 
-    // ──────────────────────────────────────────────────────
-    //  USUARIOS
-    // ──────────────────────────────────────────────────────
-
     // Lista todos los usuarios
     public function usuarios(): void
     {
@@ -318,15 +294,7 @@ class AdminControlador extends BaseControlador
         Sesion::redirigir('admin/usuarios');
     }
 
-    // ──────────────────────────────────────────────────────
-    //  HELPERS PRIVADOS
-    // ──────────────────────────────────────────────────────
-
-    /**
-     * Sube la imagen al servidor y devuelve el nombre del archivo guardado.
-     * Si la extension no esta permitida devuelve null.
-     * La imagen se renombra con time() + uniqid() para evitar colisiones.
-     */
+    /** Sube la imagen al servidor. Devuelve el nombre del archivo o null si falla */
     private function subirImagen(array $archivo): ?string
     {
         $extensionesPermitidas = ['jpg', 'jpeg', 'png', 'gif', 'webp'];

@@ -1,15 +1,14 @@
 <?php
+
 namespace Lib;
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use Utils\Utilidades;
+
 class EnvioMail
 {
-    /**
-     * Email de confirmacion de registro.
-     * Se llama al registrar un usuario nuevo para que active su cuenta.
-     */
+    /** Email de confirmacion de registro */
     public static function confirmacionRegistro(string $email, string $nombre, string $token): bool
     {
         $enlace = 'http://localhost' . URL_BASE . '/auth/confirmar/' . $token;
@@ -20,7 +19,7 @@ class EnvioMail
                     border:1px solid #e0e0e0;border-radius:8px;'>
             <h2 style='color:#1e3a5f;'>Hola, {$nombre}!</h2>
             <p>Gracias por registrarte en <strong>netStore</strong>.</p>
-            <p>Para activar tu cuenta haz clic en el boton:</p>
+            <p>Haz clic en el boton para activar tu cuenta:</p>
             <p style='text-align:center;margin:32px 0;'>
                 <a href='{$enlace}'
                    style='background:#2563eb;color:#fff;padding:12px 28px;
@@ -28,16 +27,13 @@ class EnvioMail
                     Activar mi cuenta
                 </a>
             </p>
-            <p style='color:#888;font-size:13px;'>Si no te has registrado tu, ignora este mensaje.</p>
+            <p style='color:#888;font-size:13px;'>Si no te has registrado, ignora este mensaje.</p>
         </div>";
 
         return self::enviar($email, $asunto, $cuerpo);
     }
 
-    /**
-     * Email de confirmacion de pedido.
-     * Se llama tras crear el pedido en la base de datos.
-     */
+    /** Email de confirmacion de pedido */
     public static function confirmacionPedido(
         string $email,
         string $nombre,
@@ -49,7 +45,6 @@ class EnvioMail
         $asunto = "Confirmacion de tu pedido #{$idPedido} - netStore";
         $fecha  = date('d/m/Y H:i');
 
-        // Construimos la tabla de productos del pedido
         $filas = '';
         foreach ($items as $item) {
             $p        = $item['producto'];
@@ -58,9 +53,7 @@ class EnvioMail
             $precio   = number_format($p['precio'], 2, ',', '.') . ' &euro;';
             $filas   .= "
             <tr>
-                <td style='padding:8px;border-bottom:1px solid #eee;'>"
-                    . htmlspecialchars($p['nombre']) . "
-                </td>
+                <td style='padding:8px;border-bottom:1px solid #eee;'>" . htmlspecialchars($p['nombre']) . "</td>
                 <td style='padding:8px;border-bottom:1px solid #eee;text-align:center;'>{$cantidad}</td>
                 <td style='padding:8px;border-bottom:1px solid #eee;text-align:right;'>{$precio}</td>
                 <td style='padding:8px;border-bottom:1px solid #eee;text-align:right;'>{$subtotal}</td>
@@ -76,8 +69,7 @@ class EnvioMail
         <div style='font-family:Arial,sans-serif;max-width:650px;margin:auto;padding:24px;
                     border:1px solid #e0e0e0;border-radius:8px;'>
             <h2 style='color:#1e3a5f;'>Gracias por tu compra, {$nombre}!</h2>
-            <p>Hemos recibido tu pedido correctamente Aqui tienes el resumen:</p>
-
+            <p>Hemos recibido tu pedido correctamente. Aqui tienes el resumen:</p>
             <table style='width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;'>
                 <thead>
                     <tr style='background:#f0f4f8;'>
@@ -90,67 +82,41 @@ class EnvioMail
                 <tbody>{$filas}</tbody>
                 <tfoot>
                     <tr>
-                        <td colspan='3'
-                            style='padding:12px 8px;text-align:right;font-weight:bold;'>TOTAL</td>
-                        <td style='padding:12px 8px;text-align:right;font-weight:bold;
-                                   color:#2563eb;font-size:16px;'>{$totalFmt}</td>
+                        <td colspan='3' style='padding:12px 8px;text-align:right;font-weight:bold;'>TOTAL</td>
+                        <td style='padding:12px 8px;text-align:right;font-weight:bold;color:#2563eb;font-size:16px;'>{$totalFmt}</td>
                     </tr>
                 </tfoot>
             </table>
-
             <p style='margin-top:20px;'><strong>Numero de pedido:</strong> #{$idPedido}</p>
             <p><strong>Fecha:</strong> {$fecha}</p>
             <p><strong>Direccion de envio:</strong> {$direccion}</p>
-
-            <p style='color:#888;font-size:13px;margin-top:24px;'>
-                Gracias por comprar en <strong>netStore</strong>.
-            </p>
+            <p style='color:#888;font-size:13px;margin-top:24px;'>Gracias por comprar en <strong>netStore</strong>.</p>
         </div>";
 
         return self::enviar($email, $asunto, $cuerpo);
     }
 
-    /**
-     * Metodo privado que construye el PHPMailer y envia el correo via SMTP.
-     * Lee las credenciales del archivo .env cargado en el bootstrap (init.php).
-     */
+    /** Envia el correo via SMTP con las credenciales del .env */
     private static function enviar(string $para, string $asunto, string $cuerpoHtml): bool
     {
-        // true activa las excepciones en PHPMailer, sin esto los errores fallan en silencio
         $mail = new PHPMailer(true);
 
         try {
-            // Usamos SMTP en lugar del mail() de PHP, mas fiable y configurable
             $mail->isSMTP();
-
-            // Host del servidor SMTP — en desarrollo apunta a Mailtrap (bandeja de pruebas)
-            // En produccion cambiar SMTP_HOST en el .env al servidor real (ej: smtp.gmail.com)
-            $mail->Host = Utilidades::obtener('SMTP_HOST', 'sandbox.smtp.mailtrap.io');
-
-            // SMTPAuth obliga a autenticarse con usuario y clave antes de enviar
-            // Si el servidor no requiere auth se puede poner false, pero la mayoria si lo requieren
-            $mail->SMTPAuth = true;
-            $mail->Username = Utilidades::obtener('SMTP_USER', '');
-            $mail->Password = Utilidades::obtener('SMTP_PASS', '');
-
-            // STARTTLS cifra la conexion  alternativa es SMTPS (puerto 465)
-            // Si hay error de SSL en local, puede deberse a certificados no validos en XAMPP
+            $mail->Host       = Utilidades::obtener('SMTP_HOST', 'smtp.gmail.com');
+            $mail->SMTPAuth   = true;
+            $mail->Username   = Utilidades::obtener('SMTP_USER', '');
+            $mail->Password   = Utilidades::obtener('SMTP_PASS', '');
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port       = (int) Utilidades::obtener('SMTP_PORT', 2525);
+            $mail->Port       = (int) Utilidades::obtener('SMTP_PORT', 587);
 
-            // El remitente que vera el destinatario en su bandeja de entrada
             $mail->setFrom(
-                Utilidades::obtener('SMTP_FROM',      'no-responder@netstore.local'),
+                Utilidades::obtener('SMTP_FROM',      ''),
                 Utilidades::obtener('SMTP_FROM_NAME', 'netStore')
             );
 
-            // Destinatario  se puede llamar varias veces para enviar a varios a la vez
             $mail->addAddress($para);
-
-            // Indicamos que el cuerpo es HTML, no texto plano
             $mail->isHTML(true);
-
-            // UTF-8 para que tildes y caracteres especiales no salgan como simbolos raros
             $mail->CharSet = 'UTF-8';
             $mail->Subject = $asunto;
             $mail->Body    = $cuerpoHtml;
@@ -159,8 +125,6 @@ class EnvioMail
             return true;
 
         } catch (Exception $e) {
-            // No lanzamos el error al usuario, solo lo registramos en el log del servidor
-            // $mail->ErrorInfo tiene mas detalle que $e->getMessage() en PHPMailer
             error_log('EnvioMail ERROR: ' . $mail->ErrorInfo);
             return false;
         }
