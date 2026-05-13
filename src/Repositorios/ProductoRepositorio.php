@@ -1,8 +1,9 @@
 <?php
+
 namespace Repositorios;
 
 use Config\Conexion;
-
+use PDO;
 
 class ProductoRepositorio
 {
@@ -43,7 +44,10 @@ class ProductoRepositorio
                 WHERE p.visible = 1 AND p.categoria_id = :cat
                 ORDER BY p.fecha_alta DESC";
         $stmt = $this->bd->prepare($sql);
-        $stmt->execute([':cat' => $idCategoria]);
+
+        $stmt->bindParam(':cat', $idCategoria, PDO::PARAM_INT);
+
+        $stmt->execute();
         return $stmt->fetchAll();
     }
 
@@ -57,7 +61,14 @@ class ProductoRepositorio
                   AND (p.nombre LIKE :q1 OR p.descripcion LIKE :q2)
                 ORDER BY p.fecha_alta DESC";
         $stmt = $this->bd->prepare($sql);
-        $stmt->execute([':q1' => '%' . $texto . '%', ':q2' => '%' . $texto . '%']);
+
+        // Preparamos el término de búsqueda para el LIKE
+        $busqueda = '%' . $texto . '%';
+
+        $stmt->bindParam(':q1', $busqueda, PDO::PARAM_STR);
+        $stmt->bindParam(':q2', $busqueda, PDO::PARAM_STR);
+
+        $stmt->execute();
         return $stmt->fetchAll();
     }
 
@@ -69,7 +80,10 @@ class ProductoRepositorio
                 INNER JOIN categorias c ON c.id = p.categoria_id
                 WHERE p.id = :id";
         $stmt = $this->bd->prepare($sql);
-        $stmt->execute([':id' => $id]);
+
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+
+        $stmt->execute();
         $fila = $stmt->fetch();
         return $fila ?: null;
     }
@@ -78,19 +92,28 @@ class ProductoRepositorio
     public function insertar(array $datos): int
     {
         $sql = "INSERT INTO productos
-                  (categoria_id, nombre, descripcion, precio, stock, imagen, visible)
+                (categoria_id, nombre, descripcion, precio, stock, imagen, visible)
                 VALUES
-                  (:cat, :nom, :desc, :pre, :sto, :img, :vis)";
+                (:cat, :nom, :desc, :pre, :sto, :img, :vis)";
         $stmt = $this->bd->prepare($sql);
-        $stmt->execute([
-            ':cat'  => $datos['categoria_id'],
-            ':nom'  => $datos['nombre'],
-            ':desc' => $datos['descripcion'],
-            ':pre'  => $datos['precio'],
-            ':sto'  => $datos['stock'],
-            ':img'  => $datos['imagen'] ?: 'sin-imagen.svg',
-            ':vis'  => $datos['visible'] ? 1 : 0,
-        ]);
+
+        $cat   = $datos['categoria_id'];
+        $nom   = $datos['nombre'];
+        $desc  = $datos['descripcion'];
+        $pre   = $datos['precio'];
+        $sto   = $datos['stock'];
+        $img   = $datos['imagen'] ?: 'sin-imagen.svg';
+        $vis   = $datos['visible'] ? 1 : 0;
+
+        $stmt->bindParam(':cat', $cat, PDO::PARAM_INT);
+        $stmt->bindParam(':nom', $nom, PDO::PARAM_STR);
+        $stmt->bindParam(':desc', $desc, PDO::PARAM_STR);
+        $stmt->bindParam(':pre', $pre); // Los decimales/floats es mejor vincularlos sin forzar STR o INT
+        $stmt->bindParam(':sto', $sto, PDO::PARAM_INT);
+        $stmt->bindParam(':img', $img, PDO::PARAM_STR);
+        $stmt->bindParam(':vis', $vis, PDO::PARAM_INT);
+
+        $stmt->execute();
         return (int) $this->bd->lastInsertId();
     }
 
@@ -107,23 +130,35 @@ class ProductoRepositorio
                     visible      = :vis
                 WHERE id = :id";
         $stmt = $this->bd->prepare($sql);
-        return $stmt->execute([
-            ':id'   => $id,
-            ':cat'  => $datos['categoria_id'],
-            ':nom'  => $datos['nombre'],
-            ':desc' => $datos['descripcion'],
-            ':pre'  => $datos['precio'],
-            ':sto'  => $datos['stock'],
-            ':img'  => $datos['imagen'] ?: 'sin-imagen.svg',
-            ':vis'  => $datos['visible'] ? 1 : 0,
-        ]);
+
+        $cat   = $datos['categoria_id'];
+        $nom   = $datos['nombre'];
+        $desc  = $datos['descripcion'];
+        $pre   = $datos['precio'];
+        $sto   = $datos['stock'];
+        $img   = $datos['imagen'] ?: 'sin-imagen.svg';
+        $vis   = $datos['visible'] ? 1 : 0;
+
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->bindParam(':cat', $cat, PDO::PARAM_INT);
+        $stmt->bindParam(':nom', $nom, PDO::PARAM_STR);
+        $stmt->bindParam(':desc', $desc, PDO::PARAM_STR);
+        $stmt->bindParam(':pre', $pre);
+        $stmt->bindParam(':sto', $sto, PDO::PARAM_INT);
+        $stmt->bindParam(':img', $img, PDO::PARAM_STR);
+        $stmt->bindParam(':vis', $vis, PDO::PARAM_INT);
+
+        return $stmt->execute();
     }
 
     /** Elimina un producto por su id */
     public function eliminar(int $id): bool
     {
         $stmt = $this->bd->prepare("DELETE FROM productos WHERE id = :id");
-        return $stmt->execute([':id' => $id]);
+
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+
+        return $stmt->execute();
     }
 
     /** Resta unidades del stock al confirmar un pedido */
@@ -132,6 +167,15 @@ class ProductoRepositorio
         $stmt = $this->bd->prepare(
             "UPDATE productos SET stock = stock - :u WHERE id = :id AND stock >= :u2"
         );
-        return $stmt->execute([':u' => $unidades, ':u2' => $unidades, ':id' => $id]);
+
+        // Aquí es mejor usar variables para cumplir con la referencia de bindParam
+        $u = $unidades;
+        $i = $id;
+
+        $stmt->bindParam(':u', $u, PDO::PARAM_INT);
+        $stmt->bindParam(':u2', $u, PDO::PARAM_INT);
+        $stmt->bindParam(':id', $i, PDO::PARAM_INT);
+
+        return $stmt->execute();
     }
 }

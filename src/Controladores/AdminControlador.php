@@ -85,23 +85,18 @@ class AdminControlador
 
     // Guarda un producto nuevo o actualiza uno existente
     // Gestiona tambien la subida del archivo de imagen
+    // Guarda un producto nuevo o actualiza uno existente
+    // Gestiona tambien la subida del archivo de imagen
     public function guardarProducto(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             Sesion::redirigir('admin/productos');
         }
 
-        // Recogemos y limpiamos los campos del formulario
-        $datos = [
-            'categoria_id' => (int)   ($_POST['categoria_id'] ?? 0),
-            'nombre' => trim($_POST['nombre']  ?? ''),
-            'descripcion' => trim($_POST['descripcion']  ?? ''),
-            'precio' => (float) ($_POST['precio'] ?? 0),
-            'stock'  => (int)   ($_POST['stock']   ?? 0),
-            'imagen'=> trim($_POST['imagen_actual'] ?? 'sin-imagen.svg'), // imagen anterior por defecto
-            // El checkbox no llega en $_POST si está desmarcado isset() lo convierte a 1 o 0
-            'visible' => isset($_POST['visible']) ? 1 : 0,
-        ];
+        //SANEAMIENTO Y VALIDACIÓN
+        $resultado = ProductoRequest::validar($_POST);
+        $errores = $resultado['errores'];
+        $datos = $resultado['datos']; // Estos ya vienen con trim, htmlspecialchars e (int)/(float)
 
         // Solo procesamos la imagen si el usuario slec un archivo nuevo
         if (!empty($_FILES['imagen']['name'])) {
@@ -119,8 +114,7 @@ class AdminControlador
             $datos['imagen'] = $nombreImagen;
         }
 
-        // Validamos los datos antes de tocar la BD (nombre, precio, stock, etc.)
-        $errores = ProductoRequest::validar($datos);
+        // Si el Request detectó errores, los mostramos
         if ($errores) {
             Sesion::mensaje('error', implode('<br>', $errores));
             Sesion::redirigir('admin/productos');
@@ -182,11 +176,15 @@ class AdminControlador
         // Recogemos los campos y validamos antes de guardar
         $id    = (int) ($_POST['id'] ?? 0);
         $datos = [
-            'nombre'      => trim($_POST['nombre']      ?? ''),
-            'descripcion' => trim($_POST['descripcion'] ?? ''),
+            'nombre'      => $_POST['nombre']      ?? '',
+            'descripcion' => $_POST['descripcion'] ?? '',
         ];
 
-        $errores = CategoriaRequest::validar($datos);
+        // Aquí obtenemos tanto errores como datos sanitizados
+        $resultado = CategoriaRequest::validar($datos);
+        $errores = $resultado['errores'];
+        $datosLimpios = $resultado['datos'];
+
         if ($errores) {
             Sesion::mensaje('error', implode('<br>', $errores));
             Sesion::redirigir('admin/categorias');
@@ -196,15 +194,16 @@ class AdminControlador
 
         // Si viene un id es edicion, si no es creacion
         if ($id > 0) {
-            $servicio->modificar($id, $datos);
+            $servicio->modificar($id, $datosLimpios);
             Sesion::mensaje('ok', 'Categoria actualizada');
         } else {
-            $servicio->crear($datos);
+            $servicio->crear($datosLimpios);
             Sesion::mensaje('ok', 'Categoria creada');
         }
 
         Sesion::redirigir('admin/categorias');
     }
+
 
     // Elimina una categoria si no tiene productos asociados
     public function borrarCategoria($id = null): void

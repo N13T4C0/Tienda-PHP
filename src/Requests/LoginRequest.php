@@ -8,9 +8,11 @@ class LoginRequest
     {
         $errores = [];
 
-        $email = trim($datos['email'] ?? '');
-        $clave = $datos['clave'] ?? '';
+        //SANEAR
+        $email = htmlspecialchars(trim($datos['email'] ?? ''), ENT_QUOTES, 'UTF-8');
+        $clave = trim($datos['clave'] ?? '');
 
+        // VALIDAR
         if ($email === '') {
             $errores[] = 'El email es obligatorio';
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -21,6 +23,12 @@ class LoginRequest
             $errores[] = 'La clave es obligatoria';
         }
 
-        return $errores;
+        return [
+            'errores' => $errores,
+            'datos' => [
+                'email' => $email,
+                'clave' => $clave
+            ]
+        ];
     }
 }

@@ -8,10 +8,12 @@ class RegistroRequest
     {
         $errores = [];
 
-        $nombre = trim($datos['nombre'] ?? '');
-        $email  = trim($datos['email'] ?? '');
-        $clave  = $datos['clave'] ?? '';
-        $clave2 = $datos['clave2'] ?? '';
+        // SANITIZAR
+        $nombre    = htmlspecialchars(trim($datos['nombre'] ?? ''), ENT_QUOTES, 'UTF-8');
+        $apellidos = htmlspecialchars(trim($datos['apellidos'] ?? ''), ENT_QUOTES, 'UTF-8');
+        $email     = htmlspecialchars(trim($datos['email'] ?? ''), ENT_QUOTES, 'UTF-8');
+        $clave     = trim($datos['clave'] ?? '');
+        $clave2    = trim($datos['clave2'] ?? '');
 
         if ($nombre === '') {
             $errores[] = 'El nombre es obligatorio';
@@ -29,6 +31,14 @@ class RegistroRequest
             $errores[] = 'Las claves no coinciden';
         }
 
-        return $errores;
+        return [
+            'errores' => $errores,
+            'datos' => [
+                'nombre'    => $nombre,
+                'apellidos' => $apellidos,
+                'email'     => $email,
+                'clave'     => $clave
+            ]
+        ];
     }
 }

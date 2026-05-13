@@ -23,28 +23,27 @@ class AuthControlador
     }
 
     // Procesa el formulario de registro
+    // Procesa el formulario de registro
     public function procesarRegistro(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             Sesion::redirigir('auth/registro');
         }
 
-        $nombre = trim($_POST['nombre'] ?? '');
-        $apellidos = trim($_POST['apellidos'] ?? '');
-        $email = trim($_POST['email'] ?? '');
-        $clave = $_POST['clave'] ?? '';
-        $clave2 = $_POST['clave2'] ?? '';
+        //saneamos los datos y validamos
+        $resultado = RegistroRequest::validar($_POST);
+        $errores = $resultado['errores'];
+        $datosLimpios = $resultado['datos'];
+
+        // Extraemos los datos limpios del saneo y validacion
+        $nombre    = $datosLimpios['nombre'];
+        $apellidos = $datosLimpios['apellidos'];
+        $email     = $datosLimpios['email'];
+        $clave     = $datosLimpios['clave'];
 
         // Guardamos los datos para repintar el formulario si hay errores
         // compact() convierte variables en array: ['nombre' => $nombre, 'apellidos' => $apellidos, ...]
         $_SESSION['datos_form'] = compact('nombre', 'apellidos', 'email');
-
-        $errores = RegistroRequest::validar([
-            'nombre' => $nombre,
-            'email'  => $email,
-            'clave'  => $clave,
-            'clave2' => $clave2,
-        ]);
 
         $servicio = new UsuarioServicio();
 
@@ -109,17 +108,23 @@ class AuthControlador
             Sesion::redirigir('auth/login');
         }
 
-        $email = trim($_POST['email'] ?? '');
-        $clave = $_POST['clave']      ?? '';
+        //saneamiento y validacion
+        $resultado = LoginRequest::validar($_POST);
+        $errores = $resultado['errores'];
+        $datosLimpios = $resultado['datos'];
 
-        $errores = LoginRequest::validar(['email' => $email, 'clave' => $clave]);
+        // Extraemos para usar
+        $email = $datosLimpios['email'];
+        $clave = $datosLimpios['clave'];
+
         if ($errores) {
             Sesion::mensaje('error', implode('<br>', $errores));
             Sesion::redirigir('auth/login');
         }
 
         $servicio = new UsuarioServicio();
-        $usuario  = $servicio->verificarCredenciales($email, $clave);
+        // Usamos las variables ya limpias
+        $usuario = $servicio->verificarCredenciales($email, $clave);
 
         if (!$usuario) {
             Sesion::mensaje('error', 'Credenciales incorrectas');
