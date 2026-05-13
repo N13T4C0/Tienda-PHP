@@ -18,13 +18,13 @@ class UsuarioRepositorio
     public function insertar(array $datos): int
     {
         $sql = "INSERT INTO usuarios
-                    (nombre, apellidos, email, clave, rol, activado, token_email, token_email_creado)
-                VALUES
-                    (:nom, :ape, :email, :clave, :rol, :act, :tok, :tok_creado)";
+                (nombre, apellidos, email, clave, rol, activado, token_email, token_email_creado)
+            VALUES
+                (:nom, :ape, :email, :clave, :rol, :act, :tok, NOW())";
 
         $stmt = $this->bd->prepare($sql);
 
-        // Se asignan a variables antes del bind porque bindParam vincula por referencia
+        // Asignación a variables
         $nom   = $datos['nombre'];
         $ape   = $datos['apellidos'] ?? '';
         $email = $datos['email'];
@@ -32,8 +32,8 @@ class UsuarioRepositorio
         $rol   = $datos['rol'] ?? 'cliente';
         $act   = $datos['activado'] ?? 0;
         $tok   = $datos['token_email'] ?? null;
-        $tokCreado = $datos['token_email_creado'] ?? null;
 
+        // Vinculación por referencia usando bindParam
         $stmt->bindParam(':nom', $nom, PDO::PARAM_STR);
         $stmt->bindParam(':ape', $ape, PDO::PARAM_STR);
         $stmt->bindParam(':email', $email, PDO::PARAM_STR);
@@ -41,7 +41,7 @@ class UsuarioRepositorio
         $stmt->bindParam(':rol', $rol, PDO::PARAM_STR);
         $stmt->bindParam(':act', $act, PDO::PARAM_INT);
         $stmt->bindParam(':tok', $tok, PDO::PARAM_STR | PDO::PARAM_NULL);
-        $stmt->bindParam(':tok_creado', $tokCreado, PDO::PARAM_STR | PDO::PARAM_NULL);
+
 
         $stmt->execute();
         return (int) $this->bd->lastInsertId();
@@ -70,15 +70,18 @@ class UsuarioRepositorio
     /** Busca un usuario por su token de activacion de email */
     public function encontrarPorToken(string $token): ?array
     {
-        $stmt = $this->bd->prepare(
-            "SELECT * FROM usuarios
-             WHERE token_email = :tok
-               AND activado = 0
-               AND token_email_creado IS NOT NULL
-               AND token_email_creado >= (NOW() - INTERVAL 1 MINUTE)"
-        );
+        $sql = "SELECT * FROM usuarios 
+            WHERE token_email = :tok 
+              AND activado = 0 
+              AND token_email_creado IS NOT NULL 
+              AND token_email_creado >= (NOW() - INTERVAL 1 MINUTE)";
+
+        $stmt = $this->bd->prepare($sql);
+
         $stmt->bindParam(':tok', $token, PDO::PARAM_STR);
+
         $stmt->execute();
+
         $fila = $stmt->fetch();
         return $fila ?: null;
     }
@@ -88,8 +91,8 @@ class UsuarioRepositorio
     {
         $stmt = $this->bd->prepare(
             "UPDATE usuarios
-             SET activado = 1, token_email = NULL, token_email_creado = NULL
-             WHERE id = :id"
+            SET activado = 1, token_email = NULL, token_email_creado = NULL
+            WHERE id = :id"
         );
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();
