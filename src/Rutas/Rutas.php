@@ -86,6 +86,9 @@ class Rutas
         Enrutador::agregar('GET', '/pago/error', function () {
             (new PagoControlador())->error();
         });
+        Enrutador::agregar('GET', '/pago/factura', function () {
+            (new PagoControlador())->factura();
+        });
 
         Enrutador::agregar('GET', '/admin', function () {
             (new AdminControlador())->index();
@@ -111,6 +114,9 @@ class Rutas
         
         Enrutador::agregar('GET', '/admin/categorias', function () {
             (new AdminControlador())->categorias();
+        });
+        Enrutador::agregar('GET', '/admin/editarCategoria/:id', function ($id) {
+            (new AdminControlador())->editarCategoria($id);
         });
         Enrutador::agregar('POST', '/admin/guardarCategoria', function () {
             (new AdminControlador())->guardarCategoria();
@@ -140,7 +146,13 @@ class Rutas
             (new AdminControlador())->restaurarProducto($id);
         });
 
-        
+        Enrutador::agregar('GET', '/admin/pedidos', function () {
+            (new AdminControlador())->pedidos();
+        });
+        Enrutador::agregar('GET', '/admin/detallePedido/:id', function ($id) {
+            (new AdminControlador())->detallePedido($id);
+        });
+
         Enrutador::despachar();
     }
 }

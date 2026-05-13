@@ -1,12 +1,14 @@
 <?php
 namespace Controladores;
 
+// cambio pedido maestra
+use Core\BaseControlador;
 use Servicios\ProductoServicio;
 use Servicios\CategoriaServicio;
 
-class HomeControlador
+class HomeControlador extends BaseControlador
 {
-    /** Pagina inicial: muestra los productos destacados */
+    // Pagina inicial: muestra los productos destacados
     public function index(): void
     {
         $servProd = new ProductoServicio();
@@ -18,8 +20,10 @@ class HomeControlador
         // Mostramos como destacados los 4 primeros
         $destacados = array_slice($productos, 0, 4);
 
-        require APP . '/Vistas/comunes/cabecera.php';
-        require APP . '/Vistas/home/inicio.php';
-        require APP . '/Vistas/comunes/pie.php';
+        $this->view('home/inicio', [
+            'productos'  => $productos,
+            'categorias' => $categorias,
+            'destacados' => $destacados,
+        ]);
     }
 }

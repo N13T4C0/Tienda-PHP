@@ -2,17 +2,11 @@
 
 namespace Repositorios;
 
-use Config\Conexion;
+use Core\BaseRepositorio;
 use PDO;
 
-class ProductoRepositorio
+class ProductoRepositorio extends BaseRepositorio
 {
-    private $bd;
-
-    public function __construct()
-    {
-        $this->bd = Conexion::abrir();
-    }
 
     /** Devuelve todos los productos visibles (catalogo publico) */
     public function obtenerVisibles(): array
@@ -151,21 +145,41 @@ class ProductoRepositorio
         return $stmt->execute();
     }
 
-    /** Elimina un producto. Si tiene pedidos asociados, hace borrado lógico */
+    /**
+     * Elimina un producto por su id.
+     *
+     * Si el producto tiene pedidos asociados (violacion de FK), en lugar de
+     * borrar hace un "borrado logico": pone visible = 0 para que no aparezca
+     * en el catalogo pero los historicos de pedidos siguen siendo validos.
+     *
+     * Por que usamos $e->errorInfo[0] en lugar de $e->getCode()?
+     *   - getCode() en PDOException puede devolver un int (0) o el SQLSTATE
+     *     dependiendo de la version de PHP/MySQL, por lo que no es fiable.
+     *   - errorInfo[0] siempre contiene el SQLSTATE oficial ('23000' para
+     *     violaciones de integridad referencial). Es la forma correcta.
+     */
     public function eliminar(int $id): bool
     {
         try {
             $stmt = $this->bd->prepare("DELETE FROM productos WHERE id = :id");
-            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $i = $id;
+            $stmt->bindParam(':id', $i, PDO::PARAM_INT);
             return $stmt->execute();
+
         } catch (\PDOException $e) {
-            // Si falla por FK (tiene pedidos), borrado lógico
-            if ($e->getCode() === '23000') {
+            // errorInfo[0] = SQLSTATE, errorInfo[1] = codigo del driver (ej: 1451 en MySQL)
+            $sqlState = $e->errorInfo[0] ?? '';
+
+            if ($sqlState === '23000') {
+                // El producto esta en algun pedido → ocultarlo en lugar de borrarlo
                 $stmt = $this->bd->prepare("UPDATE productos SET visible = 0 WHERE id = :id");
-                $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+                $i = $id;
+                $stmt->bindParam(':id', $i, PDO::PARAM_INT);
                 return $stmt->execute();
             }
-            throw $e; // Si es otro error, lo relanzamos
+
+            // Cualquier otro error de BD lo relanzamos para no ocultarlo
+            throw $e;
         }
     }
 

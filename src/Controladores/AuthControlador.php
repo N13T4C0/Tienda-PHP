@@ -1,6 +1,8 @@
 <?php
 namespace Controladores;
 
+// cambio pedido maestra
+use Core\BaseControlador;
 use Lib\Sesion;
 use Lib\Cesta;
 use Lib\EnvioMail;
@@ -9,7 +11,7 @@ use Servicios\UsuarioServicio;
 use Requests\RegistroRequest;
 use Requests\LoginRequest;
 
-class AuthControlador
+class AuthControlador extends BaseControlador
 {
     // Muestra el formulario de registro
     public function registro(): void
@@ -17,12 +19,11 @@ class AuthControlador
         $datosPrevios = $_SESSION['datos_form'] ?? [];
         unset($_SESSION['datos_form']);
 
-        require APP . '/Vistas/comunes/cabecera.php';
-        require APP . '/Vistas/auth/registro.php';
-        require APP . '/Vistas/comunes/pie.php';
+        $this->view('auth/registro', [
+            'datosPrevios' => $datosPrevios,
+        ]);
     }
 
-    // Procesa el formulario de registro
     // Procesa el formulario de registro
     public function procesarRegistro(): void
     {
@@ -30,19 +31,16 @@ class AuthControlador
             Sesion::redirigir('auth/registro');
         }
 
-        //saneamos los datos y validamos
-        $resultado = RegistroRequest::validar($_POST);
-        $errores = $resultado['errores'];
+        $resultado    = RegistroRequest::validar($_POST);
+        $errores      = $resultado['errores'];
         $datosLimpios = $resultado['datos'];
 
-        // Extraemos los datos limpios del saneo y validacion
         $nombre    = $datosLimpios['nombre'];
         $apellidos = $datosLimpios['apellidos'];
         $email     = $datosLimpios['email'];
         $clave     = $datosLimpios['clave'];
 
         // Guardamos los datos para repintar el formulario si hay errores
-        // compact() convierte variables en array: ['nombre' => $nombre, 'apellidos' => $apellidos, ...]
         $_SESSION['datos_form'] = compact('nombre', 'apellidos', 'email');
 
         $servicio = new UsuarioServicio();
@@ -56,7 +54,6 @@ class AuthControlador
             Sesion::redirigir('auth/registro');
         }
 
-        // El servicio hashea la clave, genera el token y hace el INSERT
         $token = $servicio->registrar([
             'nombre'    => $nombre,
             'apellidos' => $apellidos,
@@ -64,7 +61,6 @@ class AuthControlador
             'clave'     => $clave,
         ]);
 
-        // Si habia datos del formulario guardados en sesion de un intento fallido anterior, los borramos
         unset($_SESSION['datos_form']);
 
         EnvioMail::confirmacionRegistro($email, $nombre, $token);
@@ -96,9 +92,7 @@ class AuthControlador
     // Muestra el formulario de login
     public function login(): void
     {
-        require APP . '/Vistas/comunes/cabecera.php';
-        require APP . '/Vistas/auth/login.php';
-        require APP . '/Vistas/comunes/pie.php';
+        $this->view('auth/login');
     }
 
     // Procesa el formulario de login
@@ -108,12 +102,10 @@ class AuthControlador
             Sesion::redirigir('auth/login');
         }
 
-        //saneamiento y validacion
-        $resultado = LoginRequest::validar($_POST);
-        $errores = $resultado['errores'];
+        $resultado    = LoginRequest::validar($_POST);
+        $errores      = $resultado['errores'];
         $datosLimpios = $resultado['datos'];
 
-        // Extraemos para usar
         $email = $datosLimpios['email'];
         $clave = $datosLimpios['clave'];
 
@@ -123,8 +115,7 @@ class AuthControlador
         }
 
         $servicio = new UsuarioServicio();
-        // Usamos las variables ya limpias
-        $usuario = $servicio->verificarCredenciales($email, $clave);
+        $usuario  = $servicio->verificarCredenciales($email, $clave);
 
         if (!$usuario) {
             Sesion::mensaje('error', 'Credenciales incorrectas');
@@ -192,7 +183,6 @@ class AuthControlador
             Sesion::redirigir('auth/login');
         }
 
-        // El servicio maneja la logica de crear o actualizar el usuario de Google
         $servicio = new UsuarioServicio();
         $usuario  = $servicio->procesarLoginGoogle($info);
 

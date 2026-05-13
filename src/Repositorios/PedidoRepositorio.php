@@ -1,20 +1,17 @@
 <?php
+
 namespace Repositorios;
 
-use Config\Conexion;
+use Core\BaseRepositorio;
+use PDO;
 
-
-class PedidoRepositorio
+class PedidoRepositorio extends BaseRepositorio
 {
-    private $bd;
-
-    public function __construct()
-    {
-        $this->bd = Conexion::abrir();
-    }
-
-    /** Devuelve la conexion PDO  */
-    public function conexion(): \PDO
+    /**
+     * Devuelve la conexion PDO para usarla en transacciones desde el Servicio.
+     * Necesario para beginTransaction / commit / rollBack en PedidoServicio.
+     */
+    public function conexion(): PDO
     {
         return $this->bd;
     }
@@ -26,13 +23,21 @@ class PedidoRepositorio
             "INSERT INTO pedidos (usuario_id, importe_total, direccion, localidad, provincia)
              VALUES (:u, :t, :d, :l, :p)"
         );
-        $stmt->execute([
-            ':u' => $idUsuario,
-            ':t' => $total,
-            ':d' => $datosEnvio['direccion'] ?? '',
-            ':l' => $datosEnvio['localidad'] ?? '',
-            ':p' => $datosEnvio['provincia'] ?? '',
-        ]);
+
+        // bindParam vincula por referencia → usamos variables intermedias
+        $u   = $idUsuario;
+        $t   = $total;
+        $dir = $datosEnvio['direccion'] ?? '';
+        $loc = $datosEnvio['localidad'] ?? '';
+        $pro = $datosEnvio['provincia'] ?? '';
+
+        $stmt->bindParam(':u', $u, PDO::PARAM_INT);
+        $stmt->bindParam(':t', $t);                   // float, sin forzar tipo
+        $stmt->bindParam(':d', $dir, PDO::PARAM_STR);
+        $stmt->bindParam(':l', $loc, PDO::PARAM_STR);
+        $stmt->bindParam(':p', $pro, PDO::PARAM_STR);
+
+        $stmt->execute();
         return (int) $this->bd->lastInsertId();
     }
 
@@ -40,19 +45,29 @@ class PedidoRepositorio
     public function insertarLinea(int $idPedido, array $producto, int $unidades): void
     {
         $subtotal = $producto['precio'] * $unidades;
+
         $stmt = $this->bd->prepare(
             "INSERT INTO lineas_pedido
                 (pedido_id, producto_id, nombre_producto, precio_unidad, unidades, subtotal)
-            VALUES (:pe, :pr, :np, :pu, :un, :st)"
+             VALUES (:pe, :pr, :np, :pu, :un, :st)"
         );
-        $stmt->execute([
-            ':pe' => $idPedido,
-            ':pr' => $producto['id'],
-            ':np' => $producto['nombre'],
-            ':pu' => $producto['precio'],
-            ':un' => $unidades,
-            ':st' => $subtotal,
-        ]);
+
+        // Variables intermedias para bindParam (necesita referencias)
+        $pe = $idPedido;
+        $pr = (int) $producto['id'];
+        $np = $producto['nombre'];
+        $pu = $producto['precio'];
+        $un = $unidades;
+        $st = $subtotal;
+
+        $stmt->bindParam(':pe', $pe, PDO::PARAM_INT);
+        $stmt->bindParam(':pr', $pr, PDO::PARAM_INT);
+        $stmt->bindParam(':np', $np, PDO::PARAM_STR);
+        $stmt->bindParam(':pu', $pu);                 // float
+        $stmt->bindParam(':un', $un, PDO::PARAM_INT);
+        $stmt->bindParam(':st', $st);                 // float
+
+        $stmt->execute();
     }
 
     /** Devuelve los pedidos de un usuario concreto */
@@ -61,8 +76,26 @@ class PedidoRepositorio
         $stmt = $this->bd->prepare(
             "SELECT * FROM pedidos WHERE usuario_id = :u ORDER BY fecha_pedido DESC"
         );
-        $stmt->execute([':u' => $idUsuario]);
+
+        $u = $idUsuario;
+        $stmt->bindParam(':u', $u, PDO::PARAM_INT);
+        $stmt->execute();
+
         return $stmt->fetchAll();
+    }
+
+    /**
+     * Devuelve TODOS los pedidos con el nombre del usuario (para el panel admin).
+     * Hace un JOIN con la tabla usuarios para mostrar quien hizo cada pedido.
+     */
+    public function obtenerTodos(): array
+    {
+        $sql = "SELECT p.*, u.nombre AS usuario_nombre, u.email AS usuario_email
+                FROM pedidos p
+                INNER JOIN usuarios u ON u.id = p.usuario_id
+                ORDER BY p.fecha_pedido DESC";
+
+        return $this->bd->query($sql)->fetchAll();
     }
 
     /** Devuelve las lineas de un pedido concreto */
@@ -71,7 +104,29 @@ class PedidoRepositorio
         $stmt = $this->bd->prepare(
             "SELECT * FROM lineas_pedido WHERE pedido_id = :pe ORDER BY id ASC"
         );
-        $stmt->execute([':pe' => $idPedido]);
+
+        $pe = $idPedido;
+        $stmt->bindParam(':pe', $pe, PDO::PARAM_INT);
+        $stmt->execute();
+
         return $stmt->fetchAll();
+    }
+
+    /** Devuelve un pedido concreto por su id (con datos del usuario) */
+    public function obtenerUno(int $idPedido): ?array
+    {
+        $stmt = $this->bd->prepare(
+            "SELECT p.*, u.nombre AS usuario_nombre, u.email AS usuario_email
+             FROM pedidos p
+             INNER JOIN usuarios u ON u.id = p.usuario_id
+             WHERE p.id = :id"
+        );
+
+        $id = $idPedido;
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $fila = $stmt->fetch();
+        return $fila ?: null;
     }
 }

@@ -68,4 +68,20 @@ class PedidoServicio
     {
         return $this->repoPedido->obtenerLineas($idPedido);
     }
+
+    /**
+     * Devuelve TODOS los pedidos con datos del usuario (para el panel admin).
+     */
+    public function listarTodos(): array
+    {
+        return $this->repoPedido->obtenerTodos();
+    }
+
+    /**
+     * Devuelve un pedido concreto por su id (con datos del usuario).
+     */
+    public function obtenerUno(int $idPedido): ?array
+    {
+        return $this->repoPedido->obtenerUno($idPedido);
+    }
 }
