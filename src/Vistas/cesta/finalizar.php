@@ -3,11 +3,11 @@
 <div class="layout-tienda layout-tienda--checkout">
 
     <div class="formulario formulario--checkout">
-        <h2>Direccion de envio</h2>
+        <h2>Dirección de envío</h2>
 
         <form method="POST" action="<?= URL_BASE ?>/cesta/confirmar">
             <div class="campo">
-                <label for="direccion">Direccion *</label>
+                <label for="direccion">Dirección *</label>
                 <input type="text" name="direccion" id="direccion" required>
             </div>
             <div class="campo">
@@ -28,8 +28,10 @@
         <table class="resumen-cesta__tabla">
             <?php foreach ($items as $item): ?>
                 <tr>
-                    <td><?= htmlspecialchars($item['producto']['nombre']) ?>
-                        <small>x<?= $item['cantidad'] ?></small></td>
+                    <td>
+                        <?= htmlspecialchars($item['producto']->nombre) ?>
+                        <small>x<?= $item['cantidad'] ?></small>
+                    </td>
                     <td class="txt-derecha"><?= number_format($item['subtotal'], 2) ?> &euro;</td>
                 </tr>
             <?php endforeach; ?>

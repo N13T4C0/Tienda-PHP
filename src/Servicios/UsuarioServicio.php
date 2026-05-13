@@ -1,8 +1,10 @@
 <?php
+
 namespace Servicios;
 
 use Repositorios\UsuarioRepositorio;
-
+use Modelos\Usuario;
+use Lib\EnvioMail;
 
 class UsuarioServicio
 {
@@ -14,105 +16,78 @@ class UsuarioServicio
     }
 
     /**
-     * Registra un usuario nuevo.
-     * Hashea la clave y genera el token de activacion.
-     * Devuelve el token para poder enviarlo por email.
+     * Lógica completa de registro: Hash, Token, DB y Email
      */
-    public function registrar(array $datos): string
+    public function registrar(array $datos): bool
     {
-        // Token aleatorio de 32 caracteres para el enlace de verificacion del email
+        // 1. Generar token de seguridad
         $token = bin2hex(random_bytes(16));
 
-        $this->repositorio->insertar([
+        // 2. Preparar datos (Hash de clave y saneo)
+        $datosParaDB = [
             'nombre'      => htmlspecialchars($datos['nombre']),
             'apellidos'   => htmlspecialchars($datos['apellidos'] ?? ''),
             'email'       => $datos['email'],
-            // Nunca se guarda la clave en texto plano, BCRYPT la encripta de forma segura
             'clave'       => password_hash($datos['clave'], PASSWORD_BCRYPT),
-            // El rol siempre es cliente, el usuario no puede elegirlo
             'rol'         => 'cliente',
-            // La cuenta empieza desactivada hasta que el usuario verifique su email
             'activado'    => 0,
-            'token_email' => $token,
-            'token_email_creado' => date('Y-m-d H:i:s'),
-        ]);
+            'token_email' => $token
+        ];
 
-        // Se devuelve el token para que el controlador lo envie por email al usuario
-        return $token;
+        // 3. Guardar en DB
+        $id = $this->repositorio->insertar($datosParaDB);
+
+        if ($id > 0) {
+            // 4. Enviar el mail (Mantenemos tu lógica de envío)
+            EnvioMail::confirmacionRegistro($datos['email'], $datos['nombre'], $token);
+            return true;
+        }
+
+        return false;
     }
 
-    /**
-     * Comprueba si el email ya esta en uso.
-     */
     public function emailExiste(string $email): bool
     {
         return $this->repositorio->encontrarPorEmail($email) !== null;
     }
 
-    /**
-     * Valida las credenciales de un usuario.
-     * Devuelve el array del usuario si son correctas, null si no.
-     */
-    public function verificarCredenciales(string $email, string $clave): ?array
+    public function verificarCredenciales(string $email, string $clave): ?Usuario
     {
         $usuario = $this->repositorio->encontrarPorEmail($email);
 
-        if (!$usuario) {
-            return null;
+        if ($usuario && password_verify($clave, $usuario->clave)) {
+            return $usuario;
         }
-
-        if (!password_verify($clave, $usuario['clave'])) {
-            return null;
-        }
-
-        return $usuario;
+        return null;
     }
 
-    /**
-     * Activa la cuenta de un usuario a partir del token del email.
-     * Devuelve el usuario activado o null si el token no es valido.
-     */
-    public function activarCuenta(string $token): ?array
+    public function activarCuenta(string $token): ?Usuario
     {
         $usuario = $this->repositorio->encontrarPorToken($token);
 
-        if (!$usuario) {
-            return null;
+        if ($usuario) {
+            $this->repositorio->activar($usuario->id);
+            return $usuario;
         }
-
-        $this->repositorio->activar((int) $usuario['id']);
-        return $usuario;
+        return null;
     }
 
-    /**
-     * Busca un usuario por su id.
-     */
-    public function obtenerPorId(int $id): ?array
-    {
-        return $this->repositorio->encontrarPorId($id);
-    }
-
-    /**
-     * Devuelve todos los usuarios (para el panel admin).
-     */
     public function listarTodos(): array
     {
         return $this->repositorio->obtenerTodos();
     }
 
-    /**
-     * Elimina un usuario.
-     */
+    public function contarTotales(): int
+    {
+        return $this->repositorio->contarTodos();
+    }
+
     public function eliminar(int $id): bool
     {
         return $this->repositorio->eliminar($id);
     }
 
-    /**
-     * Registra o actualiza un usuario que viene de Google OAuth.
-     * Devuelve el array del usuario ya guardado.
-     */
-    public function procesarLoginGoogle(array $infoGoogle): array
+    public function procesarLoginGoogle(array $infoGoogle): Usuario
     {
         $partes    = explode(' ', $infoGoogle['name'] ?? $infoGoogle['email'], 2);
         $nombre    = htmlspecialchars($partes[0]);

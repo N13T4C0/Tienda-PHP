@@ -1,136 +1,47 @@
 <?php
+
 namespace Modelos;
-
-use Config\Conexion;
-
 
 class Usuario
 {
-    private $bd;
+    public function __construct(
+        public ?int $id = null,
+        public ?string $google_id = null,
+        public string $nombre = '',
+        public string $apellidos = '',
+        public string $email = '',
+        public ?string $clave = null,
+        public string $rol = 'cliente',
+        public bool $activado = false,
+        public ?string $avatar = null,
+        public ?string $token_email = null,
+        public ?string $token_email_creado = null,
+        public ?string $fecha_alta = null
+    ) {}
 
-    public function __construct()
+    public static function fromArray(array $datos): self
     {
-        $this->bd = Conexion::abrir();
-    }
-
-    /** Crea un usuario nuevo */
-    public function registrar(array $datos): int
-    {
-        $sql = "INSERT INTO usuarios
-                    (nombre, apellidos, email, clave, rol, activado, token_email, token_email_creado)
-                VALUES
-                    (:nom, :ape, :email, :clave, :rol, :act, :tok, :tok_creado)";
-        $stmt = $this->bd->prepare($sql);
-        $stmt->execute([
-            ':nom'   => $datos['nombre'],
-            ':ape'   => $datos['apellidos'] ?? '',
-            ':email' => $datos['email'],
-            ':clave' => $datos['clave'],
-            ':rol'   => $datos['rol'] ?? 'cliente',
-            ':act'   => $datos['activado'] ?? 0,
-            ':tok'   => $datos['token_email'] ?? null,
-            ':tok_creado' => $datos['token_email_creado'] ?? null,
-        ]);
-        return (int) $this->bd->lastInsertId();
-    }
-
-    /** Busca un usuario por su email */
-    public function buscarPorEmail(string $email): ?array
-    {
-        $stmt = $this->bd->prepare("SELECT * FROM usuarios WHERE email = :email");
-        $stmt->execute([':email' => $email]);
-        $fila = $stmt->fetch();
-        return $fila ?: null;
-    }
-
-    /** Busca un usuario por su id */
-    public function obtenerUno(int $id): ?array
-    {
-        $stmt = $this->bd->prepare("SELECT * FROM usuarios WHERE id = :id");
-        $stmt->execute([':id' => $id]);
-        $fila = $stmt->fetch();
-        return $fila ?: null;
-    }
-
-    /** Busca un usuario por su token de activacion de email */
-    public function buscarPorToken(string $token): ?array
-    {
-        $stmt = $this->bd->prepare(
-            "SELECT * FROM usuarios
-             WHERE token_email = :tok
-               AND activado = 0
-               AND token_email_creado IS NOT NULL
-               AND token_email_creado >= (NOW() - INTERVAL 1 MINUTE)"
+        return new self(
+            id: isset($datos['id']) ? (int)$datos['id'] : null,
+            google_id: $datos['google_id'] ?? null,
+            nombre: $datos['nombre'] ?? '',
+            apellidos: $datos['apellidos'] ?? '',
+            email: $datos['email'] ?? '',
+            clave: $datos['clave'] ?? null,
+            rol: $datos['rol'] ?? 'cliente',
+            activado: (bool)($datos['activado'] ?? false),
+            avatar: $datos['avatar'] ?? null,
+            token_email: $datos['token_email'] ?? null,
+            token_email_creado: $datos['token_email_creado'] ?? null,
+            fecha_alta: $datos['fecha_alta'] ?? null
         );
-        $stmt->execute([':tok' => $token]);
-        $fila = $stmt->fetch();
-        return $fila ?: null;
     }
 
-    /** Activa la cuenta del usuario (tras hacer click en el email) */
-    public function activarCuenta(int $id): bool
+    /**
+     * Helper para saber si el usuario es administrador
+     */
+    public function esAdmin(): bool
     {
-        $stmt = $this->bd->prepare(
-            "UPDATE usuarios SET activado = 1, token_email = NULL, token_email_creado = NULL WHERE id = :id"
-        );
-        return $stmt->execute([':id' => $id]);
+        return $this->rol === 'admin';
     }
-
-    /** Lista todos los usuarios (para el admin) */
-    public function listar(): array
-    {
-        return $this->bd
-            ->query("SELECT id, nombre, apellidos, email, rol, activado, fecha_alta
-                     FROM usuarios ORDER BY fecha_alta DESC")
-            ->fetchAll();
-    }
-
-    /** Elimina un usuario por su id */
-    public function eliminar(int $id): bool
-    {
-        $stmt = $this->bd->prepare("DELETE FROM usuarios WHERE id = :id");
-        return $stmt->execute([':id' => $id]);
-    }
-
-public function registrarOActualizarGoogle(array $datos): int
-{
-    // 1. Usamos $this->bd que es como se llama la conexión en esta clase
-    $sql = "SELECT id FROM usuarios WHERE google_id = :google_id OR email = :email LIMIT 1";
-    $stmt = $this->bd->prepare($sql);
-    $stmt->execute([
-        ':google_id' => $datos['google_id'],
-        ':email'     => $datos['email']
-    ]);
-    $usuario = $stmt->fetch();
-
-    if ($usuario) {
-        // 2. Actualizar si ya existe
-        $sql = "UPDATE usuarios SET 
-                nombre = :nombre, 
-                apellidos = :apellidos, 
-                avatar = :avatar 
-                WHERE id = :id";
-        $stmt = $this->bd->prepare($sql);
-        $stmt->execute([
-            ':nombre'    => $datos['nombre'],
-            ':apellidos' => $datos['apellidos'],
-            ':avatar'    => $datos['avatar'],
-            ':id'        => $usuario['id']
-        ]);
-        return (int)$usuario['id'];
-    } else {
-        // 3. Insertar nuevo si no existe
-        $sql = "INSERT INTO usuarios (google_id, email, nombre, apellidos, avatar, rol, activado) 
-                VALUES (:google_id, :email, :nombre, :apellidos, :avatar, 'cliente', 1)";
-        $stmt = $this->bd->prepare($sql);
-        $stmt->execute([
-            ':google_id' => $datos['google_id'],
-            ':email'     => $datos['email'],
-            ':nombre'    => $datos['nombre'],
-            ':apellidos' => $datos['apellidos'],
-            ':avatar'    => $datos['avatar']
-        ]);
-        return (int)$this->bd->lastInsertId();
-    }
-}
 }

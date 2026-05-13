@@ -1,71 +1,37 @@
 <?php
+
 namespace Servicios;
 
 use Repositorios\PedidoRepositorio;
 use Repositorios\ProductoRepositorio;
 
-
 class PedidoServicio
 {
-    private PedidoRepositorio   $repoPedido;
-    private ProductoRepositorio $repoProducto;
+    private $pedidoRepo;
+    private $prodRepo;
 
     public function __construct()
     {
-        $this->repoPedido   = new PedidoRepositorio();
-        $this->repoProducto = new ProductoRepositorio();
+        $this->pedidoRepo = new PedidoRepositorio();
+        $this->prodRepo = new ProductoRepositorio();
     }
 
-    /**
-     * Crea un pedido completo dentro de una transaccion:
-     * inserta cabecera, las lineas y descuenta el stock de cada producto.
-     * beginTransaction/commit/rollBack son metodos nativos de PDO: agrupan
-     * varias queries en un bloque atomico que se confirma o deshace entero.
-     */
-    public function crearPedido(int $idUsuario, array $datosEnvio, array $cesta, float $total): int
+    public function crearPedido(int $idUsuario, array $datosEnvio, array $cesta, float $total): void
     {
-        $pdo = $this->repoPedido->conexion();
-
         try {
-            // par q no guarde nda en la bd hasta q pidamos confirmacion
-            $pdo->beginTransaction();
+            $this->pedidoRepo->iniciarTransaccion();
 
-            // 1. Insertar la cabecera del pedido
-            $idPedido = $this->repoPedido->insertarCabecera($idUsuario, $total, $datosEnvio);
+            $idPedido = $this->pedidoRepo->insertarPedido($idUsuario, $total, $datosEnvio);
 
-            // 2. Insertar cada linea y descontar stock
             foreach ($cesta as $item) {
-                $producto = $item['producto'];
-                $unidades = (int) $item['cantidad'];
-
-                $this->repoPedido->insertarLinea($idPedido, $producto, $unidades);
-                // restar stock 
-                $this->repoProducto->restarStock((int) $producto['id'], $unidades);
-                
+                $this->pedidoRepo->insertarLinea($idPedido, $item);
+                $this->prodRepo->descontarStock($item['producto']->id, $item['cantidad']);
             }
 
-            $pdo->commit();
-            return $idPedido;
-
-        } catch (\Throwable $e) {
-            $pdo->rollBack();
+            $this->pedidoRepo->confirmar();
+        } catch (\Exception $e) {
+            $this->pedidoRepo->cancelar();
             throw $e;
         }
-    }
-
-    /**
-     * Devuelve los pedidos de un usuario.
-     */
-    public function obtenerPorUsuario(int $idUsuario): array
-    {
-        return $this->repoPedido->obtenerPorUsuario($idUsuario);
-    }
-
-    /**
-     * Devuelve las lineas de un pedido.
-     */
-    public function obtenerLineas(int $idPedido): array
-    {
-        return $this->repoPedido->obtenerLineas($idPedido);
     }
 }

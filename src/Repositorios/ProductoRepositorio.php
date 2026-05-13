@@ -7,190 +7,129 @@ use PDO;
 
 class ProductoRepositorio
 {
-    private $bd;
+    private $db;
 
     public function __construct()
     {
-        $this->bd = Conexion::abrir();
+        $this->db = Conexion::abrir();
     }
 
-    /** Devuelve todos los productos visibles (catalogo publico) */
-    public function obtenerVisibles(): array
+    public function contarTodos(): int
     {
-        $sql = "SELECT p.*, c.nombre AS categoria_nombre
-                FROM productos p
-                INNER JOIN categorias c ON c.id = p.categoria_id
-                WHERE p.visible = 1
-                ORDER BY p.fecha_alta DESC";
-        return $this->bd->query($sql)->fetchAll();
+        return (int) $this->db->query("SELECT COUNT(*) FROM productos")->fetchColumn();
     }
 
-    /** Devuelve TODOS los productos incluidos los no visibles (panel admin) */
     public function obtenerTodos(): array
     {
-        $sql = "SELECT p.*, c.nombre AS categoria_nombre
-                FROM productos p
-                INNER JOIN categorias c ON c.id = p.categoria_id
-                ORDER BY p.fecha_alta DESC";
-        return $this->bd->query($sql)->fetchAll();
+        return $this->db->query(
+            "SELECT p.*, c.nombre AS categoria_nombre
+             FROM productos p
+             INNER JOIN categorias c ON c.id = p.categoria_id
+             ORDER BY p.id DESC"
+        )->fetchAll(PDO::FETCH_OBJ);
     }
 
-    /** Devuelve productos de una categoria concreta */
+    public function obtenerVisibles(): array
+    {
+        $stmt = $this->db->prepare(
+            "SELECT p.*, c.nombre AS categoria_nombre
+             FROM productos p
+             INNER JOIN categorias c ON c.id = p.categoria_id
+             WHERE p.visible = 1
+             ORDER BY p.id DESC"
+        );
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
+    }
+
     public function obtenerPorCategoria(int $idCategoria): array
     {
-        $sql = "SELECT p.*, c.nombre AS categoria_nombre
-                FROM productos p
-                INNER JOIN categorias c ON c.id = p.categoria_id
-                WHERE p.visible = 1 AND p.categoria_id = :cat
-                ORDER BY p.fecha_alta DESC";
-        $stmt = $this->bd->prepare($sql);
-
-        $stmt->bindParam(':cat', $idCategoria, PDO::PARAM_INT);
-
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $stmt = $this->db->prepare(
+            "SELECT p.*, c.nombre AS categoria_nombre
+             FROM productos p
+             INNER JOIN categorias c ON c.id = p.categoria_id
+             WHERE p.visible = 1 AND p.categoria_id = ?
+             ORDER BY p.id DESC"
+        );
+        $stmt->execute([$idCategoria]);
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
-    /** Busca productos por texto en nombre o descripcion */
     public function buscarPorTexto(string $texto): array
     {
-        $sql = "SELECT p.*, c.nombre AS categoria_nombre
-                FROM productos p
-                INNER JOIN categorias c ON c.id = p.categoria_id
-                WHERE p.visible = 1
-                  AND (p.nombre LIKE :q1 OR p.descripcion LIKE :q2)
-                ORDER BY p.fecha_alta DESC";
-        $stmt = $this->bd->prepare($sql);
-
-        // Preparamos el término de búsqueda para el LIKE
+        $stmt = $this->db->prepare(
+            "SELECT p.*, c.nombre AS categoria_nombre
+             FROM productos p
+             INNER JOIN categorias c ON c.id = p.categoria_id
+             WHERE p.visible = 1
+               AND (p.nombre LIKE ? OR p.descripcion LIKE ?)
+             ORDER BY p.id DESC"
+        );
         $busqueda = '%' . $texto . '%';
-
-        $stmt->bindParam(':q1', $busqueda, PDO::PARAM_STR);
-        $stmt->bindParam(':q2', $busqueda, PDO::PARAM_STR);
-
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $stmt->execute([$busqueda, $busqueda]);
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
-    /** Devuelve un producto por su id */
-    public function obtenerUno(int $id): ?array
+    public function buscarPorId(int $id): ?object
     {
-        $sql = "SELECT p.*, c.nombre AS categoria_nombre
-                FROM productos p
-                INNER JOIN categorias c ON c.id = p.categoria_id
-                WHERE p.id = :id";
-        $stmt = $this->bd->prepare($sql);
-
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-
-        $stmt->execute();
-        $fila = $stmt->fetch();
-        return $fila ?: null;
+        $stmt = $this->db->prepare(
+            "SELECT p.*, c.nombre AS categoria_nombre
+             FROM productos p
+             INNER JOIN categorias c ON c.id = p.categoria_id
+             WHERE p.id = ?"
+        );
+        $stmt->execute([$id]);
+        $res = $stmt->fetch(PDO::FETCH_OBJ);
+        return $res ?: null;
     }
 
-    /** Inserta un producto nuevo y devuelve el id generado */
-    public function insertar(array $datos): int
+    public function guardar(array $d): bool
     {
-        $sql = "INSERT INTO productos
-                (categoria_id, nombre, descripcion, precio, stock, imagen, visible)
-                VALUES
-                (:cat, :nom, :desc, :pre, :sto, :img, :vis)";
-        $stmt = $this->bd->prepare($sql);
-
-        $cat   = $datos['categoria_id'];
-        $nom   = $datos['nombre'];
-        $desc  = $datos['descripcion'];
-        $pre   = $datos['precio'];
-        $sto   = $datos['stock'];
-        $img   = $datos['imagen'] ?: 'sin-imagen.svg';
-        $vis   = $datos['visible'] ? 1 : 0;
-
-        $stmt->bindParam(':cat', $cat, PDO::PARAM_INT);
-        $stmt->bindParam(':nom', $nom, PDO::PARAM_STR);
-        $stmt->bindParam(':desc', $desc, PDO::PARAM_STR);
-        $stmt->bindParam(':pre', $pre); // Los decimales/floats es mejor vincularlos sin forzar STR o INT
-        $stmt->bindParam(':sto', $sto, PDO::PARAM_INT);
-        $stmt->bindParam(':img', $img, PDO::PARAM_STR);
-        $stmt->bindParam(':vis', $vis, PDO::PARAM_INT);
-
-        $stmt->execute();
-        return (int) $this->bd->lastInsertId();
+        $sql = "INSERT INTO productos (categoria_id, nombre, descripcion, precio, stock, imagen, visible, fecha_alta)
+                VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+        return $this->db->prepare($sql)->execute([
+            $d['categoria_id'],
+            $d['nombre'],
+            $d['descripcion'],
+            $d['precio'],
+            $d['stock'],
+            $d['imagen'] ?? null,
+            isset($d['visible']) ? (int)$d['visible'] : 1
+        ]);
     }
 
-    /** Actualiza un producto existente */
-    public function actualizar(int $id, array $datos): bool
+    public function actualizar(int $id, array $d): bool
     {
-        $sql = "UPDATE productos SET
-                    categoria_id = :cat,
-                    nombre       = :nom,
-                    descripcion  = :desc,
-                    precio       = :pre,
-                    stock        = :sto,
-                    imagen       = :img,
-                    visible      = :vis
-                WHERE id = :id";
-        $stmt = $this->bd->prepare($sql);
-
-        $cat   = $datos['categoria_id'];
-        $nom   = $datos['nombre'];
-        $desc  = $datos['descripcion'];
-        $pre   = $datos['precio'];
-        $sto   = $datos['stock'];
-        $img   = $datos['imagen'] ?: 'sin-imagen.svg';
-        $vis   = $datos['visible'] ? 1 : 0;
-
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        $stmt->bindParam(':cat', $cat, PDO::PARAM_INT);
-        $stmt->bindParam(':nom', $nom, PDO::PARAM_STR);
-        $stmt->bindParam(':desc', $desc, PDO::PARAM_STR);
-        $stmt->bindParam(':pre', $pre);
-        $stmt->bindParam(':sto', $sto, PDO::PARAM_INT);
-        $stmt->bindParam(':img', $img, PDO::PARAM_STR);
-        $stmt->bindParam(':vis', $vis, PDO::PARAM_INT);
-
-        return $stmt->execute();
+        $sql = "UPDATE productos SET categoria_id = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, imagen = ?, visible = ? WHERE id = ?";
+        return $this->db->prepare($sql)->execute([
+            $d['categoria_id'],
+            $d['nombre'],
+            $d['descripcion'],
+            $d['precio'],
+            $d['stock'],
+            $d['imagen'] ?? null,
+            isset($d['visible']) ? (int)$d['visible'] : 1,
+            $id
+        ]);
     }
 
-    /** Elimina un producto. Si tiene pedidos asociados, hace borrado lógico */
-    public function eliminar(int $id): bool
+    public function borrarLogico(int $id): bool
     {
-        try {
-            $stmt = $this->bd->prepare("DELETE FROM productos WHERE id = :id");
-            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-            return $stmt->execute();
-        } catch (\PDOException $e) {
-            // Si falla por FK (tiene pedidos), borrado lógico
-            if ($e->getCode() === '23000') {
-                $stmt = $this->bd->prepare("UPDATE productos SET visible = 0 WHERE id = :id");
-                $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-                return $stmt->execute();
-            }
-            throw $e; // Si es otro error, lo relanzamos
-        }
+        return $this->db->prepare("UPDATE productos SET visible = 0 WHERE id = ?")->execute([$id]);
+    }
+
+    public function activar(int $id): bool
+    {
+        return $this->db->prepare("UPDATE productos SET stock = 10 WHERE id = ?")->execute([$id]);
+    }
+
+    public function descontarStock(int $id, int $cantidad): void
+    {
+        $this->db->prepare("UPDATE productos SET stock = stock - ? WHERE id = ?")->execute([$cantidad, $id]);
     }
 
     public function restaurar(int $id): bool
     {
-        $stmt = $this->bd->prepare("UPDATE productos SET visible = 1 WHERE id = :id");
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        return $stmt->execute();
-    }
-
-    /** Resta unidades del stock al confirmar un pedido */
-    public function restarStock(int $id, int $unidades): bool
-    {
-        $stmt = $this->bd->prepare(
-            "UPDATE productos SET stock = stock - :u WHERE id = :id AND stock >= :u2"
-        );
-
-        // Aquí es mejor usar variables para cumplir con la referencia de bindParam
-        $u = $unidades;
-        $i = $id;
-
-        $stmt->bindParam(':u', $u, PDO::PARAM_INT);
-        $stmt->bindParam(':u2', $u, PDO::PARAM_INT);
-        $stmt->bindParam(':id', $i, PDO::PARAM_INT);
-
-        return $stmt->execute();
+        return $this->db->prepare("UPDATE productos SET visible = 1 WHERE id = ?")->execute([$id]);
     }
 }

@@ -1,54 +1,52 @@
 <?php
-namespace Lib;
 
+namespace Lib;
 
 class Sesion
 {
     /** Guarda al usuario en sesion tras un login correcto */
-    public static function iniciar(array $usuario): void
+    public static function iniciar($usuario): void
     {
-        $_SESSION['usuario'] = [
-            'id'       => $usuario['id'],
-            'nombre'   => $usuario['nombre'],
-            'apellidos' => $usuario['apellidos'] ?? '',
-            'email'    => $usuario['email'],
-            'rol'      => $usuario['rol'],
-        ];
+        if (is_object($usuario)) {
+            $_SESSION['usuario'] = [
+                'id'        => $usuario->id,
+                'nombre'    => $usuario->nombre,
+                'apellidos' => $usuario->apellidos ?? '',
+                'email'     => $usuario->email,
+                'rol'       => $usuario->rol,
+            ];
+        } else {
+            $_SESSION['usuario'] = $usuario;
+        }
     }
 
-    /** Cierra la sesion */
     public static function cerrar(): void
     {
-        // unset para destruit las variables
         unset($_SESSION['usuario']);
         unset($_SESSION['cesta_invitado']);
+        // Borrar también cestas específicas de usuario si existen
     }
 
-    /** ¿Hay alguien logeado? */
     public static function logeado(): bool
     {
         return isset($_SESSION['usuario']);
     }
 
-    /** ¿El usuario logeado es administrador? */
     public static function esAdmin(): bool
     {
         return self::logeado() && $_SESSION['usuario']['rol'] === 'admin';
     }
 
-    /** Devuelve el usuario en sesion o null */
     public static function usuario(): ?array
     {
         return $_SESSION['usuario'] ?? null;
     }
 
-    /** Guarda un mensaje flash (se muestra una sola vez) */
     public static function mensaje(string $tipo, string $texto): void
     {
         $_SESSION['flash'] = ['tipo' => $tipo, 'texto' => $texto];
     }
 
-    /** Recupera y elimina el mensaje flash */
     public static function consumirMensaje(): ?array
     {
         if (!isset($_SESSION['flash'])) {
@@ -59,14 +57,12 @@ class Sesion
         return $msg;
     }
 
-    /** Redirige a una URL relativa al proyecto y para la ejecucion */
     public static function redirigir(string $ruta = ''): void
     {
         header('Location: ' . URL_BASE . '/' . ltrim($ruta, '/'));
         exit;
     }
 
-    /** Si no hay usuario logeado, redirige al login */
     public static function exigirLogin(): void
     {
         if (!self::logeado()) {
@@ -75,7 +71,6 @@ class Sesion
         }
     }
 
-    /** Si no es admin, lo manda al inicio con un mensaje */
     public static function exigirAdmin(): void
     {
         self::exigirLogin();

@@ -1,77 +1,54 @@
 <?php
+
 namespace Repositorios;
 
 use Lib\Conexion;
 
-
 class PedidoRepositorio
 {
-    private $bd;
+    private $db;
 
     public function __construct()
     {
-        $this->bd = Conexion::abrir();
+        $this->db = Conexion::abrir();
     }
 
-    /** Devuelve la conexion PDO  */
-    public function conexion(): \PDO
+    public function iniciarTransaccion(): void
     {
-        return $this->bd;
+        $this->db->beginTransaction();
     }
 
-    /** Inserta la cabecera del pedido y devuelve su id */
-    public function insertarCabecera(int $idUsuario, float $total, array $datosEnvio): int
+    public function confirmar(): void
     {
-        $stmt = $this->bd->prepare(
-            "INSERT INTO pedidos (usuario_id, importe_total, direccion, localidad, provincia)
-             VALUES (:u, :t, :d, :l, :p)"
-        );
+        $this->db->commit();
+    }
+
+    public function cancelar(): void
+    {
+        $this->db->rollBack();
+    }
+
+    public function insertarPedido(int $idUsuario, float $total, array $envio): int
+    {
+        $sql = "INSERT INTO pedidos (usuario_id, importe_total, direccion, localidad, provincia, estado, fecha_pedido) 
+                VALUES (?, ?, ?, ?, ?, 'pendiente', NOW())";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$idUsuario, $total, $envio['direccion'], $envio['localidad'], $envio['provincia']]);
+        return (int)$this->db->lastInsertId();
+    }
+
+    public function insertarLinea(int $idPedido, array $item): void
+    {
+        $sql = "INSERT INTO lineas_pedido (pedido_id, producto_id, nombre_producto, precio_unidad, unidades, subtotal) 
+                VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt = $this->db->prepare($sql);
         $stmt->execute([
-            ':u' => $idUsuario,
-            ':t' => $total,
-            ':d' => $datosEnvio['direccion'] ?? '',
-            ':l' => $datosEnvio['localidad'] ?? '',
-            ':p' => $datosEnvio['provincia'] ?? '',
+            $idPedido,
+            $item['producto']->id,
+            $item['producto']->nombre,
+            $item['producto']->precio,
+            $item['cantidad'],
+            $item['subtotal']
         ]);
-        return (int) $this->bd->lastInsertId();
-    }
-
-    /** Inserta una linea de pedido */
-    public function insertarLinea(int $idPedido, array $producto, int $unidades): void
-    {
-        $subtotal = $producto['precio'] * $unidades;
-        $stmt = $this->bd->prepare(
-            "INSERT INTO lineas_pedido
-                (pedido_id, producto_id, nombre_producto, precio_unidad, unidades, subtotal)
-            VALUES (:pe, :pr, :np, :pu, :un, :st)"
-        );
-        $stmt->execute([
-            ':pe' => $idPedido,
-            ':pr' => $producto['id'],
-            ':np' => $producto['nombre'],
-            ':pu' => $producto['precio'],
-            ':un' => $unidades,
-            ':st' => $subtotal,
-        ]);
-    }
-
-    /** Devuelve los pedidos de un usuario concreto */
-    public function obtenerPorUsuario(int $idUsuario): array
-    {
-        $stmt = $this->bd->prepare(
-            "SELECT * FROM pedidos WHERE usuario_id = :u ORDER BY fecha_pedido DESC"
-        );
-        $stmt->execute([':u' => $idUsuario]);
-        return $stmt->fetchAll();
-    }
-
-    /** Devuelve las lineas de un pedido concreto */
-    public function obtenerLineas(int $idPedido): array
-    {
-        $stmt = $this->bd->prepare(
-            "SELECT * FROM lineas_pedido WHERE pedido_id = :pe ORDER BY id ASC"
-        );
-        $stmt->execute([':pe' => $idPedido]);
-        return $stmt->fetchAll();
     }
 }

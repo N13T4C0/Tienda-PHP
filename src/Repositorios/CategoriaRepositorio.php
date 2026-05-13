@@ -3,6 +3,7 @@
 namespace Repositorios;
 
 use Lib\Conexion;
+use Modelos\Categoria;
 use PDO;
 
 class CategoriaRepositorio
@@ -14,83 +15,60 @@ class CategoriaRepositorio
         $this->bd = Conexion::abrir();
     }
 
-    /** Devuelve todas las categorias ordenadas alfabeticamente */
+    private function hidratar(array $filas): array
+    {
+        return array_map(fn($fila) => Categoria::fromArray($fila), $filas);
+    }
+
     public function obtenerTodas(): array
     {
-        // Al ser una consulta fija sin variables externas, query() es correcto
-        return $this->bd
-            ->query("SELECT * FROM categorias ORDER BY nombre ASC")
-            ->fetchAll();
+        $sql = "SELECT * FROM categorias ORDER BY nombre ASC";
+        return $this->hidratar($this->bd->query($sql)->fetchAll());
     }
 
-    /** Devuelve una categoria por su id */
-    public function obtenerUna(int $id): ?array
+    public function obtenerUna(int $id): ?Categoria
     {
         $stmt = $this->bd->prepare("SELECT * FROM categorias WHERE id = :id");
-
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-
-        $stmt->execute();
+        $stmt->execute([':id' => $id]);
         $fila = $stmt->fetch();
-        return $fila ?: null;
+        return $fila ? Categoria::fromArray($fila) : null;
     }
 
-    /** Inserta una categoria nueva */
+    public function contarTodas(): int
+    {
+        return (int) $this->bd->query("SELECT COUNT(*) FROM categorias")->fetchColumn();
+    }
+
     public function insertar(array $datos): int
     {
-        $stmt = $this->bd->prepare(
-            "INSERT INTO categorias (nombre, descripcion) VALUES (:nom, :desc)"
-        );
-
-        $nom  = $datos['nombre'];
-        $desc = $datos['descripcion'] ?? '';
-
-        $stmt->bindParam(':nom', $nom, PDO::PARAM_STR);
-        $stmt->bindParam(':desc', $desc, PDO::PARAM_STR);
-
-        $stmt->execute();
+        $stmt = $this->bd->prepare("INSERT INTO categorias (nombre, descripcion) VALUES (:nom, :desc)");
+        $stmt->execute([
+            ':nom'  => $datos['nombre'],
+            ':desc' => $datos['descripcion'] ?? ''
+        ]);
         return (int) $this->bd->lastInsertId();
     }
 
-    /** Actualiza una categoria existente */
     public function actualizar(int $id, array $datos): bool
     {
-        $stmt = $this->bd->prepare(
-            "UPDATE categorias SET nombre = :nom, descripcion = :desc WHERE id = :id"
-        );
-
-        $nom  = $datos['nombre'];
-        $desc = $datos['descripcion'] ?? '';
-        $i    = $id;
-
-        $stmt->bindParam(':id', $i, PDO::PARAM_INT);
-        $stmt->bindParam(':nom', $nom, PDO::PARAM_STR);
-        $stmt->bindParam(':desc', $desc, PDO::PARAM_STR);
-
-        return $stmt->execute();
+        $stmt = $this->bd->prepare("UPDATE categorias SET nombre = :nom, descripcion = :desc WHERE id = :id");
+        return $stmt->execute([
+            ':id'   => $id,
+            ':nom'  => $datos['nombre'],
+            ':desc' => $datos['descripcion'] ?? ''
+        ]);
     }
 
-    /** Elimina una categoria por su id */
     public function eliminar(int $id): bool
     {
         $stmt = $this->bd->prepare("DELETE FROM categorias WHERE id = :id");
-
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-
-        return $stmt->execute();
+        return $stmt->execute([':id' => $id]);
     }
 
-    /** Comprueba si una categoria tiene productos asociados */
     public function tieneProductos(int $id): bool
     {
-        $stmt = $this->bd->prepare(
-            "SELECT COUNT(*) AS total FROM productos WHERE categoria_id = :id"
-        );
-
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-
-        $stmt->execute();
-        $fila = $stmt->fetch();
-        return (int) $fila['total'] > 0;
+        $stmt = $this->bd->prepare("SELECT COUNT(*) FROM productos WHERE categoria_id = :id");
+        $stmt->execute([':id' => $id]);
+        return (int) $stmt->fetchColumn() > 0;
     }
 }
