@@ -85,7 +85,7 @@ class AuthControlador
         $usuario  = $servicio->activarCuenta($token);
 
         if (!$usuario) {
-            Sesion::mensaje('error', 'El enlace no es valido o ya se uso');
+            Sesion::mensaje('error', 'El enlace no es valido, ya se uso o ha expirado (1 minuto)');
             Sesion::redirigir('auth/login');
         }
 

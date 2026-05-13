@@ -17,9 +17,9 @@ class Usuario
     public function registrar(array $datos): int
     {
         $sql = "INSERT INTO usuarios
-                    (nombre, apellidos, email, clave, rol, activado, token_email)
+                    (nombre, apellidos, email, clave, rol, activado, token_email, token_email_creado)
                 VALUES
-                    (:nom, :ape, :email, :clave, :rol, :act, :tok)";
+                    (:nom, :ape, :email, :clave, :rol, :act, :tok, :tok_creado)";
         $stmt = $this->bd->prepare($sql);
         $stmt->execute([
             ':nom'   => $datos['nombre'],
@@ -29,6 +29,7 @@ class Usuario
             ':rol'   => $datos['rol'] ?? 'cliente',
             ':act'   => $datos['activado'] ?? 0,
             ':tok'   => $datos['token_email'] ?? null,
+            ':tok_creado' => $datos['token_email_creado'] ?? null,
         ]);
         return (int) $this->bd->lastInsertId();
     }
@@ -55,7 +56,11 @@ class Usuario
     public function buscarPorToken(string $token): ?array
     {
         $stmt = $this->bd->prepare(
-            "SELECT * FROM usuarios WHERE token_email = :tok AND activado = 0"
+            "SELECT * FROM usuarios
+             WHERE token_email = :tok
+               AND activado = 0
+               AND token_email_creado IS NOT NULL
+               AND token_email_creado >= (NOW() - INTERVAL 1 MINUTE)"
         );
         $stmt->execute([':tok' => $token]);
         $fila = $stmt->fetch();
@@ -66,7 +71,7 @@ class Usuario
     public function activarCuenta(int $id): bool
     {
         $stmt = $this->bd->prepare(
-            "UPDATE usuarios SET activado = 1, token_email = NULL WHERE id = :id"
+            "UPDATE usuarios SET activado = 1, token_email = NULL, token_email_creado = NULL WHERE id = :id"
         );
         return $stmt->execute([':id' => $id]);
     }

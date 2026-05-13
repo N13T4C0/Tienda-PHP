@@ -37,6 +37,7 @@ CREATE TABLE usuarios (
     rol          ENUM('cliente','admin') NOT NULL DEFAULT 'cliente',
     activado     TINYINT(1) NOT NULL DEFAULT 0,
     token_email  VARCHAR(64) DEFAULT NULL,
+    token_email_creado DATETIME DEFAULT NULL,
     fecha_alta   DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 

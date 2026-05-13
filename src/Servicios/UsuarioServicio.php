@@ -34,6 +34,7 @@ class UsuarioServicio
             // La cuenta empieza desactivada hasta que el usuario verifique su email
             'activado'    => 0,
             'token_email' => $token,
+            'token_email_creado' => date('Y-m-d H:i:s'),
         ]);
 
         // Se devuelve el token para que el controlador lo envie por email al usuario
