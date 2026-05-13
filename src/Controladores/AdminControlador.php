@@ -84,15 +84,37 @@ class AdminControlador
         ]);
     }
 
+    public function editarCategoria(int $id): void
+    {
+        Pagina::renderizar('admin/categorias', [
+            'categorias'       => $this->catServ->listarTodas(),
+            'categoriaEditar'  => $this->catServ->obtenerUna($id),
+        ]);
+    }
+
     public function guardarCategoria(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') $this->catServ->crear($_POST);
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id = $_POST['id'] ?? null;
+            if ($id) {
+                $this->catServ->modificar((int) $id, $_POST);
+                Sesion::mensaje('ok', 'Categoría actualizada');
+            } else {
+                $this->catServ->crear($_POST);
+                Sesion::mensaje('ok', 'Categoría creada');
+            }
+        }
         Sesion::redirigir('admin/categorias');
     }
 
     public function borrarCategoria(int $id): void
     {
-        $this->catServ->eliminar($id);
+        try {
+            $this->catServ->eliminar($id);
+            Sesion::mensaje('ok', 'Categoría eliminada');
+        } catch (\RuntimeException $e) {
+            Sesion::mensaje('error', $e->getMessage());
+        }
         Sesion::redirigir('admin/categorias');
     }
 

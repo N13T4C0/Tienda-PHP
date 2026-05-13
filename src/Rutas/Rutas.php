@@ -140,6 +140,9 @@ class Rutas
             (new AdminControlador())->restaurarProducto($id);
         });
 
+        Enrutador::agregar('GET', '/admin/editarCategoria/:id', function ($id) {
+            (new AdminControlador())->editarCategoria($id);
+        });
         
         Enrutador::despachar();
     }
