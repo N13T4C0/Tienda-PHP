@@ -152,6 +152,18 @@ class AdminControlador
         Sesion::redirigir('admin/productos');
     }
 
+    public function restaurarProducto($id = null): void
+    {
+        if (!is_numeric($id)) {
+            Sesion::redirigir('admin/productos');
+        }
+
+        $servicio = new ProductoServicio();
+        $servicio->restaurar((int) $id);
+        Sesion::mensaje('ok', 'Producto restaurado');
+        Sesion::redirigir('admin/productos');
+    }
+
 
     // Lista todas las categorias
     public function categorias(): void

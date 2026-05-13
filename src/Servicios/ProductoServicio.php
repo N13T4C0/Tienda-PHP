@@ -54,6 +54,11 @@ class ProductoServicio
         return $this->repositorio->insertar($datos);
     }
 
+    public function restaurar(int $id): bool
+    {
+        return $this->repositorio->restaurar($id);
+    }
+
     /**
      * Modifica un producto existente.
      */

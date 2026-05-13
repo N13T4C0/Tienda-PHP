@@ -151,13 +151,28 @@ class ProductoRepositorio
         return $stmt->execute();
     }
 
-    /** Elimina un producto por su id */
+    /** Elimina un producto. Si tiene pedidos asociados, hace borrado lógico */
     public function eliminar(int $id): bool
     {
-        $stmt = $this->bd->prepare("DELETE FROM productos WHERE id = :id");
+        try {
+            $stmt = $this->bd->prepare("DELETE FROM productos WHERE id = :id");
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            return $stmt->execute();
+        } catch (\PDOException $e) {
+            // Si falla por FK (tiene pedidos), borrado lógico
+            if ($e->getCode() === '23000') {
+                $stmt = $this->bd->prepare("UPDATE productos SET visible = 0 WHERE id = :id");
+                $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+                return $stmt->execute();
+            }
+            throw $e; // Si es otro error, lo relanzamos
+        }
+    }
 
+    public function restaurar(int $id): bool
+    {
+        $stmt = $this->bd->prepare("UPDATE productos SET visible = 1 WHERE id = :id");
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-
         return $stmt->execute();
     }
 
