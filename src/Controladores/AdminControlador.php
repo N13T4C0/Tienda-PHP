@@ -33,7 +33,12 @@ class AdminControlador extends BaseControlador
         $totalUsuarios   = count($servUser->listarTodos());
         $totalPedidos    = count($servPed->listarTodos());
 
-        $this->view('admin/panel');
+        $this->view('admin/panel', [
+            'totalProductos'  => $totalProductos,
+            'totalCategorias' => $totalCategorias,
+            'totalUsuarios'   => $totalUsuarios,
+            'totalPedidos'    => $totalPedidos,
+        ]);
     }
 
     // Lista todos los productos
@@ -42,7 +47,9 @@ class AdminControlador extends BaseControlador
         $servicio  = new ProductoServicio();
         $productos = $servicio->listarTodos();
 
-        $this->view('admin/productos');
+        $this->view('admin/productos', [
+            'productos' => $productos,
+        ]);
     }
 
     // Formulario para crear producto
@@ -52,7 +59,10 @@ class AdminControlador extends BaseControlador
         $categorias = $servCat->listarTodas();
         $producto   = null;
 
-        $this->view('admin/form_producto');
+        $this->view('admin/form_producto', [
+            'categorias' => $categorias,
+            'producto'   => $producto,
+        ]);
     }
 
     // Formulario para editar producto existente
@@ -73,7 +83,10 @@ class AdminControlador extends BaseControlador
         $servCat    = new CategoriaServicio();
         $categorias = $servCat->listarTodas();
 
-        $this->view('admin/form_producto');
+        $this->view('admin/form_producto', [
+            'categorias' => $categorias,
+            'producto'   => $producto,
+        ]);
     }
 
     // Guarda un producto nuevo o actualiza uno existente
@@ -150,7 +163,10 @@ class AdminControlador extends BaseControlador
         $categorias = $servicio->listarTodas();
         $catEditar  = null;
 
-        $this->view('admin/categorias');
+        $this->view('admin/categorias', [
+            'categorias' => $categorias,
+            'catEditar'  => $catEditar,
+        ]);
     }
 
     // Carga la pagina de categorias con el formulario pre-relleno para editar
@@ -170,7 +186,10 @@ class AdminControlador extends BaseControlador
 
         $categorias = $servicio->listarTodas();
 
-        $this->view('admin/categorias');
+        $this->view('admin/categorias', [
+            'categorias' => $categorias,
+            'catEditar'  => $catEditar,
+        ]);
     }
 
     // Guarda una categoria nueva o actualiza una existente
@@ -233,7 +252,9 @@ class AdminControlador extends BaseControlador
         $servicio = new PedidoServicio();
         $pedidos  = $servicio->listarTodos();
 
-        $this->view('admin/pedidos');
+        $this->view('admin/pedidos', [
+            'pedidos' => $pedidos,
+        ]);
     }
 
     // Muestra el detalle de un pedido con sus lineas
@@ -253,7 +274,10 @@ class AdminControlador extends BaseControlador
 
         $lineas = $servicio->obtenerLineas((int) $id);
 
-        $this->view('admin/detalle_pedido');
+        $this->view('admin/detalle_pedido', [
+            'pedido' => $pedido,
+            'lineas' => $lineas,
+        ]);
     }
 
     // Lista todos los usuarios
@@ -262,7 +286,9 @@ class AdminControlador extends BaseControlador
         $servicio = new UsuarioServicio();
         $usuarios = $servicio->listarTodos();
 
-        $this->view('admin/usuarios');
+        $this->view('admin/usuarios', [
+            'usuarios' => $usuarios,
+        ]);
     }
 
     // Elimina un usuario

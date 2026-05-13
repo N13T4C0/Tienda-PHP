@@ -19,7 +19,9 @@ class AuthControlador extends BaseControlador
         $datosPrevios = $_SESSION['datos_form'] ?? [];
         unset($_SESSION['datos_form']);
 
-        $this->view('auth/registro');
+        $this->view('auth/registro', [
+            'datosPrevios' => $datosPrevios,
+        ]);
     }
 
     // Procesa el formulario de registro

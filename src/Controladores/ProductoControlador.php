@@ -30,7 +30,12 @@ class ProductoControlador extends BaseControlador
         $paginador = new Paginador($todos, 8, (int) ($_GET['pagina'] ?? 1));
         $productos = $paginador->elementosPagina();
 
-        $this->view('productos/catalogo');
+        $this->view('productos/catalogo', [
+            'productos'       => $productos,
+            'categorias'      => $categorias,
+            'categoriaActiva' => $categoriaActiva,
+            'paginador'       => $paginador,
+        ]);
     }
 
     // Detalle de un producto
@@ -48,7 +53,9 @@ class ProductoControlador extends BaseControlador
             Sesion::redirigir('producto');
         }
 
-        $this->view('productos/detalle');
+        $this->view('productos/detalle', [
+            'producto' => $producto,
+        ]);
     }
 
     // Busca productos por texto
@@ -66,6 +73,11 @@ class ProductoControlador extends BaseControlador
             $productos = $servProd->obtenerCatalogo(null, $texto);
         }
 
-        $this->view('productos/buscar');
+        $this->view('productos/buscar', [
+            'productos'       => $productos,
+            'categorias'      => $categorias,
+            'categoriaActiva' => $categoriaActiva,
+            'texto'           => $texto,
+        ]);
     }
 }

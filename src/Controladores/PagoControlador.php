@@ -51,7 +51,9 @@ class PagoControlador extends BaseControlador
     {
         $idPedido = $_SESSION['ultimo_pedido_id'] ?? null;
 
-        $this->view('pago/gracias');
+        $this->view('pago/gracias', [
+            'idPedido' => $idPedido,
+        ]);
     }
 
     // Descarga la factura PDF del ultimo pedido

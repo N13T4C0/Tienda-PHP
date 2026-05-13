@@ -16,7 +16,10 @@ class CestaControlador extends BaseControlador
         $items = Cesta::contenido();
         $total = Cesta::importeTotal();
 
-        $this->view('cesta/ver');
+        $this->view('cesta/ver', [
+            'items' => $items,
+            'total' => $total,
+        ]);
     }
 
     // Añade un producto a la cesta
@@ -86,7 +89,10 @@ class CestaControlador extends BaseControlador
         $items = Cesta::contenido();
         $total = Cesta::importeTotal();
 
-        $this->view('cesta/finalizar');
+        $this->view('cesta/finalizar', [
+            'items' => $items,
+            'total' => $total,
+        ]);
     }
 
     // Procesa el formulario de envio y redirige a PayPal para pagar
