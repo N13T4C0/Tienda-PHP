@@ -2,13 +2,15 @@
 
 namespace Controladores;
 
+// cambio pedido maestra
+use Core\BaseControlador;
 use Lib\Sesion;
 use Lib\Cesta;
 use Servicios\PedidoServicio;
 use Utils\GeneradorFactura;
 use Utils\Paypal;
 
-class PagoControlador
+class PagoControlador extends BaseControlador
 {
     // PayPal redirige aqui cuando el usuario aprueba el pago
     public function exito(): void
@@ -49,9 +51,7 @@ class PagoControlador
     {
         $idPedido = $_SESSION['ultimo_pedido_id'] ?? null;
 
-        require APP . '/Vistas/comunes/cabecera.php';
-        require APP . '/Vistas/pago/gracias.php';
-        require APP . '/Vistas/comunes/pie.php';
+        $this->view('pago/gracias');
     }
 
     // Descarga la factura PDF del ultimo pedido
@@ -79,12 +79,12 @@ class PagoControlador
     // El usuario cancelo el pago en PayPal
     public function cancelado(): void
     {
-        require APP . '/Vistas/pago/cancelado.php';
+        $this->view('pago/cancelado');
     }
 
     // Algo fue mal con el pago
     public function error(): void
     {
-        require APP . '/Vistas/pago/error.php';
+        $this->view('pago/error');
     }
 }

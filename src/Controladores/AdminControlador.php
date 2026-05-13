@@ -2,6 +2,7 @@
 
 namespace Controladores;
 
+// cambio pedido maestra
 use Core\BaseControlador;
 use Lib\Sesion;
 use Middleware\AdminMiddleware;
@@ -32,9 +33,7 @@ class AdminControlador extends BaseControlador
         $totalUsuarios   = count($servUser->listarTodos());
         $totalPedidos    = count($servPed->listarTodos());
 
-        require APP . '/Vistas/comunes/cabecera.php';
-        require APP . '/Vistas/admin/panel.php';
-        require APP . '/Vistas/comunes/pie.php';
+        $this->view('admin/panel');
     }
 
     // Lista todos los productos
@@ -42,9 +41,8 @@ class AdminControlador extends BaseControlador
     {
         $servicio  = new ProductoServicio();
         $productos = $servicio->listarTodos();
-        require APP . '/Vistas/comunes/cabecera.php';
-        require APP . '/Vistas/admin/productos.php';
-        require APP . '/Vistas/comunes/pie.php';
+
+        $this->view('admin/productos');
     }
 
     // Formulario para crear producto
@@ -54,9 +52,7 @@ class AdminControlador extends BaseControlador
         $categorias = $servCat->listarTodas();
         $producto   = null;
 
-        require APP . '/Vistas/comunes/cabecera.php';
-        require APP . '/Vistas/admin/form_producto.php';
-        require APP . '/Vistas/comunes/pie.php';
+        $this->view('admin/form_producto');
     }
 
     // Formulario para editar producto existente
@@ -77,9 +73,7 @@ class AdminControlador extends BaseControlador
         $servCat    = new CategoriaServicio();
         $categorias = $servCat->listarTodas();
 
-        require APP . '/Vistas/comunes/cabecera.php';
-        require APP . '/Vistas/admin/form_producto.php';
-        require APP . '/Vistas/comunes/pie.php';
+        $this->view('admin/form_producto');
     }
 
     // Guarda un producto nuevo o actualiza uno existente
@@ -156,9 +150,7 @@ class AdminControlador extends BaseControlador
         $categorias = $servicio->listarTodas();
         $catEditar  = null;
 
-        require APP . '/Vistas/comunes/cabecera.php';
-        require APP . '/Vistas/admin/categorias.php';
-        require APP . '/Vistas/comunes/pie.php';
+        $this->view('admin/categorias');
     }
 
     // Carga la pagina de categorias con el formulario pre-relleno para editar
@@ -178,9 +170,7 @@ class AdminControlador extends BaseControlador
 
         $categorias = $servicio->listarTodas();
 
-        require APP . '/Vistas/comunes/cabecera.php';
-        require APP . '/Vistas/admin/categorias.php';
-        require APP . '/Vistas/comunes/pie.php';
+        $this->view('admin/categorias');
     }
 
     // Guarda una categoria nueva o actualiza una existente
@@ -243,9 +233,7 @@ class AdminControlador extends BaseControlador
         $servicio = new PedidoServicio();
         $pedidos  = $servicio->listarTodos();
 
-        require APP . '/Vistas/comunes/cabecera.php';
-        require APP . '/Vistas/admin/pedidos.php';
-        require APP . '/Vistas/comunes/pie.php';
+        $this->view('admin/pedidos');
     }
 
     // Muestra el detalle de un pedido con sus lineas
@@ -265,9 +253,7 @@ class AdminControlador extends BaseControlador
 
         $lineas = $servicio->obtenerLineas((int) $id);
 
-        require APP . '/Vistas/comunes/cabecera.php';
-        require APP . '/Vistas/admin/detalle_pedido.php';
-        require APP . '/Vistas/comunes/pie.php';
+        $this->view('admin/detalle_pedido');
     }
 
     // Lista todos los usuarios
@@ -276,9 +262,7 @@ class AdminControlador extends BaseControlador
         $servicio = new UsuarioServicio();
         $usuarios = $servicio->listarTodos();
 
-        require APP . '/Vistas/comunes/cabecera.php';
-        require APP . '/Vistas/admin/usuarios.php';
-        require APP . '/Vistas/comunes/pie.php';
+        $this->view('admin/usuarios');
     }
 
     // Elimina un usuario

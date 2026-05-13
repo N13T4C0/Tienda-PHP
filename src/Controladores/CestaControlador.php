@@ -1,12 +1,14 @@
 <?php
 namespace Controladores;
 
+// cambio pedido maestra
+use Core\BaseControlador;
 use Lib\Sesion;
 use Lib\Cesta;
 use Utils\Paypal;
 use Middleware\AccesoMiddleware;
 
-class CestaControlador
+class CestaControlador extends BaseControlador
 {
     // Muestra la cesta con todos los productos y el total
     public function index(): void
@@ -14,16 +16,13 @@ class CestaControlador
         $items = Cesta::contenido();
         $total = Cesta::importeTotal();
 
-        require APP . '/Vistas/comunes/cabecera.php';
-        require APP . '/Vistas/cesta/ver.php';
-        require APP . '/Vistas/comunes/pie.php';
+        $this->view('cesta/ver');
     }
 
     // Añade un producto a la cesta
-    // Usamos ?? 0 en vez de isset() porque el id llega por POST, si no viene se queda en 0
     public function anadir(): void
     {
-        $id = (int) ($_POST['id_producto'] ?? 0);
+        $id       = (int) ($_POST['id_producto'] ?? 0);
         $cantidad = (int) ($_POST['cantidad'] ?? 1);
 
         $resultado = Cesta::meterProducto($id, $cantidad);
@@ -40,7 +39,7 @@ class CestaControlador
     // Cambia la cantidad de un producto en la cesta
     public function actualizar(): void
     {
-        $id = (int) ($_POST['id_producto'] ?? 0);
+        $id       = (int) ($_POST['id_producto'] ?? 0);
         $cantidad = (int) ($_POST['cantidad'] ?? 0);
 
         $resultado = Cesta::cambiarUnidades($id, $cantidad);
@@ -87,9 +86,7 @@ class CestaControlador
         $items = Cesta::contenido();
         $total = Cesta::importeTotal();
 
-        require APP . '/Vistas/comunes/cabecera.php';
-        require APP . '/Vistas/cesta/finalizar.php';
-        require APP . '/Vistas/comunes/pie.php';
+        $this->view('cesta/finalizar');
     }
 
     // Procesa el formulario de envio y redirige a PayPal para pagar
@@ -111,13 +108,11 @@ class CestaControlador
             'provincia' => trim($_POST['provincia'] ?? ''),
         ];
 
-        // Calculamos el total del pedido
         $total = 0;
         foreach ($cesta as $item) {
             $total += $item['subtotal'];
         }
 
-        // Creamos la orden en PayPal y redirigimos al usuario
         $paypal = new Paypal();
         $orden  = $paypal->crearOrden($total);
 
@@ -127,7 +122,6 @@ class CestaControlador
 
         $_SESSION['paypal_order_id'] = $orden['id'];
 
-        // Buscamos el enlace de aprobacion que nos manda PayPal
         foreach ($orden['links'] as $enlace) {
             if ($enlace['rel'] === 'approve') {
                 header('Location: ' . $enlace['href']);

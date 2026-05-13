@@ -4,11 +4,12 @@ namespace Core;
 
 use Lib\Sesion;
 
+// cambio pedido maestra
 /** Clase base para todos los Controladores — helpers de vistas y redireccion */
 abstract class BaseControlador
 {
     /** Carga una vista con cabecera y pie. Acepta variables opcionales para la vista */
-    protected function renderizar(string $vista, array $datos = []): void
+    protected function view(string $vista, array $datos = []): void
     {
         if (!empty($datos)) {
             extract($datos, EXTR_SKIP);
