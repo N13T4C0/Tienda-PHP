@@ -169,6 +169,13 @@ class ProductoRepositorio
         }
     }
 
+    public function restaurar(int $id): bool
+    {
+        $stmt = $this->bd->prepare("UPDATE productos SET visible = 1 WHERE id = :id");
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+
     /** Resta unidades del stock al confirmar un pedido */
     public function restarStock(int $id, int $unidades): bool
     {

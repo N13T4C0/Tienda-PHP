@@ -136,6 +136,10 @@ class Rutas
             (new AuthControlador())->googleCallback();
         });
 
+        Enrutador::agregar('GET', '/admin/restaurarProducto/:id', function ($id) {
+            (new AdminControlador())->restaurarProducto($id);
+        });
+
         
         Enrutador::despachar();
     }
