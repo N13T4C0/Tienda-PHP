@@ -1,25 +1,28 @@
 <?php
+
 namespace Controladores;
 
+use Lib\Pagina;
 use Servicios\ProductoServicio;
 use Servicios\CategoriaServicio;
 
 class HomeControlador
 {
-    /** Pagina inicial: muestra los productos destacados */
+    private ProductoServicio $servProd;
+    private CategoriaServicio $servCat;
+
+    public function __construct()
+    {
+        $this->servProd = new ProductoServicio();
+        $this->servCat  = new CategoriaServicio();
+    }
+
     public function index(): void
     {
-        $servProd = new ProductoServicio();
-        $servCat  = new CategoriaServicio();
-
-        $productos  = $servProd->obtenerCatalogo();
-        $categorias = $servCat->listarTodas();
-
-        // Mostramos como destacados los 4 primeros
+        $productos  = $this->servProd->listarTodos();
+        $categorias = $this->servCat->listarTodas();
         $destacados = array_slice($productos, 0, 4);
 
-        require APP . '/Vistas/comunes/cabecera.php';
-        require APP . '/Vistas/home/inicio.php';
-        require APP . '/Vistas/comunes/pie.php';
+        Pagina::renderizar('home/inicio', compact('productos', 'categorias', 'destacados'));
     }
 }

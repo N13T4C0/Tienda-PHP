@@ -14,12 +14,12 @@ class Rutas
 {
     public static function registrar(): void
     {
-      
+    
         Enrutador::agregar('GET', '/', function () {
             (new HomeControlador())->index();
         });
 
-       
+    
         Enrutador::agregar('GET', '/auth/registro', function () {
             (new AuthControlador())->registro();
         });
@@ -78,7 +78,7 @@ class Rutas
             (new PagoControlador())->exito();
         });
         Enrutador::agregar('GET', '/pago/cancelado', function () {
-            (new PagoControlador())->cancelado();
+            (new PagoControlador())->error();
         });
         Enrutador::agregar('GET', '/pago/gracias', function () {
             (new PagoControlador())->gracias();
@@ -140,6 +140,9 @@ class Rutas
             (new AdminControlador())->restaurarProducto($id);
         });
 
+        Enrutador::agregar('GET', '/admin/editarCategoria/:id', function ($id) {
+            (new AdminControlador())->editarCategoria($id);
+        });
         
         Enrutador::despachar();
     }

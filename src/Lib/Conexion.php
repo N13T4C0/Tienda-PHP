@@ -1,5 +1,6 @@
 <?php
-namespace Config;
+
+namespace Lib;
 
 use PDO;
 use PDOException;
@@ -26,10 +27,10 @@ class Conexion
     public static function abrir(): PDO
     {
         if (self::$pdo === null) {
-            $dsn = 
-            'mysql:host=' . self::HOST
-             . ';dbname='   . self::BD
-            . ';charset='  . self::CHARSET;
+            $dsn =
+                'mysql:host=' . self::HOST
+                . ';dbname='   . self::BD
+                . ';charset='  . self::CHARSET;
 
             // ERRMODE_EXCEPTION: los errores SQL lanzan excepciones en lugar de fallar en silencio
             // FETCH_ASSOC: los resultados vienen como array con nombres de columna ($fila['nombre'])

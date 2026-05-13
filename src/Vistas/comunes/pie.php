@@ -1,9 +1,12 @@
-</main>
+</main> <!-- Cierre del .contenedor abierto en cabecera -->
 
 <footer class="pie">
-    <p>  netStore - Proyecto 2DAW</p>
-    <p class="pie__subtitulo">Desarrollado con PHP y  sql</p>
+    <div class="contenedor">
+        <p>netStore - Proyecto 2DAW</p>
+        <p class="pie__subtitulo">Desarrollado con PHP y MySQL</p>
+    </div>
 </footer>
 
 </body>
+
 </html>

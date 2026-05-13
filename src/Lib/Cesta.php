@@ -1,4 +1,5 @@
 <?php
+
 namespace Lib;
 
 use Lib\Sesion;
@@ -6,14 +7,14 @@ use Repositorios\ProductoRepositorio;
 
 class Cesta
 {
-    /** Devuelve la clave de sesion correcta segun si hay usuario logueado o no */
+    /* Devuelve la clave de sesion correcta segun si hay usuario logueado o no */
     private static function clave(): string
     {
         $usuario = Sesion::usuario();
         return $usuario ? 'cesta_u' . $usuario['id'] : 'cesta_invitado';
     }
 
-    /** Inicializa la cesta si no existia */
+    /* Inicializa la cesta si no existia */
     public static function preparar(): void
     {
         $clave = self::clave();
@@ -22,16 +23,14 @@ class Cesta
         }
     }
 
-    /**
-     * Anade unidades de un producto a la cesta.
-     * Valida stock real contra la base de datos.
+    /* Añade unidades de un producto a la cesta. Valida stock real contra el objeto Producto.
      */
     public static function meterProducto(int $idProducto, int $unidades = 1): array
     {
         self::preparar();
         $clave = self::clave();
         $repo = new ProductoRepositorio();
-        $producto = $repo->obtenerUno($idProducto);
+        $producto = $repo->buscarPorId($idProducto); // Devuelve objeto Producto o null
 
         if (!$producto) {
             return ['ok' => false, 'mensaje' => 'Producto no encontrado'];
@@ -40,15 +39,16 @@ class Cesta
         $yaTenia = $_SESSION[$clave][$idProducto] ?? 0;
         $total   = $yaTenia + $unidades;
 
-        if ($total > (int) $producto['stock']) {
-            return ['ok' => false, 'mensaje' => 'No hay stock suficiente (quedan ' . $producto['stock'] . ')'];
+        // Acceso como objeto: $producto->stock
+        if ($total > $producto->stock) {
+            return ['ok' => false, 'mensaje' => 'No hay stock suficiente (quedan ' . $producto->stock . ')'];
         }
 
         $_SESSION[$clave][$idProducto] = $total;
-        return ['ok' => true, 'mensaje' => 'Producto anadido a la cesta'];
+        return ['ok' => true, 'mensaje' => 'Producto añadido a la cesta'];
     }
 
-    /** Cambia las unidades de un producto en la cesta */
+    /* Cambia las unidades de un producto en la cesta */
     public static function cambiarUnidades(int $idProducto, int $unidades): array
     {
         self::preparar();
@@ -59,12 +59,14 @@ class Cesta
         }
 
         $repo     = new ProductoRepositorio();
-        $producto = $repo->obtenerUno($idProducto);
+        $producto = $repo->buscarPorId($idProducto);
 
         if (!$producto) {
             return ['ok' => false, 'mensaje' => 'Producto no encontrado'];
         }
-        if ($unidades > (int) $producto['stock']) {
+
+        // Acceso como objeto: $producto->stock
+        if ($unidades > $producto->stock) {
             return ['ok' => false, 'mensaje' => 'Stock insuficiente'];
         }
 
@@ -72,7 +74,7 @@ class Cesta
         return ['ok' => true, 'mensaje' => 'Cesta actualizada'];
     }
 
-    /** Quita un producto de la cesta */
+    /* Quita un producto de la cesta */
     public static function quitarProducto(int $idProducto): array
     {
         self::preparar();
@@ -80,13 +82,13 @@ class Cesta
         return ['ok' => true, 'mensaje' => 'Producto eliminado de la cesta'];
     }
 
-    /** Vacia la cesta */
+    /* Vacía la cesta */
     public static function vaciar(): void
     {
         $_SESSION[self::clave()] = [];
     }
 
-    /** Devuelve el contenido de la cesta con todos los datos del producto */
+    /* Devuelve el contenido de la cesta con todos los datos del producto */
     public static function contenido(): array
     {
         self::preparar();
@@ -94,26 +96,27 @@ class Cesta
         $repo  = new ProductoRepositorio();
 
         foreach ($_SESSION[self::clave()] as $idProducto => $unidades) {
-            $producto = $repo->obtenerUno((int) $idProducto);
+            $producto = $repo->buscarPorId((int) $idProducto);
             if ($producto) {
                 $items[] = [
                     'producto' => $producto,
                     'cantidad' => (int) $unidades,
-                    'subtotal' => (float) $producto['precio'] * (int) $unidades,
+                    // Acceso como objeto: $producto->precio
+                    'subtotal' => (float) $producto->precio * (int) $unidades,
                 ];
             }
         }
         return $items;
     }
 
-    /** Numero total de unidades en la cesta */
+    /* Número total de unidades en la cesta */
     public static function totalUnidades(): int
     {
         self::preparar();
         return array_sum($_SESSION[self::clave()]);
     }
 
-    /** Importe total de la cesta */
+    /* Importe total de la cesta */
     public static function importeTotal(): float
     {
         self::preparar();
@@ -121,24 +124,23 @@ class Cesta
         $repo  = new ProductoRepositorio();
 
         foreach ($_SESSION[self::clave()] as $idProducto => $unidades) {
-            $producto = $repo->obtenerUno((int) $idProducto);
+            $producto = $repo->buscarPorId((int) $idProducto);
             if ($producto) {
-                $total += (float) $producto['precio'] * (int) $unidades;
+                // Acceso como objeto: $producto->precio
+                $total += (float) $producto->precio * (int) $unidades;
             }
         }
         return $total;
     }
 
-    /** Comprueba si la cesta esta vacia */
+    /* Comprueba si la cesta esta vacia */
     public static function vacia(): bool
     {
         self::preparar();
         return empty($_SESSION[self::clave()]);
     }
 
-    /**
-     * Al hacer login: migra la cesta de invitado a la del usuario.
-     * Llamar justo despues de Sesion::iniciar()
+    /* Al hacer login: migra la cesta de invitado a la del usuario.
      */
     public static function migrarAlLogin(int $idUsuario): void
     {
@@ -146,20 +148,18 @@ class Cesta
         $claveUsuario  = 'cesta_u' . $idUsuario;
 
         if (empty($_SESSION[$claveInvitado])) {
-            return; // No habia cesta de invitado, nada que migrar
+            return;
         }
 
         if (!isset($_SESSION[$claveUsuario])) {
             $_SESSION[$claveUsuario] = [];
         }
 
-        // Fusiona: suma las unidades si el producto ya estaba en la cesta del usuario
         foreach ($_SESSION[$claveInvitado] as $idProducto => $unidades) {
             $yaHabia = $_SESSION[$claveUsuario][$idProducto] ?? 0;
             $_SESSION[$claveUsuario][$idProducto] = $yaHabia + $unidades;
         }
 
-        // Borra la cesta de invitado
         unset($_SESSION[$claveInvitado]);
     }
 }

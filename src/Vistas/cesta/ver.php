@@ -2,9 +2,9 @@
 
 <?php if (empty($items)): ?>
     <div class="bloque-vacio">
-        <p>Tu cesta esta vacia.</p>
+        <p>Tu cesta está vacía.</p>
         <p class="bloque-vacio__accion">
-            <a class="boton" href="<?= URL_BASE ?>/producto">Ver catalogo</a>
+            <a class="boton" href="<?= URL_BASE ?>/producto">Ver catálogo</a>
         </p>
     </div>
 <?php else: ?>
@@ -21,28 +21,29 @@
         </thead>
         <tbody>
             <?php foreach ($items as $item): ?>
+                <?php $p = $item['producto']; // Para abreviar 
+                ?>
                 <tr>
                     <td>
-                        <strong><?= htmlspecialchars($item['producto']['nombre']) ?></strong><br>
+                        <strong><?= htmlspecialchars($p->nombre) ?></strong><br>
                         <small class="tabla__categoria">
-                            <?= htmlspecialchars($item['producto']['categoria_nombre']) ?>
+                            <?= htmlspecialchars($p->categoria_nombre ?? 'Sin categoría') ?>
                         </small>
                     </td>
-                    <td class="txt-centro"><?= number_format($item['producto']['precio'], 2) ?> &euro;</td>
+                    <td class="txt-centro"><?= number_format($p->precio, 2) ?> &euro;</td>
                     <td class="txt-centro">
-                        <form method="POST" action="<?= URL_BASE ?>/cesta/actualizar"
-                              class="form-cantidad">
-                            <input type="hidden" name="id_producto" value="<?= $item['producto']['id'] ?>">
+                        <form method="POST" action="<?= URL_BASE ?>/cesta/actualizar" class="form-cantidad">
+                            <input type="hidden" name="id_producto" value="<?= $p->id ?>">
                             <input type="number" name="cantidad" value="<?= $item['cantidad'] ?>"
-                                   min="1" max="<?= $item['producto']['stock'] ?>"
-                                   class="input-cantidad">
+                                min="1" max="<?= $p->stock ?>"
+                                class="input-cantidad">
                             <button type="submit" class="boton boton-pequeno">OK</button>
                         </form>
                     </td>
                     <td class="txt-derecha"><?= number_format($item['subtotal'], 2) ?> &euro;</td>
                     <td class="txt-centro">
-                        <a href="<?= URL_BASE ?>/cesta/quitar/<?= $item['producto']['id'] ?>"
-                           class="boton boton-pequeno boton-borrar">Quitar</a>
+                        <a href="<?= URL_BASE ?>/cesta/quitar/<?= $p->id ?>"
+                            class="boton boton-pequeno boton-borrar">Quitar</a>
                     </td>
                 </tr>
             <?php endforeach; ?>

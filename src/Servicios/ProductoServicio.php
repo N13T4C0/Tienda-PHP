@@ -1,77 +1,66 @@
 <?php
+
 namespace Servicios;
 
 use Repositorios\ProductoRepositorio;
 
-
 class ProductoServicio
 {
-    private ProductoRepositorio $repositorio;
+    private $repo;
 
     public function __construct()
     {
-        $this->repositorio = new ProductoRepositorio();
+        $this->repo = new ProductoRepositorio();
     }
 
-    /**
-     * Devuelve los productos del catalogo publico.
-     * Si se pasa categoria o texto, filtra por esos criterios.
-     */
-    public function obtenerCatalogo(?int $idCategoria = null, string $busqueda = ''): array
+    public function contarTotales(): int
     {
-        if ($busqueda !== '') {
-            return $this->repositorio->buscarPorTexto($busqueda);
-        }
+        return $this->repo->contarTodos();
+    }
 
+    public function listarTodos(?int $idCategoria = null, ?string $texto = null): array
+    {
+        if ($texto !== null && $texto !== '') {
+            return $this->repo->buscarPorTexto($texto);
+        }
         if ($idCategoria !== null) {
-            return $this->repositorio->obtenerPorCategoria($idCategoria);
+            return $this->repo->obtenerPorCategoria($idCategoria);
         }
-
-        return $this->repositorio->obtenerVisibles();
+        return $this->repo->obtenerVisibles();
     }
 
-    /**
-     * Devuelve un producto por su id.
-     */
-    public function obtenerUno(int $id): ?array
+    public function listarTodosAdmin(): array
     {
-        return $this->repositorio->obtenerUno($id);
+        return $this->repo->obtenerTodos();
     }
 
-    /**
-     * Devuelve todos los productos para el panel admin.
-     */
-    public function listarTodos(): array
+    public function obtenerUno(int $id): ?object
     {
-        return $this->repositorio->obtenerTodos();
+        return $this->repo->buscarPorId($id);
     }
 
-    /**
-     * Crea un producto nuevo.
-     */
-    public function crear(array $datos): int
+    public function crear(array $datos): bool
     {
-        return $this->repositorio->insertar($datos);
+        return $this->repo->guardar($datos);
+    }
+
+    public function modificar(int $id, array $datos): bool
+    {
+        return $this->repo->actualizar($id, $datos);
+    }
+
+    public function eliminar(int $id): bool
+    {
+        return $this->repo->borrarLogico($id);
     }
 
     public function restaurar(int $id): bool
     {
-        return $this->repositorio->restaurar($id);
+        return $this->repo->restaurar($id);
     }
 
-    /**
-     * Modifica un producto existente.
-     */
-    public function modificar(int $id, array $datos): bool
+    public function descontarStock(int $id, int $cantidad): void
     {
-        return $this->repositorio->actualizar($id, $datos);
-    }
-
-    /**
-     * Elimina un producto.
-     */
-    public function eliminar(int $id): bool
-    {
-        return $this->repositorio->eliminar($id);
+        $this->repo->descontarStock($id, $cantidad);
     }
 }

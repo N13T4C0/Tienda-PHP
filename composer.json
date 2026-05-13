@@ -13,13 +13,13 @@
             "Requests\\":      "src/Requests/",
             "Rutas\\":         "src/Rutas/",
             "Utils\\":         "src/Utils/",
-            "Config\\":        "config/",
             "Modelos\\":       "src/Modelos/"
         }
     },
     "minimum-stability": "stable",
     "require": {
         "paypal/paypal-server-sdk": "^2.2",
-        "phpmailer/phpmailer": "^7.0"
+        "phpmailer/phpmailer": "^7.0",
+        "fpdf/fpdf": "^1.86"
     }
 }

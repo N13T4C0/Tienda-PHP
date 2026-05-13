@@ -1,6 +1,6 @@
 <?php
-namespace Lib;
 
+namespace Lib;
 
 class GoogleOAuth
 {
@@ -8,31 +8,37 @@ class GoogleOAuth
     private const TOKEN_URL = 'https://oauth2.googleapis.com/token';
     private const USER_URL  = 'https://www.googleapis.com/oauth2/v3/userinfo';
 
-    public function __construct(
-        private string $clientId,
-        private string $clientSecret,
-        private string $redirectUri
-    ) {}
+    private string $clientId;
+    private string $clientSecret;
+    private string $redirectUri;
+
+    public function __construct()
+    {
+        // Se autoconfigura usando la clase GoogleConfig que me pasaste
+        $config = GoogleConfig::obtener();
+
+        $this->clientId     = $config['client_id'] ?? '';
+        $this->clientSecret = $config['client_secret'] ?? '';
+        $this->redirectUri  = $config['redirect_uri'] ?? '';
+    }
 
     /** Genera la URL de consentimiento de Google */
     public function getAuthUrl(string $state): string
     {
         $params = http_build_query([
-            'client_id'             => $this->clientId,
-            'redirect_uri'          => $this->redirectUri,
-            'response_type'         => 'code',
-            'scope'                 => 'openid email profile',
-            'access_type'           => 'online',
-            'state'                 => $state,
-            'prompt'                => 'select_account',
+            'client_id'     => $this->clientId,
+            'redirect_uri'  => $this->redirectUri,
+            'response_type' => 'code',
+            'scope'         => 'openid email profile',
+            'access_type'   => 'online',
+            'state'         => $state,
+            'prompt'        => 'select_account',
         ]);
 
         return self::AUTH_URL . '?' . $params;
     }
 
-    /**
-     * Intercambia el code por un access_token
-     */
+    /** Intercambia el code por un access_token */
     public function intercambiarCode(string $code): array
     {
         return $this->post(self::TOKEN_URL, [
@@ -44,9 +50,7 @@ class GoogleOAuth
         ]);
     }
 
-    /**
-     * Obtiene los datos del usuario con el access_token
-     */
+    /** Obtiene los datos del usuario con el access_token */
     public function getUserInfo(string $accessToken): array
     {
         return $this->get(self::USER_URL, $accessToken);
