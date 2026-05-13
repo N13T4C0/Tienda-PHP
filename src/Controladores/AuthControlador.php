@@ -1,10 +1,12 @@
 <?php
+
 namespace Controladores;
 
 use Lib\Sesion;
 use Lib\Cesta;
 use Lib\EnvioMail;
 use Lib\GoogleOAuth;
+use Lib\GoogleConfig;
 use Servicios\UsuarioServicio;
 use Requests\RegistroRequest;
 use Requests\LoginRequest;
@@ -205,7 +207,7 @@ class AuthControlador
     // Crea el cliente de Google con las credenciales del archivo de configuracion
     private function crearClienteGoogle(): GoogleOAuth
     {
-        $config = require APP . '/../config/google.php';
+        $config = GoogleConfig::obtener();
 
         return new GoogleOAuth(
             $config['client_id'],

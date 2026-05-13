@@ -13,7 +13,6 @@
             "Requests\\":      "src/Requests/",
             "Rutas\\":         "src/Rutas/",
             "Utils\\":         "src/Utils/",
-            "Config\\":        "config/",
             "Modelos\\":       "src/Modelos/"
         }
     },

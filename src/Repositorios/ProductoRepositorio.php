@@ -2,7 +2,7 @@
 
 namespace Repositorios;
 
-use Config\Conexion;
+use Lib\Conexion;
 use PDO;
 
 class ProductoRepositorio

@@ -53,7 +53,6 @@ class ComposerStaticInitc064bb36fc9310f0db89289537876e91
             'Core\\' => 5,
             'CoreInterfaces\\' => 15,
             'Controladores\\' => 14,
-            'Config\\' => 7,
         ),
     );
 
@@ -130,10 +129,6 @@ class ComposerStaticInitc064bb36fc9310f0db89289537876e91
         array (
             0 => __DIR__ . '/../..' . '/src/Controladores',
         ),
-        'Config\\' =>
-        array (
-            0 => __DIR__ . '/../..' . '/config',
-        ),
     );
 
     public static $prefixesPsr0 = array (
@@ -148,7 +143,6 @@ class ComposerStaticInitc064bb36fc9310f0db89289537876e91
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
-        'Config\\Conexion' => __DIR__ . '/../..' . '/config/Conexion.php',
         'Controladores\\AdminControlador' => __DIR__ . '/../..' . '/src/Controladores/AdminControlador.php',
         'Controladores\\AuthControlador' => __DIR__ . '/../..' . '/src/Controladores/AuthControlador.php',
         'Controladores\\CestaControlador' => __DIR__ . '/../..' . '/src/Controladores/CestaControlador.php',
@@ -234,8 +228,10 @@ class ComposerStaticInitc064bb36fc9310f0db89289537876e91
         'Core\\Utils\\XmlDeserializer' => __DIR__ . '/..' . '/apimatic/core/src/Utils/XmlDeserializer.php',
         'Core\\Utils\\XmlSerializer' => __DIR__ . '/..' . '/apimatic/core/src/Utils/XmlSerializer.php',
         'Lib\\Cesta' => __DIR__ . '/../..' . '/src/Lib/Cesta.php',
+        'Lib\\Conexion' => __DIR__ . '/../..' . '/src/Lib/Conexion.php',
         'Lib\\Enrutador' => __DIR__ . '/../..' . '/src/Lib/Enrutador.php',
         'Lib\\EnvioMail' => __DIR__ . '/../..' . '/src/Lib/EnvioMail.php',
+        'Lib\\GoogleConfig' => __DIR__ . '/../..' . '/src/Lib/GoogleConfig.php',
         'Lib\\GoogleOAuth' => __DIR__ . '/../..' . '/src/Lib/GoogleOAuth.php',
         'Lib\\Sesion' => __DIR__ . '/../..' . '/src/Lib/Sesion.php',
         'Middleware\\AccesoMiddleware' => __DIR__ . '/../..' . '/src/Middleware/AccesoMiddleware.php',

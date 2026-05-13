@@ -7,7 +7,6 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
-    'Config\\Conexion' => $baseDir . '/config/Conexion.php',
     'Controladores\\AdminControlador' => $baseDir . '/src/Controladores/AdminControlador.php',
     'Controladores\\AuthControlador' => $baseDir . '/src/Controladores/AuthControlador.php',
     'Controladores\\CestaControlador' => $baseDir . '/src/Controladores/CestaControlador.php',
@@ -93,8 +92,10 @@ return array(
     'Core\\Utils\\XmlDeserializer' => $vendorDir . '/apimatic/core/src/Utils/XmlDeserializer.php',
     'Core\\Utils\\XmlSerializer' => $vendorDir . '/apimatic/core/src/Utils/XmlSerializer.php',
     'Lib\\Cesta' => $baseDir . '/src/Lib/Cesta.php',
+    'Lib\\Conexion' => $baseDir . '/src/Lib/Conexion.php',
     'Lib\\Enrutador' => $baseDir . '/src/Lib/Enrutador.php',
     'Lib\\EnvioMail' => $baseDir . '/src/Lib/EnvioMail.php',
+    'Lib\\GoogleConfig' => $baseDir . '/src/Lib/GoogleConfig.php',
     'Lib\\GoogleOAuth' => $baseDir . '/src/Lib/GoogleOAuth.php',
     'Lib\\Sesion' => $baseDir . '/src/Lib/Sesion.php',
     'Middleware\\AccesoMiddleware' => $baseDir . '/src/Middleware/AccesoMiddleware.php',

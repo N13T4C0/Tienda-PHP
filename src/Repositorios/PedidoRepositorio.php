@@ -1,7 +1,7 @@
 <?php
 namespace Repositorios;
 
-use Config\Conexion;
+use Lib\Conexion;
 
 
 class PedidoRepositorio
