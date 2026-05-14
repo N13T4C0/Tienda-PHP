@@ -166,4 +166,28 @@ class EnvioMail
             return false;
         }
     }
+
+    public static function resetPassword(string $email, string $nombre, string $token): bool
+    {
+        $enlace = 'http://localhost' . URL_BASE . '/auth/resetPassword/' . $token;
+        $asunto = 'Restablecer contraseña - netStore';
+
+        $cuerpo = "
+    <div style='font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:24px;
+                border:1px solid #e0e0e0;border-radius:8px;'>
+        <h2 style='color:#1e3a5f;'>Hola, {$nombre}!</h2>
+        <p>Hemos recibido una solicitud para restablecer la contraseña de tu cuenta en <strong>netStore</strong>.</p>
+        <p>Haz clic en el botón para crear una nueva contraseña:</p>
+        <p style='text-align:center;margin:32px 0;'>
+            <a href='{$enlace}'
+               style='background:#2563eb;color:#fff;padding:12px 28px;
+                      border-radius:6px;text-decoration:none;font-weight:bold;'>
+                Restablecer contraseña
+            </a>
+        </p>
+        <p style='color:#888;font-size:13px;'>Este enlace expira en 1 hora. Si no has solicitado el cambio, ignora este mensaje.</p>
+    </div>";
+
+        return self::enviar($email, $asunto, $cuerpo);
+    }
 }

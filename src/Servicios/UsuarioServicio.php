@@ -113,4 +113,29 @@ class UsuarioServicio
 
         return $this->repositorio->encontrarPorId($idUsuario);
     }
+
+    public function solicitarReset(string $email): bool
+    {
+        $usuario = $this->repositorio->encontrarPorEmail($email);
+        if (!$usuario) return false;
+
+        $token = bin2hex(random_bytes(16));
+        $this->repositorio->guardarTokenReset($usuario->id, $token);
+        EnvioMail::resetPassword($email, $usuario->nombre, $token);
+        return true;
+    }
+
+    public function validarTokenReset(string $token): ?Usuario
+    {
+        return $this->repositorio->encontrarPorTokenReset($token);
+    }
+
+    public function restablecerClave(string $token, string $nuevaClave): bool
+    {
+        $usuario = $this->repositorio->encontrarPorTokenReset($token);
+        if (!$usuario) return false;
+
+        $hash = password_hash($nuevaClave, PASSWORD_BCRYPT);
+        return $this->repositorio->actualizarClave($usuario->id, $hash);
+    }
 }
