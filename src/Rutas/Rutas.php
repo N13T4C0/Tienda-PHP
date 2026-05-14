@@ -150,10 +150,10 @@ class Rutas
         Enrutador::agregar('POST', '/auth/procesarOlvideClave', function () {
             (new AuthControlador())->procesarOlvideClave();
         });
-        Enrutador::agregar('GET', '/auth/resetPassword/:token', function ($token) {
+        Enrutador::agregar('GET', '/auth/resetpassword/:token', function ($token) {
             (new AuthControlador())->resetPassword($token);
         });
-        Enrutador::agregar('POST', '/auth/procesarResetPassword', function () {
+        Enrutador::agregar('POST', '/auth/procesarresetpassword', function () {
             (new AuthControlador())->procesarResetPassword();
         });
 
