@@ -15,11 +15,21 @@ class UsuarioServicio
         $this->repositorio = new UsuarioRepositorio();
     }
 
-    /**
-     * Lógica completa de registro: Hash, Token, DB y Email
-     */
     public function registrar(array $datos): bool
     {
+        // Comprobar si ya existe un usuario con ese email
+        $existente = $this->repositorio->encontrarPorEmail($datos['email']);
+
+        if ($existente) {
+            if (!$existente->activado) {
+                // Token expiró y no activó la cuenta → eliminamos para permitir nuevo registro
+                $this->repositorio->eliminarNoActivadoPorEmail($datos['email']);
+            } else {
+                // Cuenta ya activa → no dejamos registrarse
+                return false;
+            }
+        }
+
         // 1. Generar token de seguridad
         $token = bin2hex(random_bytes(16));
 
@@ -38,7 +48,7 @@ class UsuarioServicio
         $id = $this->repositorio->insertar($datosParaDB);
 
         if ($id > 0) {
-            // 4. Enviar el mail 
+            // 4. Enviar el mail
             EnvioMail::confirmacionRegistro($datos['email'], $datos['nombre'], $token);
             return true;
         }

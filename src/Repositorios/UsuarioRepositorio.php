@@ -38,7 +38,6 @@ class UsuarioRepositorio
 
     public function encontrarPorToken(string $token): ?Usuario
     {
-        // Validamos que el token no tenga más de 1 minuto
         $sql = "SELECT * FROM usuarios 
                 WHERE token_email = :tok 
                 AND activado = 0 
@@ -72,6 +71,15 @@ class UsuarioRepositorio
         return $stmt->execute([':id' => $id]);
     }
 
+   
+    // Elimina un usuario no activado para permitir un nuevo intento de registro
+    public function eliminarNoActivadoPorEmail(string $email): void
+    {
+        $stmt = $this->bd->prepare("DELETE FROM usuarios WHERE email = :email AND activado = 0");
+        $stmt->execute([':email' => $email]);
+    }
+    
+
     public function obtenerTodos(): array
     {
         $sql = "SELECT * FROM usuarios ORDER BY fecha_alta DESC";
@@ -91,7 +99,6 @@ class UsuarioRepositorio
 
     public function guardarDesdeGoogle(array $datos): int
     {
-        // Buscar si ya existe por Google ID o Email
         $stmt = $this->bd->prepare("SELECT id FROM usuarios WHERE google_id = :gid OR email = :email LIMIT 1");
         $stmt->execute([':gid' => $datos['google_id'], ':email' => $datos['email']]);
         $existente = $stmt->fetch();
