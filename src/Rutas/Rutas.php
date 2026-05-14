@@ -143,7 +143,20 @@ class Rutas
         Enrutador::agregar('GET', '/admin/editarCategoria/:id', function ($id) {
             (new AdminControlador())->editarCategoria($id);
         });
-        
+
+        Enrutador::agregar('GET', '/auth/olvideClave', function () {
+            (new AuthControlador())->olvideClave();
+        });
+        Enrutador::agregar('POST', '/auth/procesarOlvideClave', function () {
+            (new AuthControlador())->procesarOlvideClave();
+        });
+        Enrutador::agregar('GET', '/auth/resetPassword/:token', function ($token) {
+            (new AuthControlador())->resetPassword($token);
+        });
+        Enrutador::agregar('POST', '/auth/procesarResetPassword', function () {
+            (new AuthControlador())->procesarResetPassword();
+        });
+
         Enrutador::despachar();
     }
 }

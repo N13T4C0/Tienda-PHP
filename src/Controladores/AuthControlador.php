@@ -107,4 +107,58 @@ class AuthControlador
         Sesion::cerrar();
         Sesion::redirigir('');
     }
+
+    public function olvideClave(): void
+    {
+        Pagina::renderizar('auth/olvide_clave');
+    }
+
+    public function procesarOlvideClave(): void
+    {
+        $email = trim($_POST['email'] ?? '');
+        if (!$email) {
+            Sesion::mensaje('error', 'Introduce tu email');
+            Sesion::redirigir('auth/olvideClave');
+        }
+
+        // Siempre mostramos el mismo mensaje para no revelar si el email existe
+        $this->usuarioServicio->solicitarReset($email);
+        Sesion::mensaje('ok', 'Si el email existe, recibirás un enlace para restablecer tu contraseña');
+        Sesion::redirigir('auth/login');
+    }
+
+    public function resetPassword($token = null): void
+    {
+        if (!$token || !$this->usuarioServicio->validarTokenReset($token)) {
+            Sesion::mensaje('error', 'El enlace no es válido o ha expirado');
+            Sesion::redirigir('auth/login');
+        }
+
+        Pagina::renderizar('auth/reset_password', compact('token'));
+    }
+
+    public function procesarResetPassword(): void
+    {
+        $token  = $_POST['token'] ?? '';
+        $clave  = $_POST['clave'] ?? '';
+        $clave2 = $_POST['clave2'] ?? '';
+
+        if (!$token || !$clave || $clave !== $clave2) {
+            Sesion::mensaje('error', 'Las contraseñas no coinciden o el enlace es inválido');
+            Sesion::redirigir('auth/login');
+        }
+
+        if (strlen($clave) < 6) {
+            Sesion::mensaje('error', 'La contraseña debe tener al menos 6 caracteres');
+            Sesion::redirigir('auth/resetPassword/' . $token);
+        }
+
+        if ($this->usuarioServicio->restablecerClave($token, $clave)) {
+            Sesion::mensaje('ok', 'Contraseña restablecida correctamente. Ya puedes iniciar sesión.');
+        } else {
+            Sesion::mensaje('error', 'El enlace no es válido o ha expirado');
+        }
+
+        Sesion::redirigir('auth/login');
+    }
 }
