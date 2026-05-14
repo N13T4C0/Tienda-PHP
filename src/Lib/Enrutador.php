@@ -50,22 +50,28 @@ class Enrutador
         return trim($uri, '/');
     }
 
-    private static function resolverRuta(string $metodo, string $uri): array
-    {
-        // Coincidencia exacta: "productos" → busca $rutas['GET']['productos']
-        if ($fn = self::$rutas[$metodo][$uri] ?? null) {
-            return [$fn, null];
-        }
-
-        // Parte la uri por las barras y saca el último trozo como id
-        // ej: "productos/5"  →  $partes=["productos"]  $id="5"
-        $partes = explode('/', $uri);
-        $id     = array_pop($partes);    // extrae el último segmento
-        $base   = implode('/', $partes); // vuelve a unir el resto
-
-        // Busca la ruta con el comodín :id
-        // ej: busca $rutas['GET']['productos/:id']
-        $fn = self::$rutas[$metodo][$base . '/:id'] ?? null;
-        return [$fn, $id];
+   private static function resolverRuta(string $metodo, string $uri): array
+{
+    // Coincidencia exacta
+    if ($fn = self::$rutas[$metodo][$uri] ?? null) {
+        return [$fn, null];
     }
+
+    $partes = explode('/', $uri);
+    $param  = array_pop($partes);
+    $base   = implode('/', $partes);
+
+    // Busca cualquier ruta que empiece por $base/ y tenga un parámetro dinámico (:algo)
+    foreach (self::$rutas[$metodo] ?? [] as $ruta => $fn) {
+        $rutaPartes = explode('/', $ruta);
+        $rutaParam  = array_pop($rutaPartes);
+        $rutaBase   = implode('/', $rutaPartes);
+
+        if ($rutaBase === $base && str_starts_with($rutaParam, ':')) {
+            return [$fn, $param];
+        }
+    }
+
+    return [null, null];
+}
 }

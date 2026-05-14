@@ -169,7 +169,7 @@ class EnvioMail
 
     public static function resetPassword(string $email, string $nombre, string $token): bool
     {
-        $enlace = 'http://localhost' . URL_BASE . '/auth/resetPassword/' . $token;
+        $enlace = 'http://localhost' . URL_BASE . '/auth/resetpassword/' . $token;
         $asunto = 'Restablecer contraseña - netStore';
 
         $cuerpo = "

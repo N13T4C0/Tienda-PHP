@@ -150,7 +150,7 @@ class AuthControlador
 
         if (strlen($clave) < 6) {
             Sesion::mensaje('error', 'La contraseña debe tener al menos 6 caracteres');
-            Sesion::redirigir('auth/resetPassword/' . $token);
+            Sesion::redirigir('auth/resetpassword/' . $token);
         }
 
         if ($this->usuarioServicio->restablecerClave($token, $clave)) {
