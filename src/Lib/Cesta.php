@@ -65,7 +65,6 @@ class Cesta
             return ['ok' => false, 'mensaje' => 'Producto no encontrado'];
         }
 
-        // Acceso como objeto: $producto->stock
         if ($unidades > $producto->stock) {
             return ['ok' => false, 'mensaje' => 'Stock insuficiente'];
         }
