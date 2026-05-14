@@ -85,9 +85,14 @@ class AuthControlador
     public function procesarRegistro(): void
     {
         $resultado = RegistroRequest::validar($_POST);
+
         if ($this->usuarioServicio->registrar($resultado['datos'])) {
             Sesion::mensaje('ok', 'Registro ok, activa tu email');
             Sesion::redirigir('auth/login');
+        } else {
+            // el email ya está registrado y activado 
+            Sesion::mensaje('error', 'Este email ya está registrado. Inicia sesión o usa otro email.');
+            Sesion::redirigir('auth/registro');
         }
     }
 
