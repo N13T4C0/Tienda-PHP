@@ -1,5 +1,5 @@
 # Dependencias de Composer (se regeneran con "composer install")
-/vendor/
+vendor/
 
 # Variables de entorno y credenciales (NUNCA subir al repo)
 .env

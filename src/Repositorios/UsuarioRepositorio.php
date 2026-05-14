@@ -168,4 +168,36 @@ class UsuarioRepositorio
         $stmt->execute();
         return (int) $this->bd->lastInsertId();
     }
+
+    public function encontrarPorTokenReset(string $token): ?Usuario
+    {
+        $sql = "SELECT * FROM usuarios
+            WHERE token_reset = :tok
+            AND token_reset_creado >= (NOW() - INTERVAL 1 HOUR)";
+        $stmt = $this->bd->prepare($sql);
+        $stmt->bindParam(':tok', $token, PDO::PARAM_STR);
+        $stmt->execute();
+        $fila = $stmt->fetch();
+        return $fila ? Usuario::fromArray($fila) : null;
+    }
+
+    public function guardarTokenReset(int $id, string $token): bool
+    {
+        $stmt = $this->bd->prepare(
+            "UPDATE usuarios SET token_reset = :tok, token_reset_creado = NOW() WHERE id = :id"
+        );
+        $stmt->bindParam(':tok', $token, PDO::PARAM_STR);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+
+    public function actualizarClave(int $id, string $claveHash): bool
+    {
+        $stmt = $this->bd->prepare(
+            "UPDATE usuarios SET clave = :clave, token_reset = NULL, token_reset_creado = NULL WHERE id = :id"
+        );
+        $stmt->bindParam(':clave', $claveHash, PDO::PARAM_STR);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
 }
