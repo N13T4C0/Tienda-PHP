@@ -38,7 +38,7 @@ class UsuarioServicio
         $id = $this->repositorio->insertar($datosParaDB);
 
         if ($id > 0) {
-            // 4. Enviar el mail (Mantenemos tu lógica de envío)
+            // 4. Enviar el mail 
             EnvioMail::confirmacionRegistro($datos['email'], $datos['nombre'], $token);
             return true;
         }
